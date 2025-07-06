@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package federation;
+
+message NumpyArray {
+    bytes data = 1;           // 数组的原始字节数据
+    repeated int64 shape = 2; // 数组的形状
+    string dtype = 3;         // 数据类型
+}
+
+message ModelParameters {
+    map<string, NumpyArray> parameters = 1;
+}
+
+message TrainingMetrics {
+    float test_acc = 1; // 正确预测的样本数
+    int64 test_num = 2; // 总测试样本数
+    float auc = 3;      // AUC分数
+    float loss = 4;     // 训练损失
+    int64 train_num = 5; // 训练样本数
+}
+
+// 客户端信息消息
+message ClientInfo {
+    string client_id = 1;    // 添加客户端ID以简化通信
+    string model_type = 2;
+    int64 data_size = 3;
+}
+
+message ParametersAndMetrics {
+    ModelParameters parameters = 1;
+    TrainingMetrics metrics = 2;
+}
+
+message RegisterResponse {
+    int64 code = 1;               // 状态码 (200:注册成功, 500:注册失败)
+    ModelParameters parameters = 2; // 初始模型参数
+    string message = 3;           // 可选状态消息
+}
+
+message TrainingStatusRequest {
+    string client_id = 1;
+}
+
+
+message TrainingStatusResponse {
+    int64 code = 1;               // 状态码 (100:等待其他客户端, 200:可以开始训练)
+    string message = 2;           // 状态消息
+    int64 registered_clients = 3;  // 已注册客户端数
+    int64 total_clients = 4;      // 总需要的客户端数
+}
+
+message ClientUpdate {
+    string client_id = 1;
+    int64 round = 2;              // 当前训练轮次
+    ParametersAndMetrics parameters_and_metrics = 3;
+}
+
+message ServerUpdate {
+    int64 current_round = 1;            // 当前全局轮次
+    int64 total_clients = 2;            // 总客户端数
+    ParametersAndMetrics global_model = 3;  // 可选的全局模型
+    string message = 4;                 // 状态消息
+    int64 code = 5;                     // 状态码
+    // 状态码说明:
+    // 100: 参数已接收，等待其他客户端提交
+    // 200: 所有客户端都已提交参数，可以进入下一轮
+    // 300: 训练已完成，客户端应退出
+    // 400: 轮次不匹配
+    // 500: 服务器错误
+}
+
+message GetModelRequest {
+    string client_id = 1;
+    int64 round = 2;              // 客户端当前轮次
+}
+
+message EncryptedNumpyArray {
+  repeated bytes data = 1;
+  repeated int32 shape = 2;
+}
+
+message EncryptedModelParameters {
+  map<string, EncryptedNumpyArray> parameters = 1;
+}
+
+message EncryptedParametersAndMetrics {
+  EncryptedModelParameters parameters = 1;
+  TrainingMetrics metrics = 2;
+}
+
+message EncryptedClientUpdate {
+  string client_id = 1;
+  int32 round = 2;
+  EncryptedParametersAndMetrics parameters_and_metrics = 3;
+}
+
+// 联邦学习服务
+service FederatedLearning {
+    rpc Register(ClientInfo) returns (RegisterResponse);
+    rpc CheckTrainingStatus(TrainingStatusRequest) returns (TrainingStatusResponse);  // 新增RPC方法
+    rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate);
+    rpc GetGlobalModel(GetModelRequest) returns (ModelParameters);
+    rpc SubmitEncryptedUpdate(EncryptedClientUpdate) returns (ServerUpdate);
+} 

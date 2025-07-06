@@ -1,0 +1,19 @@
+# Core Libraries
+numpy==1.26.4        # 科学计算库，支持高效的多维数组运算
+pandas==2.2.2        # 数据分析与处理库，提供DataFrame等结构
+scikit-learn==1.5.1  # 机器学习库，包含常用算法和工具
+scipy==1.10.1        # 科学计算库，补充numpy，包含数值计算、优化等
+# torch==2.4.0        # PyTorch深度学习框架（已由基础镜像自带）
+tqdm==4.65.0         # 进度条显示库
+joblib==1.2.0        # 并行计算与模型持久化工具
+
+# Imbalanced Data
+imbalanced-learn==0.12.3  # 处理类别不平衡问题的机器学习库
+
+# gRPC and Protobuf
+grpcio>=1.71.0        # gRPC远程过程调用框架
+grpcio-tools>=1.71.0  # gRPC相关的工具，生成代码用
+protobuf>=4.23.0      # Google Protocol Buffers，序列化与反序列化
+
+
+phe>=1.4.0,<2.0.0     # Python Paillier同态加密库

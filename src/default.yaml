@@ -1,0 +1,7 @@
+data:
+  test_size: 0.2
+base:
+  random_seed: 42  # 随机种子,默认42
+
+
+
