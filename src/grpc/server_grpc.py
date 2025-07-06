@@ -1,5 +1,3 @@
-# gRPC Server implementation wrapper 
-
 import grpc
 from concurrent import futures
 import os
@@ -189,7 +187,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                         self.current_round += 1
                         self.next_step = True
                         if self.current_round >= self.max_rounds:
-                            logger.info(f"[Round {self.current_round+1}]达到最大轮次 ，结束训练")
+                            logger.info(f"[Round {self.current_round}]达到最大轮次 ，结束训练")
                             self.end_time = time.time()
                             elapsed = self.end_time - self.start_time if self.start_time else None
                             if elapsed is not None:
@@ -316,7 +314,6 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             if not self.use_homomorphic_encryption:
                 try:
                     aggregated_params = self.aggregate_parameters(round_num)
-                    print_param_stats(aggregated_params, param_names=['conv1.weight', 'fc1.weight', 'fc2.bias'], round_num=round_num+1)
                     self.global_model.set_parameters(aggregated_params)
                     logger.info(f"[Round {self.current_round+1}] 全局模型参数更新完成")
                 except Exception as e:
@@ -380,23 +377,6 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         print("Averaged Test AUC: {:.4f}".format(avg_auc))
         print("Std Test Accuracy: {:.4f}".format(np.std(accs)))
         print("Std Test AUC: {:.4f}".format(np.std(aucs)))
-
-def print_param_stats(params, param_names=None, round_num=None):
-    """
-    简洁打印参数统计信息，一行显示所有关心参数的 mean/std。
-    """
-    if param_names is None:
-        param_names = list(params.keys())[:3]
-    stats = []
-    for name in param_names:
-        if name not in params:
-            continue
-        arr = params[name]
-        if isinstance(arr, np.ndarray):
-            stats.append(f"{name}(mean={arr.mean():.4g},std={arr.std():.2g})")
-        else:
-            stats.append(f"{name}={arr}")
-    logger.info(f"[Round {round_num}] 参数统计: " + ", ".join(stats))
 
 def serve():
     """启动gRPC服务器"""

@@ -375,7 +375,6 @@ class FederatedLearningClient:
             
             try:
                 global_params = deserialize_parameters(global_model_response.parameters)
-                print_param_stats(global_params, param_names=['conv1.weight', 'fc1.weight', 'fc2.bias'], round_num=self.current_round+1)
                 self.model.set_parameters(global_params)
                 logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 更新模型参数")
             except Exception as e:
@@ -422,24 +421,6 @@ def main():
             logger.error(f"训练过程中发生错误: {str(e)}")
     else:
         logger.error("无法加载数据，客户端无法启动。")
-
-def print_param_stats(params, param_names=None, round_num=None):
-    """
-    简洁打印参数统计信息，一行显示所有关心参数的 mean/std。
-    """
-    import numpy as np
-    if param_names is None:
-        param_names = list(params.keys())[:3]
-    stats = []
-    for name in param_names:
-        if name not in params:
-            continue
-        arr = params[name]
-        if isinstance(arr, np.ndarray):
-            stats.append(f"{name}(mean={arr.mean():.4g},std={arr.std():.2g})")
-        else:
-            stats.append(f"{name}={arr}")
-    logger.info(f"[Round {round_num}] 参数统计: " + ", ".join(stats))
 
 if __name__ == "__main__":
     main() 
