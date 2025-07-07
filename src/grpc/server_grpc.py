@@ -18,6 +18,7 @@ from src.models.models import FedAvgCNN
 from src.grpc.generated import federation_pb2
 from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
+from src.utils.draw import plot_global_convergence_curve  # 新增：导入绘图函数
 
 logger = get_logger()
 
@@ -28,14 +29,14 @@ class ClientState:
         self.data_size = data_size
         self.current_round = 0
 
-
-
 class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
     def __init__(self, use_homomorphic_encryption=False):        
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.global_model = FedAvgCNN().to(self.device)
         self.clients = {}  
         self.current_round = 0
+        self.acc_delta_threshold = 0.005
+        self.converge_window = 3
         self.count = 0
         self.next_step = False
         self.need_aggregate = False
@@ -43,13 +44,15 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.aggregated_parameters = None
         self.lock = threading.Lock()  
         self.expected_clients = 3
-        self.max_rounds = 10
+        self.max_rounds = 100
         self.use_homomorphic_encryption = use_homomorphic_encryption or os.environ.get("USE_HOMOMORPHIC_ENCRYPTION", "False").lower() == "true"
         logger.info(f"同态加密状态: {'启用' if self.use_homomorphic_encryption else '未启用'}")
         self.start_time = None  
         self.end_time = None   
         self.rs_test_acc = [] 
         self.rs_train_loss = [] 
+        self.rs_auc = []  # 新增：记录每轮AUC
+        self.converged = False
         if self.use_homomorphic_encryption:
             try:
                 import pickle
@@ -126,6 +129,16 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
     def CheckTrainingStatus(self, request, context):
         client_id = request.client_id
         with self.lock:
+            # 新增：收敛判断
+            if self.converged:
+                code = 300
+                message = "训练已收敛，提前终止"
+                return federation_pb2.TrainingStatusResponse(
+                    code=code,
+                    message=message,
+                    registered_clients=self.count,
+                    total_clients=self.expected_clients
+                )
             logger.info(f"[Round {self.current_round+1}] 客户端 {client_id} 检查训练状态，当前next_step={self.next_step}, count={self.count}")
             if self.next_step:
                 code = 200
@@ -182,16 +195,11 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     if submitted_clients >= self.expected_clients:
                         logger.info(f"[Round {self.current_round+1}]所有客户端参数已收集完毕，开始聚合")
                         self.need_aggregate = True
-                        # 先聚合，再自增轮次
                         threading.Thread(target=self._process_round_completion, args=(round_num,), daemon=True).start()
                         self.current_round += 1
+                        time.sleep(1)
                         self.next_step = True
-                        if self.current_round >= self.max_rounds:
-                            logger.info(f"[Round {self.current_round}]达到最大轮次 ，结束训练")
-                            self.end_time = time.time()
-                            elapsed = self.end_time - self.start_time if self.start_time else None
-                            if elapsed is not None:
-                                logger.info(f"联邦学习流程总耗时: {elapsed:.2f} 秒")
+                        
                     response_kwargs = dict(
                         code=200,
                         current_round=self.current_round,
@@ -253,12 +261,6 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     threading.Thread(target=self._process_round_completion, args=(round_num,), daemon=True).start()
                     self.current_round += 1
                     self.next_step = True
-                    if self.current_round >= self.max_rounds:
-                        logger.info(f"达到最大轮次 {self.max_rounds}，结束训练")
-                        self.end_time = time.time()
-                        elapsed = self.end_time - self.start_time if self.start_time else None
-                        if elapsed is not None:
-                            logger.info(f"联邦学习流程总耗时: {elapsed:.2f} 秒")
 
                 return federation_pb2.ServerUpdate(
                     code=200,
@@ -289,7 +291,6 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
         return model_params
             
-
     def aggregate_encrypted_parameters(self, parameters_list, client_weights, private_key):
         """对密文参数进行同态加权聚合并解密，返回明文参数字典"""
         param_structure = parameters_list[0]
@@ -315,7 +316,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 try:
                     aggregated_params = self.aggregate_parameters(round_num)
                     self.global_model.set_parameters(aggregated_params)
-                    logger.info(f"[Round {self.current_round+1}] 全局模型参数更新完成")
+                    logger.info(f"[Round {self.current_round}] 全局模型参数更新完成")
                 except Exception as e:
                     logger.error(f"参数聚合或模型更新时出错: {str(e)}")
                     logger.exception(e)
@@ -332,6 +333,15 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 self.global_model.set_parameters(aggregated)
                 logger.info(f"全局模型参数更新完成（同态加密聚合+解密）")
 
+            if self.converged or self.current_round  >= self.max_rounds:
+                plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc)
+                logger.info("训练结束，已绘制收敛曲线图 out/convergence_curve.png")
+                logger.info(f"达到最大轮次 {self.current_round }，结束训练")
+                self.end_time = time.time()
+                elapsed = self.end_time - self.start_time if self.start_time else None
+                self.converged = True
+                if elapsed is not None:
+                    logger.info(f"联邦学习流程总耗时: {elapsed:.2f} 秒")
             logger.info(f"轮次 {round_num+1} 处理完成")
         except Exception as e:
             logger.error(f"处理轮次完成时出错: {str(e)}")
@@ -372,11 +382,21 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             self.rs_train_loss.append(avg_loss)
         else:
             loss.append(avg_loss)
-        print("Averaged Train Loss: {:.4f}".format(avg_loss))
-        print("Averaged Test Accuracy: {:.4f}".format(avg_acc))
-        print("Averaged Test AUC: {:.4f}".format(avg_auc))
-        print("Std Test Accuracy: {:.4f}".format(np.std(accs)))
-        print("Std Test AUC: {:.4f}".format(np.std(aucs)))
+        self.rs_auc.append(avg_auc) 
+        logger.info("Averaged Train Loss: {:.4f}".format(avg_loss))
+        logger.info("Averaged Test Accuracy: {:.4f}".format(avg_acc))
+        logger.info("Averaged Test AUC: {:.4f}".format(avg_auc))
+        logger.info("Std Test Accuracy: {:.4f}".format(np.std(accs)))
+        logger.info("Std Test AUC: {:.4f}".format(np.std(aucs)))
+        # 自动收敛判断
+        if len(self.rs_test_acc) >= self.converge_window + 1:
+            window = self.converge_window
+            recent_accs = self.rs_test_acc[-(window+1):]
+            acc_delta = max(recent_accs) - min(recent_accs)
+            threshold = self.acc_delta_threshold
+            if acc_delta < threshold:
+                self.converged = True
+                logger.info(f"[自动收敛] 最近{window+1}轮准确率变化({acc_delta:.6f})小于阈值({threshold})，判定收敛，训练将提前终止。")
 
 def serve():
     """启动gRPC服务器"""

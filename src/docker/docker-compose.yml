@@ -13,6 +13,7 @@ services:
     volumes:
       - ../../certs/server:/app/certs:ro
       - ../../logs:/app/logs
+      - ../../out:/app/out
     networks:
       - federated-network
 

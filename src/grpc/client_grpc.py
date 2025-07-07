@@ -28,12 +28,12 @@ class FederatedLearningClient:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = FedAvgCNN().to(self.device)
         self.num_classes = 10
-        self.global_rounds = 10
         self.current_round = 0
         self.batch_size = 100
         self.server_host = os.environ.get("GRPC_SERVER_HOST", "localhost")
         self.server_port = os.environ.get("GRPC_SERVER_PORT", "50051")
         self._init_data(data)
+        self.continue_training = True
 
         self.use_homomorphic_encryption = use_homomorphic_encryption
         logger.info(f"同态加密状态: {'启用' if self.use_homomorphic_encryption else '未启用'}")
@@ -294,7 +294,7 @@ class FederatedLearningClient:
                 logger.info(f"所有客户端已就绪，开始训练")
                 break
         
-        while self.current_round < self.global_rounds:
+        while self.continue_training:
             logger.info(f"[Round {self.current_round+1}] 开始训练")
             self.train()
             logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 完成本地训练")
@@ -358,6 +358,10 @@ class FederatedLearningClient:
                 elif status_response.code == 200:
                     logger.info(f"[Round {self.current_round+1}] 所有客户端已就绪，开始请求全局模型")
                     break
+                elif status_response.code == 300:
+                    self.continue_training = False
+                    logger.info(f"[Round {self.current_round+1}] 检测到服务器收敛信号，客户端提前终止训练")
+                    break
                 else:
                     logger.error(f"检查训练状态失败，状态码: {status_response.code}, 消息: {status_response.message}")
                     return
@@ -381,7 +385,8 @@ class FederatedLearningClient:
                 logger.error(f"[Round {self.current_round}] 反序列化或设置模型参数异常: {str(e)}", exc_info=True)
                 raise
             self.current_round += 1
-        logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 完成训练")
+
+        logger.info(f"[Round {self.current_round}] 客户端 {self.client_id} 完成训练")
         
     def __del__(self):
         """清理资源"""
