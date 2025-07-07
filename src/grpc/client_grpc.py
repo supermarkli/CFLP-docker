@@ -11,6 +11,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import label_binarize
 from sklearn import metrics
+from tqdm import tqdm 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -102,7 +103,7 @@ class FederatedLearningClient:
             y_test = data.get('y_test')
             if X_train is not None and y_train is not None:
                 X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-                y_train_tensor = torch.tensor(y_train, dtype=torch.int64)
+                y_train_tensor = torch.tensor(y_train, dtype=torch.long)
                 train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
                 self.train_data = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=True)
                 self.data_size = len(X_train_tensor)
@@ -113,7 +114,7 @@ class FederatedLearningClient:
                 logger.warning("未提供训练集数据")
             if X_test is not None and y_test is not None:
                 X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
-                y_test_tensor = torch.tensor(y_test, dtype=torch.int64)
+                y_test_tensor = torch.tensor(y_test, dtype=torch.long)
                 test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
                 self.test_data = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, drop_last=False)
                 logger.debug(f"数据集划分完成 - 测试集: {X_test_tensor.shape}")
@@ -231,19 +232,29 @@ class FederatedLearningClient:
         parameters = self.model.get_parameters()
         encrypted_parameters = {}
         for key, value in parameters.items():
-            if isinstance(value, np.ndarray):
-                flat = value.flatten()
-                encrypted_bytes = [pickle.dumps(self.public_key.encrypt(v)) for v in flat]
-                encrypted_parameters[key] = {
-                    'data': encrypted_bytes,
-                    'shape': list(value.shape)
-                }
-            else:
-                encrypted_bytes = [pickle.dumps(self.public_key.encrypt(value))]
-                encrypted_parameters[key] = {
-                    'data': encrypted_bytes,
-                    'shape': [1]
-                }
+            try:
+                if isinstance(value, np.ndarray):
+                    flat = value.flatten()
+                    total = len(flat)
+                    encrypted_bytes = []
+                    logger.info(f"开始加密参数 {key}, 形状: {value.shape}, 总参数量: {total}")
+                    for i, v in enumerate(flat):
+                        encrypted_bytes.append(pickle.dumps(self.public_key.encrypt(float(v))))
+                        if (i + 1) % 1000 == 0:
+                            logger.info(f"参数 {key} 加密进度: {i + 1}/{total} ({(i + 1)/total*100:.1f}%)")
+                    encrypted_parameters[key] = {
+                        'data': encrypted_bytes,
+                        'shape': list(value.shape)
+                    }
+                else:
+                    encrypted_bytes = [pickle.dumps(self.public_key.encrypt(float(value)))]
+                    encrypted_parameters[key] = {
+                        'data': encrypted_bytes,
+                        'shape': [1]
+                    }
+            except Exception as e:
+                logger.error(f"加密参数 {key} 时出错: {e}", exc_info=True)
+                raise
         proto_params = {}
         for k, v in encrypted_parameters.items():
             proto_params[k] = federation_pb2.EncryptedNumpyArray(
@@ -251,21 +262,56 @@ class FederatedLearningClient:
                 shape=v['shape']
             )
         model_parameters = federation_pb2.EncryptedModelParameters(parameters=proto_params)
+
+        encrypted_metrics = {}
+        metrics_to_encrypt = {
+            'test_acc': float(metrics.get('test_acc', 0.0)),
+            'test_num': float(metrics.get('test_num', 0.0)),  # 转换为float进行加密
+            'auc': float(metrics.get('auc', 0.0)),
+            'loss': float(metrics.get('loss', 0.0)),
+            'train_num': float(metrics.get('train_num', 0.0))  # 转换为float进行加密
+        }
+        
+        for key, value in metrics_to_encrypt.items():
+            encrypted_metrics[key] = pickle.dumps(self.public_key.encrypt(float(value)))
+
+        encrypted_metrics_proto = federation_pb2.EncryptedTrainingMetrics(
+            test_acc=encrypted_metrics['test_acc'],
+            test_num=encrypted_metrics['test_num'],
+            auc=encrypted_metrics['auc'],
+            loss=encrypted_metrics['loss'],
+            train_num=encrypted_metrics['train_num']
+        )
+
         params_and_metrics = federation_pb2.EncryptedParametersAndMetrics(
             parameters=model_parameters,
-            metrics=federation_pb2.TrainingMetrics(
-                accuracy=metrics.get('accuracy', 0.0),
-                precision=metrics.get('precision', 0.0),
-                recall=metrics.get('recall', 0.0),
-                f1=metrics.get('f1', 0.0),
-                auc_roc=metrics.get('auc_roc', 0.0)
-            )
+            metrics=encrypted_metrics_proto
         )
+
         return federation_pb2.EncryptedClientUpdate(
             client_id=self.client_id,
             round=self.current_round,
             parameters_and_metrics=params_and_metrics
         )
+
+    def _submit_with_retry(self, submit_func, parameter_update, log_prefix, max_retries=5, retry_interval=1):
+        for attempt in range(max_retries):
+            try:
+                submit_func(parameter_update)
+                logger.info(f"{log_prefix} 调用成功")
+                return
+            except grpc._channel._InactiveRpcError as e:
+                if e.code() == grpc.StatusCode.UNAVAILABLE:
+                    logger.warning(f"{log_prefix} 连接断开，重试 {attempt+1}/{max_retries}，原因: {e.details()}")
+                    time.sleep(retry_interval)
+                else:
+                    logger.error(f"{log_prefix} 调用异常: {str(e)}", exc_info=True)
+                    raise
+            except Exception as e:
+                logger.error(f"{log_prefix} 调用异常: {str(e)}", exc_info=True)
+                raise
+        logger.error(f"{log_prefix} 多次重试后仍失败")
+        raise RuntimeError(f"{log_prefix} 多次重试后仍失败")
 
     def participate_in_training(self):
         """参与联邦学习训练"""
@@ -310,35 +356,17 @@ class FederatedLearningClient:
                 'train_num': train_num
                 }
             if self.use_homomorphic_encryption:
+                logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 正在加密模型参数...")
                 parameter_update = self._create_encrypted_parameter_update_message(metrics)
-                logger.info(f"[Round {self.current_round}] 尝试提交密文参数更新，参数类型: {type(parameter_update)}")
-                try:
-                    self.stub.SubmitEncryptedUpdate(parameter_update)
-                    logger.info(f"[Round {self.current_round}] SubmitEncryptedUpdate 调用成功")
-                except Exception as e:
-                    logger.error(f"[Round {self.current_round}] SubmitEncryptedUpdate 调用异常: {str(e)}", exc_info=True)
-                    raise
-                logger.info(f"客户端 {self.client_id} 提交轮次 {self.current_round+1} 的密文参数更新")
+                log_prefix = f"[Round {self.current_round}] SubmitEncryptedUpdate"
+                self._submit_with_retry(self.stub.SubmitEncryptedUpdate, parameter_update, log_prefix)
+                logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 提交密文参数更新成功")
             else:
+                logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 正在创建明文参数更新消息...")
                 parameter_update = self._create_parameter_update_message(metrics)
-                logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 尝试提交明文参数更新")
-                max_retries = 5
-                retry_interval = 1  # 秒
-                for attempt in range(max_retries):
-                    try:
-                        self.stub.SubmitUpdate(parameter_update)
-                        logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 提交明文参数更新成功")
-                        break
-                    except grpc._channel._InactiveRpcError as e:
-                        if e.code() == grpc.StatusCode.UNAVAILABLE:
-                            logger.warning(f"[Round {self.current_round+1}] SubmitUpdate 连接断开，重试 {attempt+1}/{max_retries}，原因: {e.details()}")
-                            time.sleep(retry_interval)
-                        else:
-                            logger.error(f"[Round {self.current_round+1}] SubmitUpdate 调用异常: {str(e)}", exc_info=True)
-                            raise
-                else:
-                    logger.error(f"[Round {self.current_round+1}] SubmitUpdate 多次重试后仍失败")
-                    raise RuntimeError("SubmitUpdate 多次重试后仍失败")
+                log_prefix = f"[Round {self.current_round+1}] SubmitUpdate"
+                self._submit_with_retry(self.stub.SubmitUpdate, parameter_update, log_prefix)
+                logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 提交明文参数更新成功")
             
             while True:
                 logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 等待其他客户端提交参数")
@@ -417,7 +445,7 @@ def load_client_data():
 def main():
     client_data = load_client_data()
     if client_data:
-        client = FederatedLearningClient(data=client_data, use_homomorphic_encryption=False)
+        client = FederatedLearningClient(data=client_data, use_homomorphic_encryption=True)
         try:
             client.participate_in_training()
         except KeyboardInterrupt:

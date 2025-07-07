@@ -10,12 +10,13 @@ plt.rcParams['axes.unicode_minus'] = False
 save_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'out'))
 os.makedirs(save_dir, exist_ok=True)
 
-def plot_global_convergence_curve(acc_list, loss_list=None, auc_list=None):
+def plot_global_convergence_curve(acc_list, loss_list=None, auc_list=None, prefix=''):
     """
     绘制全局模型收敛曲线，将accuracy、loss和AUC分别绘制成独立的图表。
     acc_list: 每轮的accuracy列表
     loss_list: 每轮的loss列表（可选）
     auc_list: 每轮的AUC列表（可选）
+    prefix: 文件名前缀（可选）
     """
     rounds = np.arange(1, len(acc_list)+1)
     
@@ -27,7 +28,7 @@ def plot_global_convergence_curve(acc_list, loss_list=None, auc_list=None):
     plt.title('全局模型测试准确率')
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, 'accuracy_curve.png'), dpi=300)
+    plt.savefig(os.path.join(save_dir, f'{prefix}accuracy_curve.png'), dpi=300)
     plt.close()
 
     # 绘制Loss曲线（如果提供）
@@ -39,7 +40,7 @@ def plot_global_convergence_curve(acc_list, loss_list=None, auc_list=None):
         plt.title('全局模型训练损失')
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.tight_layout()
-        plt.savefig(os.path.join(save_dir, 'loss_curve.png'), dpi=300)
+        plt.savefig(os.path.join(save_dir, f'{prefix}loss_curve.png'), dpi=300)
         plt.close()
 
     # 绘制AUC曲线（如果提供）
@@ -51,7 +52,7 @@ def plot_global_convergence_curve(acc_list, loss_list=None, auc_list=None):
         plt.title('全局模型测试AUC')
         plt.grid(True, linestyle='--', alpha=0.6)
         plt.tight_layout()
-        plt.savefig(os.path.join(save_dir, 'auc_curve.png'), dpi=300)
+        plt.savefig(os.path.join(save_dir, f'{prefix}auc_curve.png'), dpi=300)
         plt.close()
 
 

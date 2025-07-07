@@ -15,8 +15,8 @@ grpcio>=1.71.0        # gRPC远程过程调用框架
 grpcio-tools>=1.71.0  # gRPC相关的工具，生成代码用
 protobuf>=4.23.0      # Google Protocol Buffers，序列化与反序列化
 
-
 phe>=1.4.0,<2.0.0     # Python Paillier同态加密库
 
 matplotlib>=3.0.0      # 绘图库，支持收敛曲线等可视化
 seaborn>=0.11.0        # 统计数据可视化库，辅助美化图表
+tqdm>=4.65.0           #进度条

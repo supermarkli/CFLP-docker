@@ -220,54 +220,63 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             )
 
     def SubmitEncryptedUpdate(self, request, context):
-        """接收客户端密文模型更新（只反序列化密文，不解密）"""
+        """接收客户端密文模型更新（保持metrics加密状态）"""
         try:
             import pickle
             client_id = request.client_id
             round_num = request.round
-            logger.info(f"接收到客户端 {client_id} 的密文参数更新，轮次: {round_num+1}")
+            # 保持参数和metrics都处于加密状态
+            encrypted_params = request.parameters_and_metrics.parameters.parameters
+            params = {}
+            for key, enc_array in encrypted_params.items():
+                flat = [pickle.loads(b) for b in enc_array.data]
+                arr = np.array(flat, dtype=object).reshape(enc_array.shape)
+                params[key] = arr
+
+            # 存储加密的metrics
+            encrypted_metrics = {
+                'test_acc': pickle.loads(request.parameters_and_metrics.metrics.test_acc),
+                'test_num': pickle.loads(request.parameters_and_metrics.metrics.test_num),
+                'auc': pickle.loads(request.parameters_and_metrics.metrics.auc),
+                'loss': pickle.loads(request.parameters_and_metrics.metrics.loss),
+                'train_num': pickle.loads(request.parameters_and_metrics.metrics.train_num)
+            }
+            
+            logger.info(f"[Round {self.current_round+1}] 接收到客户端 {client_id} 的密文参数更新")
+            response_kwargs = {}
+
             with self.lock:
-                # 检查轮次是否匹配
                 if round_num != self.current_round:
                     logger.warning(f"客户端 {client_id} 的轮次 {round_num+1} 与服务器当前轮次 {self.current_round+1} 不匹配")
-                    return federation_pb2.ServerUpdate(
+                    response_kwargs = dict(
                         code=400,
                         current_round=self.current_round,
                         message=f"轮次不匹配，当前服务器轮次为 {self.current_round+1}",
                         total_clients=self.expected_clients
                     )
-                # 只反序列化密文参数，不解密
-                encrypted_params = request.parameters_and_metrics.parameters.parameters
-                params = {}
-                for key, enc_array in encrypted_params.items():
-                    flat = [pickle.loads(b) for b in enc_array.data]
-                    arr = np.array(flat, dtype=object).reshape(enc_array.shape)
-                    params[key] = arr
-                self.client_parameters[round_num][client_id] = params
-                # 更新客户端状态
-                if client_id in self.clients:
-                    self.clients[client_id].current_round = round_num
-                    self.clients[client_id].metrics = {
-                        'test_acc': request.parameters_and_metrics.metrics.test_acc,
-                        'test_num': request.parameters_and_metrics.metrics.test_num,
-                        'auc': request.parameters_and_metrics.metrics.auc,
-                        'loss': request.parameters_and_metrics.metrics.loss,
-                        'train_num': request.parameters_and_metrics.metrics.train_num
-                    }
-                logger.info(f"存储客户端 {client_id} 密文参数（未解密），当前轮次 {round_num+1} 已提交 {len(self.client_parameters[round_num])}/{self.expected_clients}个客户端")
-                submitted_clients = len(self.client_parameters[round_num])
-                if submitted_clients >= self.expected_clients:
-                    logger.info(f"轮次 {round_num+1} 所有客户端参数已收集完毕，开始聚合")
-                    threading.Thread(target=self._process_round_completion, args=(round_num,), daemon=True).start()
-                    self.current_round += 1
-                    self.next_step = True
+                else:
+                    self.client_parameters[round_num][client_id] = params
+                    if client_id in self.clients:
+                        self.clients[client_id].current_round = round_num
+                        self.clients[client_id].encrypted_metrics = encrypted_metrics  # 存储加密的metrics
+                    logger.info(f"[Round {self.current_round+1}] 存储客户端 {client_id} 密文参数更新,已提交 {len(self.client_parameters[round_num])}/{self.expected_clients}个客户端")
+                    submitted_clients = len(self.client_parameters[round_num])
+                    if submitted_clients >= self.expected_clients:
+                        logger.info(f"[Round {self.current_round+1}]所有客户端参数已收集完毕，开始聚合")
+                        threading.Thread(target=self._process_round_completion, args=(round_num,), daemon=True).start()
+                        self.current_round += 1
+                        time.sleep(1)
+                        self.next_step = True
+                        
+                    response_kwargs = dict(
+                        code=200,
+                        current_round=self.current_round,
+                        message="",
+                        total_clients=self.expected_clients
+                    )
 
-                return federation_pb2.ServerUpdate(
-                    code=200,
-                    current_round=self.current_round,
-                    message="",
-                    total_clients=self.expected_clients
-                )
+            return federation_pb2.ServerUpdate(**response_kwargs)
+
         except Exception as e:
             logger.error(f"处理客户端密文更新时出错: {str(e)}")
             logger.exception(e)
@@ -291,23 +300,50 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
         return model_params
             
-    def aggregate_encrypted_parameters(self, parameters_list, client_weights, private_key):
-        """对密文参数进行同态加权聚合并解密，返回明文参数字典"""
-        param_structure = parameters_list[0]
-        aggregated = {}
-        for param_name in param_structure.keys():
-            param_shape = parameters_list[0][param_name].shape
-            agg = None
-            for i, (params, weight) in enumerate(zip(parameters_list, client_weights)):
-                param_value = params[param_name]
-                weighted = np.vectorize(lambda x: x * weight, otypes=[object])(param_value)
-                if agg is None:
-                    agg = weighted
-                else:
-                    agg = np.vectorize(lambda a, b: a + b, otypes=[object])(agg, weighted)
-            decrypted = np.vectorize(private_key.decrypt)(agg)
-            aggregated[param_name] = decrypted.reshape(param_shape)
-        return aggregated
+    def aggregate_encrypted_parameters(self, round_num):
+        """聚合加密的客户端参数，保证参数和权重顺序严格一致"""
+        try:
+            self.evaluate()
+            active_client_ids = list(self.client_parameters[round_num].keys())
+            parameters_list = [self.client_parameters[round_num][cid] for cid in active_client_ids]
+            active_clients = [self.clients[cid] for cid in active_client_ids]
+            total_data_size = sum(client.data_size for client in active_clients)
+            client_weights = [client.data_size / total_data_size for client in active_clients]
+            logger.info(f"开始聚合密文参数，参数列表长度: {len(parameters_list)}")
+            if not parameters_list:
+                raise ValueError("参数列表为空")
+            param_structure = parameters_list[0]
+            aggregated = {}
+            logger.info(f"当前轮次活跃客户端IDs: {active_client_ids}")
+            logger.info(f"计算客户端权重完成: {client_weights}")
+            
+            for param_name in param_structure.keys():
+                if not all(param_name in params for params in parameters_list):
+                    raise ValueError(f"参数 {param_name} 在某些客户端中缺失")
+                param_shape = parameters_list[0][param_name].shape
+                agg_array = None
+                for j, (params, weight) in enumerate(zip(parameters_list, client_weights)):
+                    logger.debug(f"聚合密文参数 {param_name}: 客户端 {j+1}/{len(parameters_list)}, 权重 {weight}")
+                    param_value = params[param_name]
+                    if param_value.shape != param_shape:
+                        raise ValueError(f"参数 {param_name} 的形状不一致")
+                    # 对每个加密值进行加权
+                    weighted_array = np.vectorize(lambda x: x * weight, otypes=[object])(param_value)
+                    if agg_array is None:
+                        agg_array = weighted_array
+                    else:
+                        # 同态加密支持加法，直接相加
+                        agg_array = np.vectorize(lambda a, b: a + b, otypes=[object])(agg_array, weighted_array)
+                
+                # 解密聚合后的参数
+                decrypted = np.vectorize(self.private_key.decrypt)(agg_array)
+                aggregated[param_name] = decrypted.reshape(param_shape)
+            
+            return aggregated
+        except Exception as e:
+            logger.error(f"密文参数聚合过程中发生错误: {str(e)}")
+            logger.exception(e)
+            raise
 
     def _process_round_completion(self, round_num):
         """处理轮次完成，聚合参数并更新全局模型（支持同态加密）"""
@@ -322,19 +358,19 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     logger.exception(e)
                     raise
             else:
-                # 同态加密聚合
-                logger.info("开始同态加密参数聚合")
-                active_client_ids = list(self.client_parameters[round_num].keys())
-                active_clients = {cid: self.clients[cid] for cid in active_client_ids if cid in self.clients}
-                total_data_size = sum(client.data_size for client in active_clients.values())
-                client_weights = [client.data_size / total_data_size for client in active_clients.values()]
-                logger.info(f"同态聚合权重: {client_weights}")
-                aggregated = self.aggregate_encrypted_parameters(self.client_parameters[round_num], client_weights, self.private_key)
-                self.global_model.set_parameters(aggregated)
-                logger.info(f"全局模型参数更新完成（同态加密聚合+解密）")
+                try:
+                    logger.info("开始同态加密参数聚合")
+                    aggregated_params = self.aggregate_encrypted_parameters(round_num)
+                    self.global_model.set_parameters(aggregated_params)
+                    logger.info(f"[Round {self.current_round}] 全局模型参数更新完成（同态加密聚合）")
+                except Exception as e:
+                    logger.error(f"密文参数聚合或模型更新时出错: {str(e)}")
+                    logger.exception(e)
+                    raise
 
             if self.converged or self.current_round  >= self.max_rounds:
-                plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc)
+                prefix = 'he_' if self.use_homomorphic_encryption else ''
+                plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc, prefix=prefix)
                 logger.info("训练结束，已绘制收敛曲线图 out/convergence_curve.png")
                 logger.info(f"达到最大轮次 {self.current_round }，结束训练")
                 self.end_time = time.time()
@@ -349,31 +385,70 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
     def evaluate(self, acc=None, loss=None):
         """评估所有客户端的平均准确率、AUC和训练损失，并打印和保存历史"""
-        total_test_acc = 0
-        total_test_num = 0
-        total_auc = 0
-        total_loss = 0
-        total_train_num = 0
-        accs = []
-        aucs = []
-        for c in self.clients.values():
-            m = getattr(c, 'metrics', None)
-            if m:
-                ta = m.get('test_acc', 0)
-                tn = m.get('test_num', 0)
-                auc = m.get('auc', 0)
-                l = m.get('loss', 0)
-                trn = m.get('train_num', 0)
-                total_test_acc += ta
-                total_test_num += tn
-                total_auc += auc * tn
-                total_loss += l * trn
-                total_train_num += trn
-                accs.append(ta / tn if tn > 0 else 0)
-                aucs.append(auc)
+        if not self.use_homomorphic_encryption:
+            # 明文metrics的处理逻辑保持不变
+            total_test_acc = 0
+            total_test_num = 0
+            total_auc = 0
+            total_loss = 0
+            total_train_num = 0
+            accs = []
+            aucs = []
+            for c in self.clients.values():
+                m = getattr(c, 'metrics', None)
+                if m:
+                    ta = m.get('test_acc', 0)
+                    tn = m.get('test_num', 0)
+                    auc = m.get('auc', 0)
+                    l = m.get('loss', 0)
+                    trn = m.get('train_num', 0)
+                    total_test_acc += ta
+                    total_test_num += tn
+                    total_auc += auc * tn
+                    total_loss += l * trn
+                    total_train_num += trn
+                    accs.append(ta / tn if tn > 0 else 0)
+                    aucs.append(auc)
+        else:
+            agg_test_acc = None
+            agg_test_num = None
+            agg_auc = None
+            agg_loss = None
+            agg_train_num = None
+            # 新增：累加所有客户端的加密指标
+            for c in self.clients.values():
+                encrypted_metrics = getattr(c, 'encrypted_metrics', None)
+                if encrypted_metrics:
+                    if agg_test_acc is None:
+                        agg_test_acc = encrypted_metrics['test_acc']
+                        agg_test_num = encrypted_metrics['test_num']
+                        agg_auc = encrypted_metrics['auc']
+                        agg_loss = encrypted_metrics['loss']
+                        agg_train_num = encrypted_metrics['train_num']
+                    else:
+                        agg_test_acc += encrypted_metrics['test_acc']
+                        agg_test_num += encrypted_metrics['test_num']
+                        agg_auc += encrypted_metrics['auc']
+                        agg_loss += encrypted_metrics['loss']
+                        agg_train_num += encrypted_metrics['train_num']
+            if agg_test_acc is not None:
+                total_test_acc = self.private_key.decrypt(agg_test_acc)
+                total_test_num = int(self.private_key.decrypt(agg_test_num))
+                total_auc = self.private_key.decrypt(agg_auc)
+                total_loss = self.private_key.decrypt(agg_loss)
+                total_train_num = int(self.private_key.decrypt(agg_train_num))
+            else:
+                total_test_acc = 0
+                total_test_num = 0
+                total_auc = 0
+                total_loss = 0
+                total_train_num = 0
+
+        # 计算平均值
         avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
         avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
         avg_loss = total_loss / total_train_num if total_train_num > 0 else 0
+
         if acc is None:
             self.rs_test_acc.append(avg_acc)
         else:
@@ -382,13 +457,15 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             self.rs_train_loss.append(avg_loss)
         else:
             loss.append(avg_loss)
-        self.rs_auc.append(avg_auc) 
+        self.rs_auc.append(avg_auc)
+
         logger.info("Averaged Train Loss: {:.4f}".format(avg_loss))
         logger.info("Averaged Test Accuracy: {:.4f}".format(avg_acc))
         logger.info("Averaged Test AUC: {:.4f}".format(avg_auc))
-        logger.info("Std Test Accuracy: {:.4f}".format(np.std(accs)))
-        logger.info("Std Test AUC: {:.4f}".format(np.std(aucs)))
-        # 自动收敛判断
+        if not self.use_homomorphic_encryption:
+            logger.info("Std Test Accuracy: {:.4f}".format(np.std(accs)))
+            logger.info("Std Test AUC: {:.4f}".format(np.std(aucs)))
+
         if len(self.rs_test_acc) >= self.converge_window + 1:
             window = self.converge_window
             recent_accs = self.rs_test_acc[-(window+1):]
@@ -411,7 +488,7 @@ def serve():
     
     # 添加服务
     federation_pb2_grpc.add_FederatedLearningServicer_to_server(
-        FederatedLearningServicer(use_homomorphic_encryption=False), server
+        FederatedLearningServicer(use_homomorphic_encryption=True), server
     )
     
     port = os.environ.get("GRPC_SERVER_PORT", "50051")
