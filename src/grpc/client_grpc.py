@@ -12,6 +12,19 @@ from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import label_binarize
 from sklearn import metrics
 from tqdm import tqdm 
+import random  # 新增
+
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed(42)  # 在模块加载时设置随机种子
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -86,12 +99,8 @@ class FederatedLearningClient:
         
         self.stub = federation_pb2_grpc.FederatedLearningStub(self.channel)
         self.loss = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01)
-        self.learning_rate_scheduler = torch.optim.lr_scheduler.ExponentialLR(
-            optimizer=self.optimizer, 
-            gamma=0.99
-        )
-        self.learning_rate_decay = True
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001)
+
         logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}")
 
     def _init_data(self, data):
@@ -228,28 +237,37 @@ class FederatedLearningClient:
         )
 
     def _create_encrypted_parameter_update_message(self, metrics):
-        """创建参数更新消息（密文）"""  
+        """创建参数更新消息（密文，分块整体pickle优化）"""
         parameters = self.model.get_parameters()
         encrypted_parameters = {}
+        import gc
+        chunk_size = 100000  # 可根据内存情况调整
         for key, value in parameters.items():
             try:
                 if isinstance(value, np.ndarray):
                     flat = value.flatten()
+                    encrypted_chunks = []
                     total = len(flat)
-                    encrypted_bytes = []
                     logger.info(f"开始加密参数 {key}, 形状: {value.shape}, 总参数量: {total}")
-                    for i, v in enumerate(flat):
-                        encrypted_bytes.append(pickle.dumps(self.public_key.encrypt(float(v))))
-                        if (i + 1) % 1000 == 0:
-                            logger.info(f"参数 {key} 加密进度: {i + 1}/{total} ({(i + 1)/total*100:.1f}%)")
+                    for i in range(0, total, chunk_size):
+                        chunk = flat[i:i+chunk_size]
+                        encrypted_chunk = [self.public_key.encrypt(float(v)) for v in chunk]
+                        encrypted_bytes = pickle.dumps(encrypted_chunk)
+                        encrypted_chunks.append(encrypted_bytes)
+                        del encrypted_chunk, encrypted_bytes
+                        gc.collect()
+                        logger.info(f"参数 {key} 加密进度: {min(i+chunk_size, total)}/{total} ({(min(i+chunk_size, total)/total)*100:.1f}%)")
                     encrypted_parameters[key] = {
-                        'data': encrypted_bytes,
+                        'data': encrypted_chunks,  
                         'shape': list(value.shape)
                     }
+                    del flat, encrypted_chunks
+                    gc.collect()
                 else:
-                    encrypted_bytes = [pickle.dumps(self.public_key.encrypt(float(value)))]
+                    encrypted_value = self.public_key.encrypt(float(value))
+                    encrypted_bytes = pickle.dumps([encrypted_value])
                     encrypted_parameters[key] = {
-                        'data': encrypted_bytes,
+                        'data': [encrypted_bytes],
                         'shape': [1]
                     }
             except Exception as e:
@@ -266,10 +284,10 @@ class FederatedLearningClient:
         encrypted_metrics = {}
         metrics_to_encrypt = {
             'test_acc': float(metrics.get('test_acc', 0.0)),
-            'test_num': float(metrics.get('test_num', 0.0)),  # 转换为float进行加密
+            'test_num': float(metrics.get('test_num', 0.0)),
             'auc': float(metrics.get('auc', 0.0)),
             'loss': float(metrics.get('loss', 0.0)),
-            'train_num': float(metrics.get('train_num', 0.0))  # 转换为float进行加密
+            'train_num': float(metrics.get('train_num', 0.0))
         }
         
         for key, value in metrics_to_encrypt.items():

@@ -9,6 +9,19 @@ import threading
 import time
 import torch
 from torch.utils.data import TensorDataset, DataLoader
+import random  # 新增
+
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed(42)  # 在模块加载时设置随机种子
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -35,7 +48,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.global_model = FedAvgCNN().to(self.device)
         self.clients = {}  
         self.current_round = 0
-        self.acc_delta_threshold = 0.005
+        self.acc_delta_threshold = 0.001
         self.converge_window = 3
         self.count = 0
         self.next_step = False
@@ -220,7 +233,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             )
 
     def SubmitEncryptedUpdate(self, request, context):
-        """接收客户端密文模型更新（保持metrics加密状态）"""
+        """接收客户端密文模型更新（适配分块整体pickle解包）"""
         try:
             import pickle
             client_id = request.client_id
@@ -229,7 +242,9 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             encrypted_params = request.parameters_and_metrics.parameters.parameters
             params = {}
             for key, enc_array in encrypted_params.items():
-                flat = [pickle.loads(b) for b in enc_array.data]
+                flat = []
+                for b in enc_array.data:
+                    flat.extend(pickle.loads(b))
                 arr = np.array(flat, dtype=object).reshape(enc_array.shape)
                 params[key] = arr
 
