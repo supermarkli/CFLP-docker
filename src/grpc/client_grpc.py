@@ -76,8 +76,8 @@ class FederatedLearningClient:
                 f"{self.server_host}:{self.server_port}",
                 credentials,
                 options=[
-                    ('grpc.max_send_message_length', 50 * 1024 * 1024),
-                    ('grpc.max_receive_message_length', 50 * 1024 * 1024)
+                    ('grpc.max_send_message_length', 500 * 1024 * 1024),
+                    ('grpc.max_receive_message_length', 500 * 1024 * 1024)
                 ]
             )
             logger.info("使用安全通道(SSL/TLS)连接服务器")
@@ -87,8 +87,8 @@ class FederatedLearningClient:
             self.channel = grpc.insecure_channel(
                 f"{self.server_host}:{self.server_port}",
                 options=[
-                    ('grpc.max_send_message_length', 50 * 1024 * 1024),
-                    ('grpc.max_receive_message_length', 50 * 1024 * 1024)
+                    ('grpc.max_send_message_length', 500 * 1024 * 1024),
+                    ('grpc.max_receive_message_length', 500 * 1024 * 1024)
                 ]
             )
             logger.info("使用不安全通道连接服务器")
