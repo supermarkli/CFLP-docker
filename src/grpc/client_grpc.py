@@ -33,23 +33,24 @@ from src.grpc.generated import federation_pb2
 from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
 from src.models.models import FedAvgCNN
+from src.utils.config_utils import config # 导入全局配置
 
 logger = get_logger()
 
 class FederatedLearningClient:
-    def __init__(self, data=None, use_homomorphic_encryption=False):
-        self.client_id = os.environ.get("CLIENT_ID", str(uuid.uuid4()))
+    def __init__(self, data=None):
+        self.client_id = config['client_id'] or str(uuid.uuid4())
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model = FedAvgCNN().to(self.device)
         self.num_classes = 10
         self.current_round = 0
-        self.batch_size = 100
-        self.server_host = os.environ.get("GRPC_SERVER_HOST", "localhost")
-        self.server_port = os.environ.get("GRPC_SERVER_PORT", "50051")
+        self.batch_size = config['training']['batch_size']
+        self.server_host = config['grpc']['server_host']
+        self.server_port = config['grpc']['server_port']
         self._init_data(data)
         self.continue_training = True
 
-        self.use_homomorphic_encryption = use_homomorphic_encryption
+        self.use_homomorphic_encryption = config['encryption']['enabled']
         logger.info(f"同态加密状态: {'启用' if self.use_homomorphic_encryption else '未启用'}")
         if self.use_homomorphic_encryption:
             try:
@@ -99,7 +100,7 @@ class FederatedLearningClient:
         
         self.stub = federation_pb2_grpc.FederatedLearningStub(self.channel)
         self.loss = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001)
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config['training']['learning_rate'])
 
         logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}")
 
@@ -241,7 +242,7 @@ class FederatedLearningClient:
         parameters = self.model.get_parameters()
         encrypted_parameters = {}
         import gc
-        chunk_size = 100000  # 可根据内存情况调整
+        chunk_size = config['encryption']['chunk_size']
         for key, value in parameters.items():
             try:
                 if isinstance(value, np.ndarray):
@@ -312,7 +313,9 @@ class FederatedLearningClient:
             parameters_and_metrics=params_and_metrics
         )
 
-    def _submit_with_retry(self, submit_func, parameter_update, log_prefix, max_retries=5, retry_interval=1):
+    def _submit_with_retry(self, submit_func, parameter_update, log_prefix):
+        max_retries = config['grpc']['max_retries']
+        retry_interval = config['grpc']['retry_interval']
         for attempt in range(max_retries):
             try:
                 submit_func(parameter_update)
@@ -360,7 +363,7 @@ class FederatedLearningClient:
         
         while self.continue_training:
             logger.info(f"[Round {self.current_round+1}] 开始训练")
-            self.train()
+            self.train(epochs=config['training']['epochs'])
             logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 完成本地训练")
             test_acc, test_num, auc = self.test_metrics()
             logger.info(f"[Round {self.current_round+1}] 客户端 {self.client_id} 测试集: acc={test_acc}, num={test_num}, auc={auc}")
@@ -463,7 +466,7 @@ def load_client_data():
 def main():
     client_data = load_client_data()
     if client_data:
-        client = FederatedLearningClient(data=client_data, use_homomorphic_encryption=True)
+        client = FederatedLearningClient(data=client_data)
         try:
             client.participate_in_training()
         except KeyboardInterrupt:

@@ -1,7 +1,31 @@
 data:
   test_size: 0.2
+
 base:
-  random_seed: 42  # 随机种子,默认42
+  random_seed: 42  
+
+grpc:
+  server_host: "localhost"
+  server_port: 50051
+  max_retries: 5
+  retry_interval: 1 
+  max_workers: 10
+
+federation:
+  expected_clients: 3
+  max_rounds: 100
+  convergence:
+    acc_delta_threshold: 0.001
+    window: 3
+
+training:
+  batch_size: 100
+  learning_rate: 0.001
+  epochs: 1 
+
+encryption:
+  enabled: true
+  chunk_size: 100000
 
 
 

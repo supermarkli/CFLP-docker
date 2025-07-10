@@ -32,6 +32,7 @@ from src.grpc.generated import federation_pb2
 from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
 from src.utils.draw import plot_global_convergence_curve  # 新增：导入绘图函数
+from src.utils.config_utils import config  # 导入全局配置
 
 logger = get_logger()
 
@@ -48,17 +49,17 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.global_model = FedAvgCNN().to(self.device)
         self.clients = {}  
         self.current_round = 0
-        self.acc_delta_threshold = 0.001
-        self.converge_window = 3
+        self.acc_delta_threshold = config['federation']['convergence']['acc_delta_threshold']
+        self.converge_window = config['federation']['convergence']['window']
         self.count = 0
         self.next_step = False
         self.need_aggregate = False
         self.client_parameters = defaultdict(dict)
         self.aggregated_parameters = None
         self.lock = threading.Lock()  
-        self.expected_clients = 3
-        self.max_rounds = 100
-        self.use_homomorphic_encryption = use_homomorphic_encryption or os.environ.get("USE_HOMOMORPHIC_ENCRYPTION", "False").lower() == "true"
+        self.expected_clients = config['federation']['expected_clients']
+        self.max_rounds = config['federation']['max_rounds']
+        self.use_homomorphic_encryption = config['encryption']['enabled']
         logger.info(f"同态加密状态: {'启用' if self.use_homomorphic_encryption else '未启用'}")
         self.start_time = None  
         self.end_time = None   
@@ -494,7 +495,7 @@ def serve():
     """启动gRPC服务器"""
     # 创建服务器
     server = grpc.server(
-        futures.ThreadPoolExecutor(max_workers=10),
+        futures.ThreadPoolExecutor(max_workers=config['grpc']['max_workers']),
         options=[
             ('grpc.max_send_message_length', 500 * 1024 * 1024),
             ('grpc.max_receive_message_length', 500 * 1024 * 1024),
@@ -503,10 +504,10 @@ def serve():
     
     # 添加服务
     federation_pb2_grpc.add_FederatedLearningServicer_to_server(
-        FederatedLearningServicer(use_homomorphic_encryption=True), server
+        FederatedLearningServicer(), server
     )
     
-    port = os.environ.get("GRPC_SERVER_PORT", "50051")
+    port = config['grpc']['server_port']
     
     try:
         # 尝试读取服务器证书和私钥
