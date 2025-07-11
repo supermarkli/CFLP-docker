@@ -9,7 +9,7 @@ federation:
   # "none" - 标准联邦学习，明文传输。
   # "he"   - 使用同态加密保护模型参数。
   # "tee"  - 使用TEE（可信执行环境）在服务器端保护明文聚合。
-  privacy_mode: "he"  # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "none"  # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 100
   convergence:
@@ -25,7 +25,7 @@ grpc:
 
 training:
   batch_size: 100
-  learning_rate: 0.01
+  learning_rate: 0.001
   epochs: 1
 
 # 仅在 privacy_mode = "he" 时生效
@@ -36,7 +36,7 @@ encryption:
 # 仅在 privacy_mode = "tee" 时生效
 tee:
   # 客户端用于验证服务端TEE身份的“代码指纹”。
-  expected_mrenclave: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+  expected_mrenclave: "08a4668e1b5055c8dea11d8631ffa5ae51db16dbf3741cc5c7c0d69f1b66708b"
 
 
 

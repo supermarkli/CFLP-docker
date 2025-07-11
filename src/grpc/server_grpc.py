@@ -61,6 +61,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.start_time = None
         self.end_time = None
         self.rs_test_acc, self.rs_train_loss, self.rs_auc = [], [], []
+        self.count = 0
+        self.next_step = False
 
         # -- 从配置加载参数 --
         self.privacy_mode = config['federation']['privacy_mode']
@@ -105,7 +107,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     data_size=request.data_size
                 )
                 logger.info(f"客户端 {client_id} 注册成功。当前 {len(self.clients)}/{self.expected_clients} 个客户端。")
-
+ 
             response = federation_pb2.SetupResponse(
                 privacy_mode=self.privacy_mode,
                 initial_model=federation_pb2.ModelParameters(
@@ -126,35 +128,45 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 }
                 response.attestation_report = json.dumps(report_data).encode('utf-8')
 
+            if len(self.clients) >= self.expected_clients:
+                self.next_step = True
+                logger.info(f"所有客户端已注册，设置 next_step=True，准备开始训练。")
+
             return response
 
     def CheckTrainingStatus(self, request, context):
         client_id = request.client_id
         with self.lock:
+            # 新增：收敛判断
             if self.converged:
-                return federation_pb2.TrainingStatusResponse(code=300, message="训练已收敛，提前终止")
-            
-            ready_clients = len(self.clients)
-            if ready_clients >= self.expected_clients:
-                submitted_this_round = len(self.client_parameters.get(self.current_round, {}))
-                if submitted_this_round < self.expected_clients:
-                     return federation_pb2.TrainingStatusResponse(
-                        code=200, 
-                        message=f"可以开始训练/等待其他客户端提交参数 ({submitted_this_round}/{self.expected_clients})",
-                        registered_clients=submitted_this_round, 
-                        total_clients=self.expected_clients)
-                else: # 所有人都提交了，等待下一轮
-                    return federation_pb2.TrainingStatusResponse(
-                        code=100, 
-                        message=f"等待第 {self.current_round + 1} 轮开始",
-                        registered_clients=submitted_this_round, 
-                        total_clients=self.expected_clients)
-            else:
+                code = 300
+                message = "训练已收敛，提前终止"
                 return federation_pb2.TrainingStatusResponse(
-                    code=100, 
-                    message=f"等待其他客户端注册 ({ready_clients}/{self.expected_clients})",
-                    registered_clients=ready_clients, 
-                    total_clients=self.expected_clients)
+                    code=code,
+                    message=message,
+                    registered_clients=self.count,
+                    total_clients=self.expected_clients
+                )
+            logger.info(f"[Round {self.current_round+1}] 客户端 {client_id} 检查训练状态，当前next_step={self.next_step}, count={self.count}")
+            if self.next_step:
+                code = 200
+                message = "可以开始训练"
+                self.count += 1
+                logger.info(f"[Round {self.current_round+1}] 客户端 {client_id} 获得训练许可，count增加到 {self.count}/{self.expected_clients}")
+                if self.count >= self.expected_clients:
+                    self.next_step = False
+                    self.count = 0
+                    logger.info(f"[Round {self.current_round+1}] 所有客户端已获得训练许可，重置next_step={self.next_step}, count={self.count}")
+            else:
+                code = 100
+                message = f"[Round {self.current_round+1}] 等待其他客户端, 当前{self.count}/{self.expected_clients}个客户端"
+
+            return federation_pb2.TrainingStatusResponse(
+                code=code,
+                message=message,
+                registered_clients=self.count,
+                total_clients=self.expected_clients
+            )
 
     def SubmitUpdate(self, request, context):
         """接收客户端明文模型更新"""
@@ -300,6 +312,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc, prefix=prefix)
                 else:
                     self.current_round += 1
+                    self.next_step = True
+                    logger.info(f"第 {round_num + 1} 轮聚合完成，设置 next_step=True，准备开始下一轮。")
 
         except Exception as e:
             logger.error(f"处理轮次 {round_num+1} 完成时出错: {e}", exc_info=True)

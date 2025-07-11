@@ -80,7 +80,7 @@ class FederatedLearningClient:
         self.stub = federation_pb2_grpc.FederatedLearningStub(self.channel)
 
         # -- 注册并协商运行模式 --
-        logger.info("正在向服务器注册并获取联邦设置...")
+        logger.info(f"客户端{self.client_id}正在向服务器注册并获取联邦设置...")
         register_request = federation_pb2.ClientInfo(
             client_id=self.client_id,
             model_type="CNN",
@@ -91,25 +91,23 @@ class FederatedLearningClient:
         self.privacy_mode = setup_response.privacy_mode
         logger.info(f"服务器运行模式为: {self.privacy_mode.upper()}")
 
-        # 根据模式处理安全材料
         if self.privacy_mode == 'he':
             self.he_public_key = pickle.loads(setup_response.he_public_key)
-            logger.info("成功接收并加载HE公钥。")
+            logger.info(f"客户端{self.client_id}成功接收并加载HE公钥。")
         
         elif self.privacy_mode == 'tee':
             report = json.loads(setup_response.attestation_report.decode('utf-8'))
             actual_mrenclave = report.get("mrenclave")
             expected_mrenclave = config['tee']['expected_mrenclave']
-            logger.info(f"收到TEE证明报告，MRENCLAVE为: {actual_mrenclave}")
             if actual_mrenclave == expected_mrenclave:
-                logger.info("TEE身份验证成功！服务器可信。")
+                logger.info(f"客户端{self.client_id}TEE身份验证成功！服务器可信。")
             else:
                 raise Exception(f"TEE身份验证失败！预期MRENCLAVE为{expected_mrenclave}，实际为{actual_mrenclave}。")
 
         # 设置初始模型参数
         initial_params = deserialize_parameters(setup_response.initial_model.parameters)
         self.model.set_parameters(initial_params)
-        logger.info("已设置初始模型参数。")
+        logger.info(f"客户端{self.client_id}已设置初始模型参数。")
 
     def _init_data(self, data):
         """初始化训练和测试数据"""
@@ -316,54 +314,47 @@ class FederatedLearningClient:
     def participate_in_training(self):
         """参与联邦学习训练"""
         self.setup_connection_and_register()
+        while True:
+            status_request = federation_pb2.ClientInfo(client_id=self.client_id)
+            status_response = self.stub.CheckTrainingStatus(status_request)
+            if status_response.code == 100:
+                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待其他客户注册 (当前进度: {status_response.registered_clients}/{status_response.total_clients})")
+                time.sleep(1)  
+            else:
+                break
 
         while self.continue_training:
-            logger.info(f"等待开始第 {self.current_round + 1} 轮训练...")
+            logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}开始训练...")
+            self.train(epochs=config['training']['epochs'])
+            
+            metrics_data = self.get_metrics()
+            
+            if self.privacy_mode == 'he':
+                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}在HE模式下: 正在加密并提交更新...")
+                update_request = self._create_encrypted_parameter_update_message(metrics_data)
+                self.stub.SubmitEncryptedUpdate(update_request)
+            else: # 'none' and 'tee' modes
+                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}在{self.privacy_mode.upper()}模式下: 正在提交明文更新...")
+                update_request = self._create_parameter_update_message(metrics_data)
+                self.stub.SubmitUpdate(update_request)
+
+            logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
+
             while True:
                 status_request = federation_pb2.ClientInfo(client_id=self.client_id)
                 status_response = self.stub.CheckTrainingStatus(status_request)
                 if status_response.code == 200:
-                    logger.info(f"服务器已就绪，开始训练。")
-                    break
-                elif status_response.code == 300:
-                    self.continue_training = False
-                    logger.info("检测到服务器收敛信号，客户端终止训练。")
-                    break
-                time.sleep(2)
-            
-            if not self.continue_training:
-                break
-
-            logger.info(f"[Round {self.current_round+1}] 开始本地训练...")
-            self.train(epochs=config['training']['epochs'])
-            
-            # ... (获取指标)
-            metrics_data = self.get_metrics()
-            
-            if self.privacy_mode == 'he':
-                logger.info(f"[Round {self.current_round+1}] HE模式: 正在加密并提交更新...")
-                update_request = self._create_encrypted_parameter_update_message(metrics_data)
-                self.stub.SubmitEncryptedUpdate(update_request)
-            else: # 'none' and 'tee' modes
-                logger.info(f"[Round {self.current_round+1}] {self.privacy_mode.upper()}模式: 正在提交明文更新...")
-                update_request = self._create_parameter_update_message(metrics_data)
-                self.stub.SubmitUpdate(update_request)
-
-            logger.info(f"[Round {self.current_round+1}] 等待全局模型更新...")
-            while True:
-                 # Check status again to see if aggregation is done for the *next* round
-                status_request = federation_pb2.ClientInfo(client_id=self.client_id)
-                status_response = self.stub.CheckTrainingStatus(status_request) # Re-check status
-
-                if status_response.code == 200:
                     break
                 if status_response.code == 300:
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}检测到服务器收敛信号，终止训练。")
                     self.continue_training = False
                     break
-                time.sleep(2)
-
-            if not self.continue_training:
-                break
+                elif status_response.code == 100:
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待服务器聚合: {status_response.message} (当前进度: {status_response.registered_clients}/{status_response.total_clients})")
+                    time.sleep(2)
+                else:
+                    logger.warning(f"[Round {self.current_round+1}] 客户端{self.client_id}收到未知状态码 {status_response.code}，等待中...")
+                    time.sleep(2)
                 
             global_model_request = federation_pb2.GetModelRequest(client_id=self.client_id, round=self.current_round)
             global_model_response = self.stub.GetGlobalModel(global_model_request)
