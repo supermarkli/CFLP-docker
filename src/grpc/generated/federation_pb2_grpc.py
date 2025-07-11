@@ -39,14 +39,14 @@ class FederatedLearningStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Register = channel.unary_unary(
-                '/federation.FederatedLearning/Register',
+        self.RegisterAndSetup = channel.unary_unary(
+                '/federation.FederatedLearning/RegisterAndSetup',
                 request_serializer=federation__pb2.ClientInfo.SerializeToString,
-                response_deserializer=federation__pb2.RegisterResponse.FromString,
+                response_deserializer=federation__pb2.SetupResponse.FromString,
                 _registered_method=True)
         self.CheckTrainingStatus = channel.unary_unary(
                 '/federation.FederatedLearning/CheckTrainingStatus',
-                request_serializer=federation__pb2.TrainingStatusRequest.SerializeToString,
+                request_serializer=federation__pb2.ClientInfo.SerializeToString,
                 response_deserializer=federation__pb2.TrainingStatusResponse.FromString,
                 _registered_method=True)
         self.SubmitUpdate = channel.unary_unary(
@@ -54,15 +54,15 @@ class FederatedLearningStub(object):
                 request_serializer=federation__pb2.ClientUpdate.SerializeToString,
                 response_deserializer=federation__pb2.ServerUpdate.FromString,
                 _registered_method=True)
-        self.GetGlobalModel = channel.unary_unary(
-                '/federation.FederatedLearning/GetGlobalModel',
-                request_serializer=federation__pb2.GetModelRequest.SerializeToString,
-                response_deserializer=federation__pb2.ModelParameters.FromString,
-                _registered_method=True)
         self.SubmitEncryptedUpdate = channel.unary_unary(
                 '/federation.FederatedLearning/SubmitEncryptedUpdate',
                 request_serializer=federation__pb2.EncryptedClientUpdate.SerializeToString,
                 response_deserializer=federation__pb2.ServerUpdate.FromString,
+                _registered_method=True)
+        self.GetGlobalModel = channel.unary_unary(
+                '/federation.FederatedLearning/GetGlobalModel',
+                request_serializer=federation__pb2.GetModelRequest.SerializeToString,
+                response_deserializer=federation__pb2.ModelParameters.FromString,
                 _registered_method=True)
 
 
@@ -70,33 +70,38 @@ class FederatedLearningServicer(object):
     """联邦学习服务
     """
 
-    def Register(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+    def RegisterAndSetup(self, request, context):
+        """客户端注册自己，获取初始模型、运行模式和所需的安全材料
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CheckTrainingStatus(self, request, context):
-        """新增RPC方法
+        """客户端循环查询训练是否可以开始
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def SubmitUpdate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetGlobalModel(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """客户端提交更新
+        for "none" and "tee" modes
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def SubmitEncryptedUpdate(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """for "he" mode
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetGlobalModel(self, request, context):
+        """客户端获取全局模型
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -104,14 +109,14 @@ class FederatedLearningServicer(object):
 
 def add_FederatedLearningServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Register': grpc.unary_unary_rpc_method_handler(
-                    servicer.Register,
+            'RegisterAndSetup': grpc.unary_unary_rpc_method_handler(
+                    servicer.RegisterAndSetup,
                     request_deserializer=federation__pb2.ClientInfo.FromString,
-                    response_serializer=federation__pb2.RegisterResponse.SerializeToString,
+                    response_serializer=federation__pb2.SetupResponse.SerializeToString,
             ),
             'CheckTrainingStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.CheckTrainingStatus,
-                    request_deserializer=federation__pb2.TrainingStatusRequest.FromString,
+                    request_deserializer=federation__pb2.ClientInfo.FromString,
                     response_serializer=federation__pb2.TrainingStatusResponse.SerializeToString,
             ),
             'SubmitUpdate': grpc.unary_unary_rpc_method_handler(
@@ -119,15 +124,15 @@ def add_FederatedLearningServicer_to_server(servicer, server):
                     request_deserializer=federation__pb2.ClientUpdate.FromString,
                     response_serializer=federation__pb2.ServerUpdate.SerializeToString,
             ),
-            'GetGlobalModel': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetGlobalModel,
-                    request_deserializer=federation__pb2.GetModelRequest.FromString,
-                    response_serializer=federation__pb2.ModelParameters.SerializeToString,
-            ),
             'SubmitEncryptedUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.SubmitEncryptedUpdate,
                     request_deserializer=federation__pb2.EncryptedClientUpdate.FromString,
                     response_serializer=federation__pb2.ServerUpdate.SerializeToString,
+            ),
+            'GetGlobalModel': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetGlobalModel,
+                    request_deserializer=federation__pb2.GetModelRequest.FromString,
+                    response_serializer=federation__pb2.ModelParameters.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -142,7 +147,7 @@ class FederatedLearning(object):
     """
 
     @staticmethod
-    def Register(request,
+    def RegisterAndSetup(request,
             target,
             options=(),
             channel_credentials=None,
@@ -155,9 +160,9 @@ class FederatedLearning(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/federation.FederatedLearning/Register',
+            '/federation.FederatedLearning/RegisterAndSetup',
             federation__pb2.ClientInfo.SerializeToString,
-            federation__pb2.RegisterResponse.FromString,
+            federation__pb2.SetupResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -183,7 +188,7 @@ class FederatedLearning(object):
             request,
             target,
             '/federation.FederatedLearning/CheckTrainingStatus',
-            federation__pb2.TrainingStatusRequest.SerializeToString,
+            federation__pb2.ClientInfo.SerializeToString,
             federation__pb2.TrainingStatusResponse.FromString,
             options,
             channel_credentials,
@@ -223,33 +228,6 @@ class FederatedLearning(object):
             _registered_method=True)
 
     @staticmethod
-    def GetGlobalModel(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/federation.FederatedLearning/GetGlobalModel',
-            federation__pb2.GetModelRequest.SerializeToString,
-            federation__pb2.ModelParameters.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
     def SubmitEncryptedUpdate(request,
             target,
             options=(),
@@ -266,6 +244,33 @@ class FederatedLearning(object):
             '/federation.FederatedLearning/SubmitEncryptedUpdate',
             federation__pb2.EncryptedClientUpdate.SerializeToString,
             federation__pb2.ServerUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetGlobalModel(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/federation.FederatedLearning/GetGlobalModel',
+            federation__pb2.GetModelRequest.SerializeToString,
+            federation__pb2.ModelParameters.FromString,
             options,
             channel_credentials,
             insecure,

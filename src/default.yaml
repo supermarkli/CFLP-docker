@@ -2,30 +2,41 @@ data:
   test_size: 0.2
 
 base:
-  random_seed: 42  
-
-grpc:
-  server_host: "localhost"
-  server_port: 50051
-  max_retries: 5
-  retry_interval: 1 
-  max_workers: 10
+  random_seed: 42
 
 federation:
+  # 隐私保护模式:
+  # "none" - 标准联邦学习，明文传输。
+  # "he"   - 使用同态加密保护模型参数。
+  # "tee"  - 使用TEE（可信执行环境）在服务器端保护明文聚合。
+  privacy_mode: "he"  # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 100
   convergence:
     acc_delta_threshold: 0.001
     window: 3
 
+grpc:
+  server_host: "localhost"
+  server_port: 50051
+  max_retries: 5
+  retry_interval: 1
+  max_workers: 10
+
 training:
   batch_size: 100
-  learning_rate: 0.001
-  epochs: 1 
+  learning_rate: 0.01
+  epochs: 1
 
+# 仅在 privacy_mode = "he" 时生效
 encryption:
-  enabled: true
+  key_size: 2048 # Paillier密钥长度
   chunk_size: 100000
+
+# 仅在 privacy_mode = "tee" 时生效
+tee:
+  # 客户端用于验证服务端TEE身份的“代码指纹”。
+  expected_mrenclave: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
 
 
 
