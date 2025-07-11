@@ -12,10 +12,8 @@ service FederatedLearning {
     // 客户端循环查询训练是否可以开始
     rpc CheckTrainingStatus(ClientInfo) returns (TrainingStatusResponse);
     
-    // 客户端提交更新
-    rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate); // for "none" mode
-    rpc SubmitEncryptedUpdate(EncryptedClientUpdate) returns (ServerUpdate); // for "he" mode
-    rpc SubmitTeeUpdate(TeeClientUpdate) returns (ServerUpdate); // for "tee" mode
+    // 客户端提交更新（统一接口）
+    rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate);
 
     // 客户端获取全局模型
     rpc GetGlobalModel(GetModelRequest) returns (ModelParameters);
@@ -48,14 +46,43 @@ message TrainingStatusResponse {
     string message = 2;     // 状态消息
     int32 registered_clients = 3;
     int32 total_clients = 4;
+    int32 submitted_clients = 5;
+}
+
+// 统一的客户端更新消息
+message ClientUpdate {
+    string client_id = 1;
+    int32 round = 2;
+
+    oneof payload {
+        PlaintextPayload plaintext = 3;
+        HePayload he = 4;
+        TeePayload tee = 5;
+    }
+}
+
+// "none" 模式的载荷
+message PlaintextPayload {
+    ParametersAndMetrics parameters_and_metrics = 1;
+}
+
+// "he" 模式的载荷
+message HePayload {
+    EncryptedParametersAndMetrics parameters_and_metrics = 1;
+}
+
+// "tee" 模式的载荷
+message TeePayload {
+    bytes encrypted_symmetric_key = 1; // AES key, encrypted with TEE RSA public key
+    bytes nonce = 2;                   // Nonce/IV used for AES encryption
+    bytes encrypted_payload = 3;       // ParametersAndMetrics, encrypted with AES key
 }
 
 // 服务器对客户端更新的响应
 message ServerUpdate {
-    int32 code = 1;         // 状态码
-    int32 current_round = 2; // 服务器当前轮次
-    string message = 3;
-    int32 total_clients = 4;
+    int32 code = 1;         // 状态码, 200:成功, 400:失败, 500:服务器错误
+    string message = 2;     // 状态消息
+    int32 current_round = 3;// 当前轮次
 }
 
 // 获取全局模型的请求
@@ -65,11 +92,13 @@ message GetModelRequest {
 }
 
 // 明文客户端更新
+/*
 message ClientUpdate {
     string client_id = 1;
     int32 round = 2;
     ParametersAndMetrics parameters_and_metrics = 3;
 }
+*/
 
 // 明文参数和指标
 message ParametersAndMetrics {
@@ -92,6 +121,7 @@ message TrainingMetrics {
 }
 
 // TEE 模式下的加密客户端更新
+/*
 message TeeClientUpdate {
     string client_id = 1;
     int32 round = 2;
@@ -99,13 +129,16 @@ message TeeClientUpdate {
     bytes nonce = 4;                   // Nonce/IV used for AES encryption
     bytes encrypted_payload = 5;       // ParametersAndMetrics, encrypted with AES key
 }
+*/
 
 // 密文客户端更新
+/*
 message EncryptedClientUpdate {
     string client_id = 1;
     int32 round = 2;
     EncryptedParametersAndMetrics parameters_and_metrics = 3;
 }
+*/
 
 // 密文参数和指标
 message EncryptedParametersAndMetrics {

@@ -31,6 +31,9 @@ from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
 from src.models.models import FedAvgCNN
 from src.utils.config_utils import config
+from src.strategies.client.none_strategy import NoneClientStrategy
+from src.strategies.client.he_strategy import HeClientStrategy
+from src.strategies.client.tee_strategy import TeeClientStrategy
 
 logger = get_logger()
 random.seed(config['base']['random_seed'])
@@ -51,17 +54,15 @@ class FederatedLearningClient:
         self.server_port = config['grpc']['server_port']
         self._init_data(data)
 
-        # -- 将在 setup_connection 中初始化 --
         self.stub = None
         self.channel = None
         self.privacy_mode = None
-        self.he_public_key = None
-        self.tee_public_key = None
+        self.strategy = None  
         self.continue_training = True
 
         self.loss = nn.CrossEntropyLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=config['training']['learning_rate'])
-        logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}")
+        
 
     def setup_connection_and_register(self):
         """建立gRPC连接，并与服务器协商运行模式和安全材料。"""
@@ -74,9 +75,9 @@ class FederatedLearningClient:
                 options=[('grpc.max_send_message_length', 500 * 1024 * 1024),
                          ('grpc.max_receive_message_length', 500 * 1024 * 1024)]
             )
-            logger.info("使用安全通道(SSL/TLS)连接服务器。")
+            logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器。")
         except FileNotFoundError:
-            logger.warning("未找到CA证书，使用不安全通道。")
+            logger.warning(f"未找到CA证书，使用不安全通道连接服务器。")
             channel = grpc.insecure_channel(
                 f"{self.server_host}:{self.server_port}",
                 options=[('grpc.max_send_message_length', 500 * 1024 * 1024),
@@ -85,22 +86,19 @@ class FederatedLearningClient:
         self.channel = channel
         self.stub = federation_pb2_grpc.FederatedLearningStub(self.channel)
 
-        # -- 注册并协商运行模式 --
-        logger.info(f"客户端{self.client_id}正在向服务器注册并获取联邦设置...")
         register_request = federation_pb2.ClientInfo(
             client_id=self.client_id,
             model_type="CNN",
             data_size=self.data_size
         )
 
-        # 添加重试逻辑以应对服务器启动延迟
         max_retries = 5
         retry_interval = 3
         for attempt in range(max_retries):
             try:
                 setup_response = self.stub.RegisterAndSetup(register_request)
                 logger.info(f"客户端{self.client_id}注册成功。")
-                break # 成功则跳出循环
+                break 
             except grpc._channel._InactiveRpcError as e:
                 if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
                     logger.warning(f"无法连接到服务器，将在 {retry_interval} 秒后重试 ({attempt+1}/{max_retries})...")
@@ -112,31 +110,27 @@ class FederatedLearningClient:
         self.privacy_mode = setup_response.privacy_mode
         logger.info(f"服务器运行模式为: {self.privacy_mode.upper()}")
 
-        # 根据模式处理安全材料
-        if self.privacy_mode == 'he':
-            self.he_public_key = pickle.loads(setup_response.he_public_key)
-            logger.info(f"客户端{self.client_id}成功接收并加载HE公钥。")
-        
-        elif self.privacy_mode == 'tee':
-            # 1. 验证TEE身份
-            report = json.loads(setup_response.tee_attestation_report.decode('utf-8'))
-            actual_mrenclave = report.get("mrenclave")
-            expected_mrenclave = config['tee']['expected_mrenclave']
-            if actual_mrenclave == expected_mrenclave:
-                logger.info(f"客户端{self.client_id}TEE身份验证成功！服务器可信。")
-            else:
-                raise Exception(f"TEE身份验证失败！预期MRENCLAVE为{expected_mrenclave}，实际为{actual_mrenclave}。")
-            
-            # 2. 加载公钥
-            self.tee_public_key = serialization.load_pem_public_key(
-                setup_response.tee_public_key,
-            )
-            logger.info("成功接收并加载TEE公钥。")
+        self.strategy = self._create_strategy(setup_response)
+        if not self.strategy:
+            raise ValueError(f"不支持的隐私模式: {self.privacy_mode}")
 
-        # 设置初始模型参数
         initial_params = deserialize_parameters(setup_response.initial_model.parameters)
         self.model.set_parameters(initial_params)
         logger.info(f"客户端{self.client_id}已设置初始模型参数。")
+
+    def _create_strategy(self, setup_response):
+        """根据服务器响应创建并返回相应的客户端策略实例。"""
+        if self.privacy_mode == 'none':
+            return NoneClientStrategy(self)
+        elif self.privacy_mode == 'he':
+            # 策略类自己处理反序列化
+            return HeClientStrategy(self, setup_response.he_public_key)
+        elif self.privacy_mode == 'tee':
+            # 策略类自己处理验证和反序列化
+            return TeeClientStrategy(self, setup_response.tee_attestation_report, setup_response.tee_public_key)
+        else:
+            logger.error(f"接收到未知的隐私模式: {self.privacy_mode}")
+            return None
 
     def _init_data(self, data):
         """初始化训练和测试数据"""
@@ -247,149 +241,34 @@ class FederatedLearningClient:
         
         return test_acc, test_num, auc
     
-    def _create_parameter_update_message(self, metrics_data):
-        """创建参数更新消息（明文）"""
-        parameters = self.model.get_parameters()
-        serialized_params = serialize_parameters(parameters)
-        training_metrics = federation_pb2.TrainingMetrics(
-            test_acc=metrics_data.get('test_acc', 0.0),
-            test_num=metrics_data.get('test_num', 0.0),
-            auc=metrics_data.get('auc', 0.0),
-            loss=metrics_data.get('loss', 0.0),
-            train_num=metrics_data.get('train_num', 0)
-        )
-        model_parameters = federation_pb2.ModelParameters(
-            parameters=serialized_params
-        )
-        params_and_metrics = federation_pb2.ParametersAndMetrics(
-            parameters=model_parameters,
-            metrics=training_metrics
-        )
-        return federation_pb2.ClientUpdate(
-            client_id=self.client_id,
-            round=self.current_round,  
-            parameters_and_metrics=params_and_metrics
-        )
-
-    def _create_tee_parameter_update_message(self, metrics_data):
-        """创建在TEE模式下加密的参数更新消息"""
-        # 1. 创建包含明文参数和指标的载荷
-        parameters = self.model.get_parameters()
-        serialized_params = serialize_parameters(parameters)
-        training_metrics = federation_pb2.TrainingMetrics(
-            test_acc=metrics_data.get('test_acc', 0.0),
-            test_num=metrics_data.get('test_num', 0.0),
-            auc=metrics_data.get('auc', 0.0),
-            loss=metrics_data.get('loss', 0.0),
-            train_num=metrics_data.get('train_num', 0)
-        )
-        model_parameters = federation_pb2.ModelParameters(parameters=serialized_params)
-        payload = federation_pb2.ParametersAndMetrics(
-            parameters=model_parameters,
-            metrics=training_metrics
-        )
-        serialized_payload = payload.SerializeToString()
-
-        # 2. 生成一次性对称密钥(AES)并用RSA公钥加密它
-        symmetric_key = AESGCM.generate_key(bit_length=256)
-        encrypted_symmetric_key = self.tee_public_key.encrypt(
-            symmetric_key,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-
-        # 3. 使用AES密钥加密主载荷
-        aesgcm = AESGCM(symmetric_key)
-        nonce = os.urandom(12)  # 96-bit nonce is recommended
-        encrypted_payload = aesgcm.encrypt(nonce, serialized_payload, None)
-
-        # 4. 创建最终的TEE更新消息
-        return federation_pb2.TeeClientUpdate(
-            client_id=self.client_id,
-            round=self.current_round,
-            encrypted_symmetric_key=encrypted_symmetric_key,
-            nonce=nonce,
-            encrypted_payload=encrypted_payload
-        )
-
-    def _create_encrypted_parameter_update_message(self, metrics_data):
-        """创建参数更新消息（HE密文）"""
-        parameters = self.model.get_parameters()
-        encrypted_parameters = {}
-        chunk_size = config['encryption']['chunk_size']
-        # A ciphertext is a number modulo n^2. We need enough bytes to represent any such number.
-        ciphertext_bytes_len = (self.he_public_key.nsquare.bit_length() + 7) // 8
-
-        for key, value in parameters.items():
-            if isinstance(value, np.ndarray):
-                flat = value.flatten()
-                encrypted_chunks = []
-                total = len(flat)
-                logger.info(f"开始加密参数 {key}, 形状: {value.shape}, 总参数量: {total}, 分块大小: {chunk_size}")
-
-                for i in range(0, total, chunk_size):
-                    chunk = flat[i:i+chunk_size]
-                    encrypted_part = [self.he_public_key.encrypt(float(v)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for v in chunk]
-                    encrypted_chunks.extend(encrypted_part)
-                    
-                    progress = min(i + chunk_size, total)
-                    logger.info(f"参数 {key} 加密进度: {progress}/{total} ({(progress/total)*100:.1f}%)")
-
-                    del chunk, encrypted_part
-                    gc.collect()
-                
-                encrypted_parameters[key] = {
-                    'data': encrypted_chunks, 'shape': list(value.shape)
-                }
-            else: # scalar
-                encrypted_value = self.he_public_key.encrypt(float(value))
-                encrypted_parameters[key] = {
-                    'data': [encrypted_value.ciphertext().to_bytes(ciphertext_bytes_len, 'big')], 'shape': [1]
-                }
-        
-        proto_params = {k: federation_pb2.EncryptedNumpyArray(data=v['data'], shape=v['shape']) for k, v in encrypted_parameters.items()}
-        model_parameters = federation_pb2.EncryptedModelParameters(parameters=proto_params)
-
-        encrypted_metrics = {k: self.he_public_key.encrypt(float(v)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for k, v in metrics_data.items()}
-        encrypted_metrics_proto = federation_pb2.EncryptedTrainingMetrics(**encrypted_metrics)
-
-        return federation_pb2.EncryptedClientUpdate(
-            client_id=self.client_id, round=self.current_round,
-            parameters_and_metrics=federation_pb2.EncryptedParametersAndMetrics(
-                parameters=model_parameters, metrics=encrypted_metrics_proto
-            )
-        )
-
-    def _submit_with_retry(self, submit_func, parameter_update, log_prefix):
+    def _submit_update_with_retry(self, update_request):
+        """使用重试逻辑提交统一的更新请求。"""
         max_retries = config['grpc']['max_retries']
         retry_interval = config['grpc']['retry_interval']
+        log_prefix = f"[{self.privacy_mode.upper()}] [轮次 {self.current_round + 1}]"
+        
         for attempt in range(max_retries):
             try:
-                submit_func(parameter_update)
-                logger.info(f"{log_prefix} 调用成功")
-                return
+                server_response = self.stub.SubmitUpdate(update_request)
+                return server_response  # 成功则返回响应
             except grpc._channel._InactiveRpcError as e:
-                if e.code() == grpc.StatusCode.UNAVAILABLE:
-                    logger.warning(f"{log_prefix} 连接断开，重试 {attempt+1}/{max_retries}，原因: {e.details()}")
+                if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
+                    logger.warning(f"{log_prefix} 提交更新失败 (服务器不可达)，将在 {retry_interval} 秒后重试...")
                     time.sleep(retry_interval)
                 else:
-                    logger.error(f"{log_prefix} 调用异常: {str(e)}", exc_info=True)
-                    raise
-            except Exception as e:
-                logger.error(f"{log_prefix} 调用异常: {str(e)}", exc_info=True)
-                raise
-        logger.error(f"{log_prefix} 多次重试后仍失败")
-        raise RuntimeError(f"{log_prefix} 多次重试后仍失败")
+                    logger.error(f"{log_prefix} 多次尝试后仍无法提交更新，训练终止。")
+                    raise e  # 将异常重新抛出，由上层处理
+        
+        raise RuntimeError(f"{log_prefix} 多次尝试后仍无法提交更新。")
 
     def participate_in_training(self):
         """参与联邦学习训练"""
         self.setup_connection_and_register()
+        
         while True:
             status_request = federation_pb2.ClientInfo(client_id=self.client_id)
             status_response = self.stub.CheckTrainingStatus(status_request)
+
             if status_response.code == 100:
                 logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待其他客户注册 (当前进度: {status_response.registered_clients}/{status_response.total_clients})")
                 time.sleep(1)  
@@ -402,18 +281,9 @@ class FederatedLearningClient:
             
             metrics_data = self.get_metrics()
             
-            if self.privacy_mode == 'he':
-                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}在HE模式下: 正在加密并提交更新...")
-                update_request = self._create_encrypted_parameter_update_message(metrics_data)
-                self.stub.SubmitEncryptedUpdate(update_request)
-            elif self.privacy_mode == 'tee':
-                logger.info(f"[Round {self.current_round+1}] TEE模式: 正在加密并提交更新...")
-                update_request = self._create_tee_parameter_update_message(metrics_data)
-                self.stub.SubmitTeeUpdate(update_request)
-            else: # 'none'
-                logger.info(f"[Round {self.current_round+1}] NONE模式: 正在提交明文更新...")
-                update_request = self._create_parameter_update_message(metrics_data)
-                self.stub.SubmitUpdate(update_request)
+            update_request = self.strategy.prepare_update_request(self.current_round, self.model.get_parameters(), metrics_data)
+
+            self._submit_update_with_retry(update_request)
 
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
 
@@ -427,7 +297,7 @@ class FederatedLearningClient:
                     self.continue_training = False
                     break
                 elif status_response.code == 100:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待服务器聚合: {status_response.message} (当前进度: {status_response.registered_clients}/{status_response.total_clients})")
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待服务器聚合 (当前进度: {status_response.submitted_clients}/{status_response.total_clients})")
                     time.sleep(2)
                 else:
                     logger.warning(f"[Round {self.current_round+1}] 客户端{self.client_id}收到未知状态码 {status_response.code}，等待中...")
@@ -452,7 +322,7 @@ class FederatedLearningClient:
         test_acc, test_num, auc = self.test_metrics()
         loss, train_num = self.train_metrics()
 
-        logger.info(f"[Round {self.current_round+1}] 本地评估: Acc={test_acc/test_num if test_num>0 else 0:.4f}, AUC={auc:.4f}, Loss={loss/train_num if train_num>0 else 0:.4f}")
+        logger.info(f"[Round {self.current_round+1}] 本地评估: Acc={test_acc/test_num if test_num>0 else 0:.4f}, AUC={auc:.4f}, Loss={loss:.4f}")
 
         return {
             'test_acc': test_acc,
@@ -463,13 +333,9 @@ class FederatedLearningClient:
         }
 
     def __del__(self):
-        """清理资源"""
-        try:
-            if hasattr(self, 'channel') and self.channel:
-                self.channel.close()
-                logger.info("已关闭gRPC channel")
-        except Exception as e:
-            logger.error(f"关闭gRPC channel时出错: {str(e)}")
+        if self.channel:
+            self.channel.close()
+            logger.info(f"客户端 {self.client_id}: gRPC 通道已关闭。")
 
 
 
