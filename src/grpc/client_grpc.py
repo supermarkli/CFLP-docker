@@ -48,6 +48,7 @@ class FederatedLearningClient:
 
         # -- 将在 setup_connection 中初始化 --
         self.stub = None
+        self.channel = None
         self.privacy_mode = None
         self.he_public_key = None
         self.continue_training = True
@@ -75,7 +76,8 @@ class FederatedLearningClient:
                 options=[('grpc.max_send_message_length', 500 * 1024 * 1024),
                          ('grpc.max_receive_message_length', 500 * 1024 * 1024)]
             )
-        self.stub = federation_pb2_grpc.FederatedLearningStub(channel)
+        self.channel = channel
+        self.stub = federation_pb2_grpc.FederatedLearningStub(self.channel)
 
         # -- 注册并协商运行模式 --
         logger.info("正在向服务器注册并获取联邦设置...")
@@ -247,7 +249,8 @@ class FederatedLearningClient:
         parameters = self.model.get_parameters()
         encrypted_parameters = {}
         chunk_size = config['encryption']['chunk_size']
-        ciphertext_bytes_len = self.he_public_key.n_length // 4
+        # A ciphertext is a number modulo n^2. We need enough bytes to represent any such number.
+        ciphertext_bytes_len = (self.he_public_key.nsquare.bit_length() + 7) // 8
 
         for key, value in parameters.items():
             if isinstance(value, np.ndarray):
@@ -346,15 +349,12 @@ class FederatedLearningClient:
                 update_request = self._create_parameter_update_message(metrics_data)
                 self.stub.SubmitUpdate(update_request)
 
-            # ... (获取全局模型)
             logger.info(f"[Round {self.current_round+1}] 等待全局模型更新...")
             while True:
                  # Check status again to see if aggregation is done for the *next* round
                 status_request = federation_pb2.ClientInfo(client_id=self.client_id)
                 status_response = self.stub.CheckTrainingStatus(status_request) # Re-check status
-                # A bit of a simplification: we assume if we are allowed to train the *next* round,
-                # the model must have been updated.
-                # A more robust solution might need a separate status for 'model_ready_for_download'.
+
                 if status_response.code == 200:
                     break
                 if status_response.code == 300:
@@ -397,11 +397,11 @@ class FederatedLearningClient:
     def __del__(self):
         """清理资源"""
         try:
-            if hasattr(self, 'stub') and self.stub:
-                self.stub.close()
-                logger.info("已关闭gRPC stub")
+            if hasattr(self, 'channel') and self.channel:
+                self.channel.close()
+                logger.info("已关闭gRPC channel")
         except Exception as e:
-            logger.error(f"关闭gRPC stub时出错: {str(e)}")
+            logger.error(f"关闭gRPC channel时出错: {str(e)}")
 
 
 
