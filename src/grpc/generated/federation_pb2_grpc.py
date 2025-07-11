@@ -59,6 +59,11 @@ class FederatedLearningStub(object):
                 request_serializer=federation__pb2.EncryptedClientUpdate.SerializeToString,
                 response_deserializer=federation__pb2.ServerUpdate.FromString,
                 _registered_method=True)
+        self.SubmitTeeUpdate = channel.unary_unary(
+                '/federation.FederatedLearning/SubmitTeeUpdate',
+                request_serializer=federation__pb2.TeeClientUpdate.SerializeToString,
+                response_deserializer=federation__pb2.ServerUpdate.FromString,
+                _registered_method=True)
         self.GetGlobalModel = channel.unary_unary(
                 '/federation.FederatedLearning/GetGlobalModel',
                 request_serializer=federation__pb2.GetModelRequest.SerializeToString,
@@ -86,7 +91,7 @@ class FederatedLearningServicer(object):
 
     def SubmitUpdate(self, request, context):
         """客户端提交更新
-        for "none" and "tee" modes
+        for "none" mode
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -94,6 +99,13 @@ class FederatedLearningServicer(object):
 
     def SubmitEncryptedUpdate(self, request, context):
         """for "he" mode
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SubmitTeeUpdate(self, request, context):
+        """for "tee" mode
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -127,6 +139,11 @@ def add_FederatedLearningServicer_to_server(servicer, server):
             'SubmitEncryptedUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.SubmitEncryptedUpdate,
                     request_deserializer=federation__pb2.EncryptedClientUpdate.FromString,
+                    response_serializer=federation__pb2.ServerUpdate.SerializeToString,
+            ),
+            'SubmitTeeUpdate': grpc.unary_unary_rpc_method_handler(
+                    servicer.SubmitTeeUpdate,
+                    request_deserializer=federation__pb2.TeeClientUpdate.FromString,
                     response_serializer=federation__pb2.ServerUpdate.SerializeToString,
             ),
             'GetGlobalModel': grpc.unary_unary_rpc_method_handler(
@@ -243,6 +260,33 @@ class FederatedLearning(object):
             target,
             '/federation.FederatedLearning/SubmitEncryptedUpdate',
             federation__pb2.EncryptedClientUpdate.SerializeToString,
+            federation__pb2.ServerUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SubmitTeeUpdate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/federation.FederatedLearning/SubmitTeeUpdate',
+            federation__pb2.TeeClientUpdate.SerializeToString,
             federation__pb2.ServerUpdate.FromString,
             options,
             channel_credentials,

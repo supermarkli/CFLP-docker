@@ -13,8 +13,9 @@ service FederatedLearning {
     rpc CheckTrainingStatus(ClientInfo) returns (TrainingStatusResponse);
     
     // 客户端提交更新
-    rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate); // for "none" and "tee" modes
+    rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate); // for "none" mode
     rpc SubmitEncryptedUpdate(EncryptedClientUpdate) returns (ServerUpdate); // for "he" mode
+    rpc SubmitTeeUpdate(TeeClientUpdate) returns (ServerUpdate); // for "tee" mode
 
     // 客户端获取全局模型
     rpc GetGlobalModel(GetModelRequest) returns (ModelParameters);
@@ -37,7 +38,8 @@ message SetupResponse {
 
     // 仅在 mode = "tee" 时填充
     // 模拟的 TEE 证明报告，在真实场景中由 TEE 硬件生成
-    bytes attestation_report = 4;
+    bytes tee_attestation_report = 4;
+    bytes tee_public_key = 5;
 }
 
 // 训练状态检查的响应
@@ -87,6 +89,15 @@ message TrainingMetrics {
     double auc = 3;
     double loss = 4;
     int64 train_num = 5;
+}
+
+// TEE 模式下的加密客户端更新
+message TeeClientUpdate {
+    string client_id = 1;
+    int32 round = 2;
+    bytes encrypted_symmetric_key = 3; // AES key, encrypted with TEE RSA public key
+    bytes nonce = 4;                   // Nonce/IV used for AES encryption
+    bytes encrypted_payload = 5;       // ParametersAndMetrics, encrypted with AES key
 }
 
 // 密文客户端更新

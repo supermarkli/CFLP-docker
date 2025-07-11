@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x66\x65\x64\x65ration.proto\x12\nfederation\x1a\x19google/protobuf/any.proto\"F\n\nClientInfo\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x12\n\nmodel_type\x18\x02 \x01(\t\x12\x11\n\tdata_size\x18\x03 \x01(\x03\"\x8c\x01\n\rSetupResponse\x12\x14\n\x0cprivacy_mode\x18\x01 \x01(\t\x12\x32\n\rinitial_model\x18\x02 \x01(\x0b\x32\x1b.federation.ModelParameters\x12\x15\n\rhe_public_key\x18\x03 \x01(\x0c\x12\x1a\n\x12\x61ttestation_report\x18\x04 \x01(\x0c\"j\n\x16TrainingStatusResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x1a\n\x12registered_clients\x18\x03 \x01(\x05\x12\x15\n\rtotal_clients\x18\x04 \x01(\x05\"[\n\x0cServerUpdate\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x15\n\rcurrent_round\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\x12\x15\n\rtotal_clients\x18\x04 \x01(\x05\"3\n\x0fGetModelRequest\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\"r\n\x0c\x43lientUpdate\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\x12@\n\x16parameters_and_metrics\x18\x03 \x01(\x0b\x32 .federation.ParametersAndMetrics\"u\n\x14ParametersAndMetrics\x12/\n\nparameters\x18\x01 \x01(\x0b\x32\x1b.federation.ModelParameters\x12,\n\x07metrics\x18\x02 \x01(\x0b\x32\x1b.federation.TrainingMetrics\"%\n\x0fModelParameters\x12\x12\n\nparameters\x18\x01 \x01(\x0c\"c\n\x0fTrainingMetrics\x12\x10\n\x08test_acc\x18\x01 \x01(\x01\x12\x10\n\x08test_num\x18\x02 \x01(\x03\x12\x0b\n\x03\x61uc\x18\x03 \x01(\x01\x12\x0c\n\x04loss\x18\x04 \x01(\x01\x12\x11\n\ttrain_num\x18\x05 \x01(\x03\"\x84\x01\n\x15\x45ncryptedClientUpdate\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\x12I\n\x16parameters_and_metrics\x18\x03 \x01(\x0b\x32).federation.EncryptedParametersAndMetrics\"\x90\x01\n\x1d\x45ncryptedParametersAndMetrics\x12\x38\n\nparameters\x18\x01 \x01(\x0b\x32$.federation.EncryptedModelParameters\x12\x35\n\x07metrics\x18\x02 \x01(\x0b\x32$.federation.EncryptedTrainingMetrics\"\xb8\x01\n\x18\x45ncryptedModelParameters\x12H\n\nparameters\x18\x01 \x03(\x0b\x32\x34.federation.EncryptedModelParameters.ParametersEntry\x1aR\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12.\n\x05value\x18\x02 \x01(\x0b\x32\x1f.federation.EncryptedNumpyArray:\x02\x38\x01\"2\n\x13\x45ncryptedNumpyArray\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x03\"l\n\x18\x45ncryptedTrainingMetrics\x12\x10\n\x08test_acc\x18\x01 \x01(\x0c\x12\x10\n\x08test_num\x18\x02 \x01(\x0c\x12\x0b\n\x03\x61uc\x18\x03 \x01(\x0c\x12\x0c\n\x04loss\x18\x04 \x01(\x0c\x12\x11\n\ttrain_num\x18\x05 \x01(\x0c\x32\x93\x03\n\x11\x46\x65\x64\x65ratedLearning\x12\x45\n\x10RegisterAndSetup\x12\x16.federation.ClientInfo\x1a\x19.federation.SetupResponse\x12Q\n\x13\x43heckTrainingStatus\x12\x16.federation.ClientInfo\x1a\".federation.TrainingStatusResponse\x12\x42\n\x0cSubmitUpdate\x12\x18.federation.ClientUpdate\x1a\x18.federation.ServerUpdate\x12T\n\x15SubmitEncryptedUpdate\x12!.federation.EncryptedClientUpdate\x1a\x18.federation.ServerUpdate\x12J\n\x0eGetGlobalModel\x12\x1b.federation.GetModelRequest\x1a\x1b.federation.ModelParametersb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x66\x65\x64\x65ration.proto\x12\nfederation\x1a\x19google/protobuf/any.proto\"F\n\nClientInfo\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x12\n\nmodel_type\x18\x02 \x01(\t\x12\x11\n\tdata_size\x18\x03 \x01(\x03\"\xa8\x01\n\rSetupResponse\x12\x14\n\x0cprivacy_mode\x18\x01 \x01(\t\x12\x32\n\rinitial_model\x18\x02 \x01(\x0b\x32\x1b.federation.ModelParameters\x12\x15\n\rhe_public_key\x18\x03 \x01(\x0c\x12\x1e\n\x16tee_attestation_report\x18\x04 \x01(\x0c\x12\x16\n\x0etee_public_key\x18\x05 \x01(\x0c\"j\n\x16TrainingStatusResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x1a\n\x12registered_clients\x18\x03 \x01(\x05\x12\x15\n\rtotal_clients\x18\x04 \x01(\x05\"[\n\x0cServerUpdate\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x15\n\rcurrent_round\x18\x02 \x01(\x05\x12\x0f\n\x07message\x18\x03 \x01(\t\x12\x15\n\rtotal_clients\x18\x04 \x01(\x05\"3\n\x0fGetModelRequest\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\"r\n\x0c\x43lientUpdate\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\x12@\n\x16parameters_and_metrics\x18\x03 \x01(\x0b\x32 .federation.ParametersAndMetrics\"u\n\x14ParametersAndMetrics\x12/\n\nparameters\x18\x01 \x01(\x0b\x32\x1b.federation.ModelParameters\x12,\n\x07metrics\x18\x02 \x01(\x0b\x32\x1b.federation.TrainingMetrics\"%\n\x0fModelParameters\x12\x12\n\nparameters\x18\x01 \x01(\x0c\"c\n\x0fTrainingMetrics\x12\x10\n\x08test_acc\x18\x01 \x01(\x01\x12\x10\n\x08test_num\x18\x02 \x01(\x03\x12\x0b\n\x03\x61uc\x18\x03 \x01(\x01\x12\x0c\n\x04loss\x18\x04 \x01(\x01\x12\x11\n\ttrain_num\x18\x05 \x01(\x03\"~\n\x0fTeeClientUpdate\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\x12\x1f\n\x17\x65ncrypted_symmetric_key\x18\x03 \x01(\x0c\x12\r\n\x05nonce\x18\x04 \x01(\x0c\x12\x19\n\x11\x65ncrypted_payload\x18\x05 \x01(\x0c\"\x84\x01\n\x15\x45ncryptedClientUpdate\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\r\n\x05round\x18\x02 \x01(\x05\x12I\n\x16parameters_and_metrics\x18\x03 \x01(\x0b\x32).federation.EncryptedParametersAndMetrics\"\x90\x01\n\x1d\x45ncryptedParametersAndMetrics\x12\x38\n\nparameters\x18\x01 \x01(\x0b\x32$.federation.EncryptedModelParameters\x12\x35\n\x07metrics\x18\x02 \x01(\x0b\x32$.federation.EncryptedTrainingMetrics\"\xb8\x01\n\x18\x45ncryptedModelParameters\x12H\n\nparameters\x18\x01 \x03(\x0b\x32\x34.federation.EncryptedModelParameters.ParametersEntry\x1aR\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12.\n\x05value\x18\x02 \x01(\x0b\x32\x1f.federation.EncryptedNumpyArray:\x02\x38\x01\"2\n\x13\x45ncryptedNumpyArray\x12\x0c\n\x04\x64\x61ta\x18\x01 \x03(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x03\"l\n\x18\x45ncryptedTrainingMetrics\x12\x10\n\x08test_acc\x18\x01 \x01(\x0c\x12\x10\n\x08test_num\x18\x02 \x01(\x0c\x12\x0b\n\x03\x61uc\x18\x03 \x01(\x0c\x12\x0c\n\x04loss\x18\x04 \x01(\x0c\x12\x11\n\ttrain_num\x18\x05 \x01(\x0c\x32\xdd\x03\n\x11\x46\x65\x64\x65ratedLearning\x12\x45\n\x10RegisterAndSetup\x12\x16.federation.ClientInfo\x1a\x19.federation.SetupResponse\x12Q\n\x13\x43heckTrainingStatus\x12\x16.federation.ClientInfo\x1a\".federation.TrainingStatusResponse\x12\x42\n\x0cSubmitUpdate\x12\x18.federation.ClientUpdate\x1a\x18.federation.ServerUpdate\x12T\n\x15SubmitEncryptedUpdate\x12!.federation.EncryptedClientUpdate\x1a\x18.federation.ServerUpdate\x12H\n\x0fSubmitTeeUpdate\x12\x1b.federation.TeeClientUpdate\x1a\x18.federation.ServerUpdate\x12J\n\x0eGetGlobalModel\x12\x1b.federation.GetModelRequest\x1a\x1b.federation.ModelParametersb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,33 +37,35 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CLIENTINFO']._serialized_start=59
   _globals['_CLIENTINFO']._serialized_end=129
   _globals['_SETUPRESPONSE']._serialized_start=132
-  _globals['_SETUPRESPONSE']._serialized_end=272
-  _globals['_TRAININGSTATUSRESPONSE']._serialized_start=274
-  _globals['_TRAININGSTATUSRESPONSE']._serialized_end=380
-  _globals['_SERVERUPDATE']._serialized_start=382
-  _globals['_SERVERUPDATE']._serialized_end=473
-  _globals['_GETMODELREQUEST']._serialized_start=475
-  _globals['_GETMODELREQUEST']._serialized_end=526
-  _globals['_CLIENTUPDATE']._serialized_start=528
-  _globals['_CLIENTUPDATE']._serialized_end=642
-  _globals['_PARAMETERSANDMETRICS']._serialized_start=644
-  _globals['_PARAMETERSANDMETRICS']._serialized_end=761
-  _globals['_MODELPARAMETERS']._serialized_start=763
-  _globals['_MODELPARAMETERS']._serialized_end=800
-  _globals['_TRAININGMETRICS']._serialized_start=802
-  _globals['_TRAININGMETRICS']._serialized_end=901
-  _globals['_ENCRYPTEDCLIENTUPDATE']._serialized_start=904
-  _globals['_ENCRYPTEDCLIENTUPDATE']._serialized_end=1036
-  _globals['_ENCRYPTEDPARAMETERSANDMETRICS']._serialized_start=1039
-  _globals['_ENCRYPTEDPARAMETERSANDMETRICS']._serialized_end=1183
-  _globals['_ENCRYPTEDMODELPARAMETERS']._serialized_start=1186
-  _globals['_ENCRYPTEDMODELPARAMETERS']._serialized_end=1370
-  _globals['_ENCRYPTEDMODELPARAMETERS_PARAMETERSENTRY']._serialized_start=1288
-  _globals['_ENCRYPTEDMODELPARAMETERS_PARAMETERSENTRY']._serialized_end=1370
-  _globals['_ENCRYPTEDNUMPYARRAY']._serialized_start=1372
-  _globals['_ENCRYPTEDNUMPYARRAY']._serialized_end=1422
-  _globals['_ENCRYPTEDTRAININGMETRICS']._serialized_start=1424
-  _globals['_ENCRYPTEDTRAININGMETRICS']._serialized_end=1532
-  _globals['_FEDERATEDLEARNING']._serialized_start=1535
-  _globals['_FEDERATEDLEARNING']._serialized_end=1938
+  _globals['_SETUPRESPONSE']._serialized_end=300
+  _globals['_TRAININGSTATUSRESPONSE']._serialized_start=302
+  _globals['_TRAININGSTATUSRESPONSE']._serialized_end=408
+  _globals['_SERVERUPDATE']._serialized_start=410
+  _globals['_SERVERUPDATE']._serialized_end=501
+  _globals['_GETMODELREQUEST']._serialized_start=503
+  _globals['_GETMODELREQUEST']._serialized_end=554
+  _globals['_CLIENTUPDATE']._serialized_start=556
+  _globals['_CLIENTUPDATE']._serialized_end=670
+  _globals['_PARAMETERSANDMETRICS']._serialized_start=672
+  _globals['_PARAMETERSANDMETRICS']._serialized_end=789
+  _globals['_MODELPARAMETERS']._serialized_start=791
+  _globals['_MODELPARAMETERS']._serialized_end=828
+  _globals['_TRAININGMETRICS']._serialized_start=830
+  _globals['_TRAININGMETRICS']._serialized_end=929
+  _globals['_TEECLIENTUPDATE']._serialized_start=931
+  _globals['_TEECLIENTUPDATE']._serialized_end=1057
+  _globals['_ENCRYPTEDCLIENTUPDATE']._serialized_start=1060
+  _globals['_ENCRYPTEDCLIENTUPDATE']._serialized_end=1192
+  _globals['_ENCRYPTEDPARAMETERSANDMETRICS']._serialized_start=1195
+  _globals['_ENCRYPTEDPARAMETERSANDMETRICS']._serialized_end=1339
+  _globals['_ENCRYPTEDMODELPARAMETERS']._serialized_start=1342
+  _globals['_ENCRYPTEDMODELPARAMETERS']._serialized_end=1526
+  _globals['_ENCRYPTEDMODELPARAMETERS_PARAMETERSENTRY']._serialized_start=1444
+  _globals['_ENCRYPTEDMODELPARAMETERS_PARAMETERSENTRY']._serialized_end=1526
+  _globals['_ENCRYPTEDNUMPYARRAY']._serialized_start=1528
+  _globals['_ENCRYPTEDNUMPYARRAY']._serialized_end=1578
+  _globals['_ENCRYPTEDTRAININGMETRICS']._serialized_start=1580
+  _globals['_ENCRYPTEDTRAININGMETRICS']._serialized_end=1688
+  _globals['_FEDERATEDLEARNING']._serialized_start=1691
+  _globals['_FEDERATEDLEARNING']._serialized_end=2168
 # @@protoc_insertion_point(module_scope)

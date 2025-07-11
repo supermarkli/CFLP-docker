@@ -16,6 +16,11 @@ import pickle
 import gc
 
 from phe import paillier
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
 
 def set_seed(seed=42):
     random.seed(seed)
@@ -75,6 +80,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.he_public_key = None
         self.he_private_key = None
         self.mrenclave = None
+        self.tee_private_key = None
+        self.tee_public_key = None
 
         if self.privacy_mode == 'he':
             logger.info("启动HE模式：正在生成Paillier密钥对...")
@@ -83,6 +90,14 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             logger.info(f"Paillier密钥对生成完毕 (密钥长度: {key_size} bits)。")
         
         elif self.privacy_mode == 'tee':
+            logger.info("启动TEE模式：正在生成RSA密钥对用于模拟Enclave...")
+            self.tee_private_key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=2048,
+            )
+            self.tee_public_key = self.tee_private_key.public_key()
+            logger.info("模拟Enclave的RSA密钥对已生成。")
+
             logger.info("启动TEE模式：正在模拟生成身份指纹(MRENCLAVE)...")
             # 在真实场景中，MRENCLAVE由TEE构建过程生成。这里我们模拟它。
             # 我们对模型结构进行哈希来模拟一个稳定的、与代码相关的指纹。
@@ -120,13 +135,18 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 response.he_public_key = pickle.dumps(self.he_public_key)
 
             elif self.privacy_mode == 'tee':
-                logger.info(f"向客户端 {client_id} 提供模拟的证明报告。")
-                # 模拟证明报告，真实场景下由TEE硬件和SDK生成
+                logger.info(f"向客户端 {client_id} 提供模拟的证明报告和公钥。")
+                # 1. 模拟证明报告
                 report_data = {
                     "mrenclave": self.mrenclave,
                     "report_data": hashlib.sha256(request.client_id.encode()).hexdigest() # 绑定请求
                 }
-                response.attestation_report = json.dumps(report_data).encode('utf-8')
+                response.tee_attestation_report = json.dumps(report_data).encode('utf-8')
+                # 2. 提供公钥
+                response.tee_public_key = self.tee_public_key.public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.SubjectPublicKeyInfo
+                )
 
             if len(self.clients) >= self.expected_clients:
                 self.next_step = True
@@ -170,17 +190,58 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
     def SubmitUpdate(self, request, context):
         """接收客户端明文模型更新"""
-        if self.privacy_mode not in ['none', 'tee']:
+        if self.privacy_mode != 'none':
             return federation_pb2.ServerUpdate(code=400, message="服务器当前不接受明文更新。")
-        return self._submit_update_handler(request, context, is_encrypted=False)
+        return self._submit_update_handler(request, context, update_type='none')
 
     def SubmitEncryptedUpdate(self, request, context):
         """接收客户端密文模型更新"""
         if self.privacy_mode != 'he':
             return federation_pb2.ServerUpdate(code=400, message="服务器当前不接受密文更新。")
-        return self._submit_update_handler(request, context, is_encrypted=True)
+        return self._submit_update_handler(request, context, update_type='he')
 
-    def _submit_update_handler(self, request, context, is_encrypted):
+    def SubmitTeeUpdate(self, request, context):
+        """接收客户端在TEE模式下的加密更新"""
+        if self.privacy_mode != 'tee':
+            return federation_pb2.ServerUpdate(code=400, message="服务器当前不接受TEE更新。")
+
+        try:
+            # 1. 用RSA私钥解密AES对称密钥
+            symmetric_key = self.tee_private_key.decrypt(
+                request.encrypted_symmetric_key,
+                padding.OAEP(
+                    mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                    algorithm=hashes.SHA256(),
+                    label=None
+                )
+            )
+
+            # 2. 使用AES密钥和Nonce解密主载荷
+            aesgcm = AESGCM(symmetric_key)
+            decrypted_payload = aesgcm.decrypt(
+                request.nonce,
+                request.encrypted_payload,
+                None # Associated data
+            )
+            
+            # 3. 反序列化为真正的请求体
+            tee_request_data = federation_pb2.ParametersAndMetrics()
+            tee_request_data.ParseFromString(decrypted_payload)
+
+            # 4. 包装成与普通更新类似的结构，以便复用处理逻辑
+            wrapped_request = federation_pb2.ClientUpdate(
+                client_id=request.client_id,
+                round=request.round,
+                parameters_and_metrics=tee_request_data
+            )
+            return self._submit_update_handler(wrapped_request, context, update_type='tee')
+
+        except Exception as e:
+            logger.error(f"处理TEE更新失败: {e}", exc_info=True)
+            return federation_pb2.ServerUpdate(code=500, message="解密或处理TEE载荷时发生错误")
+
+
+    def _submit_update_handler(self, request, context, update_type):
         """统一处理更新请求的内部逻辑"""
         try:
             client_id = request.client_id
@@ -190,15 +251,16 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 if round_num != self.current_round:
                     return federation_pb2.ServerUpdate(code=400, message=f"轮次不匹配，服务器当前轮次为 {self.current_round}")
 
-                if is_encrypted:
+                if update_type == 'he':
                     params, metrics_data = self._process_encrypted_update(request)
                     self.clients[client_id].encrypted_metrics = metrics_data
-                else:
+                else: # 'none' or 'tee'
                     params, metrics_data = self._process_plaintext_update(request)
                     self.clients[client_id].metrics = metrics_data
                 
                 self.client_parameters[round_num][client_id] = params
-                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} 的 {'密文' if is_encrypted else '明文'} 更新。")
+                log_msg_map = {'none': '明文', 'he': '密文', 'tee': 'TEE加密'}
+                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} 的 {log_msg_map[update_type]} 更新。")
 
                 submitted_clients = len(self.client_parameters[round_num])
                 if submitted_clients >= self.expected_clients:
@@ -295,7 +357,11 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         try:
             logger.info(f"[Round {round_num+1}] 所有客户端参数已收集完毕，开始聚合。")
             
-            aggregator = self.aggregate_encrypted_parameters if self.privacy_mode == 'he' else self.aggregate_parameters
+            if self.privacy_mode == 'he':
+                aggregator = self.aggregate_encrypted_parameters
+            else: # 'none' or 'tee'
+                aggregator = self.aggregate_parameters
+
             aggregated_params = aggregator(round_num)
             
             self.global_model.set_parameters(aggregated_params)

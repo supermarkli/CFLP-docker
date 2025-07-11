@@ -18,6 +18,11 @@ import json
 import hashlib
 import gc
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from src.utils.logging_config import get_logger
@@ -51,6 +56,7 @@ class FederatedLearningClient:
         self.channel = None
         self.privacy_mode = None
         self.he_public_key = None
+        self.tee_public_key = None
         self.continue_training = True
 
         self.loss = nn.CrossEntropyLoss()
@@ -86,23 +92,46 @@ class FederatedLearningClient:
             model_type="CNN",
             data_size=self.data_size
         )
-        setup_response = self.stub.RegisterAndSetup(register_request)
+
+        # 添加重试逻辑以应对服务器启动延迟
+        max_retries = 5
+        retry_interval = 3
+        for attempt in range(max_retries):
+            try:
+                setup_response = self.stub.RegisterAndSetup(register_request)
+                logger.info(f"客户端{self.client_id}注册成功。")
+                break # 成功则跳出循环
+            except grpc._channel._InactiveRpcError as e:
+                if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
+                    logger.warning(f"无法连接到服务器，将在 {retry_interval} 秒后重试 ({attempt+1}/{max_retries})...")
+                    time.sleep(retry_interval)
+                else:
+                    logger.error("多次尝试后仍无法连接到服务器，放弃连接。")
+                    raise e
         
         self.privacy_mode = setup_response.privacy_mode
         logger.info(f"服务器运行模式为: {self.privacy_mode.upper()}")
 
+        # 根据模式处理安全材料
         if self.privacy_mode == 'he':
             self.he_public_key = pickle.loads(setup_response.he_public_key)
             logger.info(f"客户端{self.client_id}成功接收并加载HE公钥。")
         
         elif self.privacy_mode == 'tee':
-            report = json.loads(setup_response.attestation_report.decode('utf-8'))
+            # 1. 验证TEE身份
+            report = json.loads(setup_response.tee_attestation_report.decode('utf-8'))
             actual_mrenclave = report.get("mrenclave")
             expected_mrenclave = config['tee']['expected_mrenclave']
             if actual_mrenclave == expected_mrenclave:
                 logger.info(f"客户端{self.client_id}TEE身份验证成功！服务器可信。")
             else:
                 raise Exception(f"TEE身份验证失败！预期MRENCLAVE为{expected_mrenclave}，实际为{actual_mrenclave}。")
+            
+            # 2. 加载公钥
+            self.tee_public_key = serialization.load_pem_public_key(
+                setup_response.tee_public_key,
+            )
+            logger.info("成功接收并加载TEE公钥。")
 
         # 设置初始模型参数
         initial_params = deserialize_parameters(setup_response.initial_model.parameters)
@@ -242,8 +271,52 @@ class FederatedLearningClient:
             parameters_and_metrics=params_and_metrics
         )
 
+    def _create_tee_parameter_update_message(self, metrics_data):
+        """创建在TEE模式下加密的参数更新消息"""
+        # 1. 创建包含明文参数和指标的载荷
+        parameters = self.model.get_parameters()
+        serialized_params = serialize_parameters(parameters)
+        training_metrics = federation_pb2.TrainingMetrics(
+            test_acc=metrics_data.get('test_acc', 0.0),
+            test_num=metrics_data.get('test_num', 0.0),
+            auc=metrics_data.get('auc', 0.0),
+            loss=metrics_data.get('loss', 0.0),
+            train_num=metrics_data.get('train_num', 0)
+        )
+        model_parameters = federation_pb2.ModelParameters(parameters=serialized_params)
+        payload = federation_pb2.ParametersAndMetrics(
+            parameters=model_parameters,
+            metrics=training_metrics
+        )
+        serialized_payload = payload.SerializeToString()
+
+        # 2. 生成一次性对称密钥(AES)并用RSA公钥加密它
+        symmetric_key = AESGCM.generate_key(bit_length=256)
+        encrypted_symmetric_key = self.tee_public_key.encrypt(
+            symmetric_key,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+
+        # 3. 使用AES密钥加密主载荷
+        aesgcm = AESGCM(symmetric_key)
+        nonce = os.urandom(12)  # 96-bit nonce is recommended
+        encrypted_payload = aesgcm.encrypt(nonce, serialized_payload, None)
+
+        # 4. 创建最终的TEE更新消息
+        return federation_pb2.TeeClientUpdate(
+            client_id=self.client_id,
+            round=self.current_round,
+            encrypted_symmetric_key=encrypted_symmetric_key,
+            nonce=nonce,
+            encrypted_payload=encrypted_payload
+        )
+
     def _create_encrypted_parameter_update_message(self, metrics_data):
-        """创建参数更新消息（密文）"""
+        """创建参数更新消息（HE密文）"""
         parameters = self.model.get_parameters()
         encrypted_parameters = {}
         chunk_size = config['encryption']['chunk_size']
@@ -333,8 +406,12 @@ class FederatedLearningClient:
                 logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}在HE模式下: 正在加密并提交更新...")
                 update_request = self._create_encrypted_parameter_update_message(metrics_data)
                 self.stub.SubmitEncryptedUpdate(update_request)
-            else: # 'none' and 'tee' modes
-                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}在{self.privacy_mode.upper()}模式下: 正在提交明文更新...")
+            elif self.privacy_mode == 'tee':
+                logger.info(f"[Round {self.current_round+1}] TEE模式: 正在加密并提交更新...")
+                update_request = self._create_tee_parameter_update_message(metrics_data)
+                self.stub.SubmitTeeUpdate(update_request)
+            else: # 'none'
+                logger.info(f"[Round {self.current_round+1}] NONE模式: 正在提交明文更新...")
                 update_request = self._create_parameter_update_message(metrics_data)
                 self.stub.SubmitUpdate(update_request)
 

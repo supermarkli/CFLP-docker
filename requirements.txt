@@ -1,9 +1,13 @@
 grpcio
 numpy
+pandas
+torch
 scikit-learn
+tqdm
+matplotlib
 PyYAML
-phe
 grpcio-tools
 protobuf
-matplotlib
+phe
+cryptography
 seaborn

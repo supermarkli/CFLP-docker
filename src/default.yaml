@@ -9,7 +9,7 @@ federation:
   # "none" - 标准联邦学习，明文传输。
   # "he"   - 使用同态加密保护模型参数。
   # "tee"  - 使用TEE（可信执行环境）在服务器端保护明文聚合。
-  privacy_mode: "none"  # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "tee"  # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 100
   convergence:
