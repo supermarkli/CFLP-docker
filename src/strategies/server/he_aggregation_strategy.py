@@ -92,17 +92,29 @@ class HeAggregationStrategy(AggregationStrategy):
         total_data_size = sum(c.data_size for c in active_clients)
         
         if total_data_size == 0: return self.server.global_model.get_parameters()
-        client_weights = [c.data_size / total_data_size for c in active_clients]
+        
+        # 将浮点数权重转换为定点整数以进行同态乘法
+        scaling_factor = 1e6  # 缩放因子，用于保留精度
+        client_weights_int = [int(w * scaling_factor) for c in active_clients for w in [c.data_size / total_data_size]]
+        total_weight_int = sum(client_weights_int)
 
         aggregated_params = {}
         param_structure = parameters_list[0]
         for key in param_structure.keys():
-            weighted_sum = sum(p[key] * w for p, w in zip(parameters_list, client_weights))
+            # 使用整数权重进行加权求和
+            weighted_sum = sum(p[key] * w for p, w in zip(parameters_list, client_weights_int))
             
             logger.debug(f"开始解密参数 {key}...")
             flat_sum = weighted_sum.flatten()
             decrypted_flat = np.array([self.private_key.decrypt(val) for val in flat_sum])
-            aggregated_params[key] = decrypted_flat.reshape(param_structure[key].shape)
+            
+            # 解密和反缩放
+            if total_weight_int > 0:
+                scaled_avg = decrypted_flat / total_weight_int
+            else:
+                scaled_avg = decrypted_flat # Should not happen if total_data_size > 0
+            
+            aggregated_params[key] = scaled_avg.reshape(param_structure[key].shape)
         
         logger.info(f"[Round {round_num+1}] 密文参数聚合与解密完成。")
         return aggregated_params
@@ -125,7 +137,7 @@ class HeAggregationStrategy(AggregationStrategy):
         
         total_test_acc = decrypted_metrics.get('test_acc', 0)
         total_test_num = decrypted_metrics.get('test_num', 0)
-        total_auc = decrypted_metrics.get('auc', 0)
+        total_auc = decrypted_metrics.get('auc', 0) 
         total_loss = decrypted_metrics.get('loss', 0)
         total_train_num = decrypted_metrics.get('train_num', 0)
 
@@ -137,7 +149,7 @@ class HeAggregationStrategy(AggregationStrategy):
             del self.server.client_parameters[round_num]
 
         avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
-        avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
+        avg_auc = total_auc / total_test_num if total_test_num > 0 else 0 # auc已经是加权和，这里直接除以总数
         avg_loss = total_loss / total_train_num if total_train_num > 0 else 0
 
         self.server.rs_test_acc.append(avg_acc)

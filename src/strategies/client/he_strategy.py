@@ -24,6 +24,7 @@ class HeClientStrategy(ClientStrategy):
         encrypted_parameters = {}
         chunk_size = config['encryption']['chunk_size']
         ciphertext_bytes_len = (self.he_public_key.nsquare.bit_length() + 7) // 8
+        scaling_factor = 1e6 # 与服务器端一致
 
         for key, value in model_parameters.items():
             if isinstance(value, np.ndarray):
@@ -34,7 +35,8 @@ class HeClientStrategy(ClientStrategy):
 
                 for i in range(0, total, chunk_size):
                     chunk = flat[i:i+chunk_size]
-                    encrypted_part = [self.he_public_key.encrypt(float(v)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for v in chunk]
+                    # 将浮点数参数转换为定点整数进行加密
+                    encrypted_part = [self.he_public_key.encrypt(int(v * scaling_factor)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for v in chunk]
                     encrypted_chunks.extend(encrypted_part)
                     
                     progress = min(i + chunk_size, total)
@@ -47,7 +49,7 @@ class HeClientStrategy(ClientStrategy):
                     'data': encrypted_chunks, 'shape': list(value.shape)
                 }
             else: # scalar
-                encrypted_value = self.he_public_key.encrypt(float(value))
+                encrypted_value = self.he_public_key.encrypt(int(value * scaling_factor))
                 encrypted_parameters[key] = {
                     'data': [encrypted_value.ciphertext().to_bytes(ciphertext_bytes_len, 'big')], 'shape': [1]
                 }
@@ -56,7 +58,12 @@ class HeClientStrategy(ClientStrategy):
         encrypted_model_params = federation_pb2.EncryptedModelParameters(parameters=proto_params)
 
         # --- 加密训练指标 ---
-        encrypted_metrics_dict = {k: self.he_public_key.encrypt(float(v)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for k, v in metrics.items()}
+        # 预处理指标，将auc乘以样本数
+        metrics_to_encrypt = metrics.copy()
+        if 'auc' in metrics_to_encrypt and 'test_num' in metrics_to_encrypt:
+            metrics_to_encrypt['auc'] = metrics_to_encrypt['auc'] * metrics_to_encrypt.get('test_num', 1)
+
+        encrypted_metrics_dict = {k: self.he_public_key.encrypt(float(v)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for k, v in metrics_to_encrypt.items()}
         encrypted_metrics_proto = federation_pb2.EncryptedTrainingMetrics(**encrypted_metrics_dict)
         
         # --- 组装 Payload ---

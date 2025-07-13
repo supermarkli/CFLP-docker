@@ -103,7 +103,7 @@ class NoneAggregationStrategy(AggregationStrategy):
         
         avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
         avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
-        avg_loss = total_loss / total_test_num if total_test_num > 0 else 0
+        avg_loss = total_loss / total_train_num if total_train_num > 0 else 0
         
         self.server.rs_test_acc.append(avg_acc)
         self.server.rs_train_loss.append(avg_loss)
