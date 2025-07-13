@@ -58,6 +58,7 @@ message ClientUpdate {
         PlaintextPayload plaintext = 3;
         HePayload he = 4;
         TeePayload tee = 5;
+        MpcPayload mpc = 6;
     }
 }
 
@@ -69,6 +70,11 @@ message PlaintextPayload {
 // "he" 模式的载荷
 message HePayload {
     EncryptedParametersAndMetrics parameters_and_metrics = 1;
+}
+
+// "mpc" 模式的载荷
+message MpcPayload {
+    SharedParametersAndMetrics parameters_and_metrics = 1;
 }
 
 // "tee" 模式的载荷
@@ -144,6 +150,32 @@ message EncryptedClientUpdate {
 message EncryptedParametersAndMetrics {
     EncryptedModelParameters parameters = 1;
     EncryptedTrainingMetrics metrics = 2;
+}
+
+// MPC 模式下的份额化参数和指标
+message SharedParametersAndMetrics {
+    SharedModelParameters parameters = 1;
+    SharedTrainingMetrics metrics = 2;
+}
+
+// 份额化的模型参数
+message SharedModelParameters {
+    map<string, SharedNumpyArray> parameters = 1;
+}
+
+// 份额化的 Numpy 数组
+message SharedNumpyArray {
+    repeated bytes data = 1; // 参数被分割成的所有份额
+    repeated int64 shape = 2; // 原始形状
+}
+
+// 份额化的训练指标
+message SharedTrainingMetrics {
+    bytes test_acc = 1;
+    bytes test_num = 2;
+    bytes auc = 3;
+    bytes loss = 4;
+    bytes train_num = 5;
 }
 
 // 密文模型参数

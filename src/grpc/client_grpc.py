@@ -34,6 +34,7 @@ from src.utils.config_utils import config
 from src.strategies.client.none_strategy import NoneClientStrategy
 from src.strategies.client.he_strategy import HeClientStrategy
 from src.strategies.client.tee_strategy import TeeClientStrategy
+from src.strategies.client.mpc_strategy import MpcClientStrategy
 
 logger = get_logger()
 random.seed(config['base']['random_seed'])
@@ -128,6 +129,8 @@ class FederatedLearningClient:
         elif self.privacy_mode == 'tee':
             # 策略类自己处理验证和反序列化
             return TeeClientStrategy(self, setup_response.tee_attestation_report, setup_response.tee_public_key)
+        elif self.privacy_mode == 'mpc':
+            return MpcClientStrategy(self)
         else:
             logger.error(f"接收到未知的隐私模式: {self.privacy_mode}")
             return None

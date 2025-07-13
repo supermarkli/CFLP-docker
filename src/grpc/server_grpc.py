@@ -44,6 +44,7 @@ from src.utils.config_utils import config
 from src.strategies.server.none_aggregation_strategy import NoneAggregationStrategy
 from src.strategies.server.he_aggregation_strategy import HeAggregationStrategy
 from src.strategies.server.tee_aggregation_strategy import TeeAggregationStrategy
+from src.strategies.server.mpc_aggregation_strategy import MpcAggregationStrategy
 
 logger = get_logger()
 set_seed(config['base']['random_seed'])
@@ -91,6 +92,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             return HeAggregationStrategy(self)
         elif self.privacy_mode == 'tee':
             return TeeAggregationStrategy(self)
+        elif self.privacy_mode == 'mpc':
+            return MpcAggregationStrategy(self)
         else:
             return None
 
