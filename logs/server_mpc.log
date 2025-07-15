@@ -1,0 +1,507 @@
+2025-07-14 09:59:10 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_mpc.log
+2025-07-14 09:59:10 - INFO - [mpc_aggregation_strategy.py:16] - MPC 聚合策略已初始化。
+2025-07-14 09:59:10 - INFO - [server_grpc.py:85] - 服务器初始化完成 (模式: mpc)，等待 3 个客户端注册...
+2025-07-14 09:59:10 - INFO - [server_grpc.py:248] - 联邦学习安全服务器正在启动，监听端口: 50051
+2025-07-14 09:59:11 - INFO - [server_grpc.py:102] - 接收到客户端 1 的注册请求 (模型: CNN, 数据量: 18667)
+2025-07-14 09:59:11 - INFO - [server_grpc.py:111] - 客户端 1 注册成功。当前 1/3 个客户端。
+2025-07-14 09:59:11 - INFO - [mpc_aggregation_strategy.py:31] - 为客户端 1 准备MPC模式的设置响应。
+2025-07-14 09:59:11 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:59:11 - INFO - [server_grpc.py:102] - 接收到客户端 2 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-14 09:59:11 - INFO - [server_grpc.py:111] - 客户端 2 注册成功。当前 2/3 个客户端。
+2025-07-14 09:59:11 - INFO - [mpc_aggregation_strategy.py:31] - 为客户端 2 准备MPC模式的设置响应。
+2025-07-14 09:59:11 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:59:11 - INFO - [server_grpc.py:102] - 接收到客户端 3 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-14 09:59:11 - INFO - [server_grpc.py:111] - 客户端 3 注册成功。当前 3/3 个客户端。
+2025-07-14 09:59:11 - INFO - [mpc_aggregation_strategy.py:31] - 为客户端 3 准备MPC模式的设置响应。
+2025-07-14 09:59:11 - INFO - [server_grpc.py:117] - 所有客户端已注册，设置 next_step=True，准备开始训练。
+2025-07-14 09:59:11 - INFO - [server_grpc.py:120] - 联邦学习流程计时开始
+2025-07-14 09:59:11 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:59:11 - INFO - [server_grpc.py:142] - [Round 1] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:59:12 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:59:12 - INFO - [server_grpc.py:142] - [Round 1] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:59:12 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:59:12 - INFO - [server_grpc.py:142] - [Round 1] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:59:12 - INFO - [server_grpc.py:146] - [Round 1] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:00:00 - INFO - [mpc_aggregation_strategy.py:57] - [Round 1] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:00:00 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:00:01 - INFO - [mpc_aggregation_strategy.py:57] - [Round 1] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:00:01 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:00:01 - INFO - [mpc_aggregation_strategy.py:57] - [Round 1] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:00:01 - INFO - [server_grpc.py:183] - [Round 1] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:00:01 - INFO - [mpc_aggregation_strategy.py:71] - [Round 1] 开始MPC参数聚合...
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:00:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:00:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:00:08 - INFO - [mpc_aggregation_strategy.py:131] - [Round 1] MPC参数聚合完成。
+2025-07-14 10:00:08 - INFO - [server_grpc.py:188] - [Round 1] 全局模型参数更新完成。
+2025-07-14 10:00:08 - INFO - [mpc_aggregation_strategy.py:136] - [Round 1] 开始MPC指标评估...
+2025-07-14 10:00:08 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13641000000, 'test_num': 14001000000, 'auc': 13949614836, 'loss': 73528906604367, 'train_num': 55800000000}
+2025-07-14 10:00:08 - INFO - [mpc_aggregation_strategy.py:202] - [Round 1] 全局评估 (MPC): Acc=0.9743, AUC=0.9963, Loss=1317.7223
+2025-07-14 10:00:08 - INFO - [server_grpc.py:213] - 第 1 轮聚合完成，进入第 2 轮。
+2025-07-14 10:00:08 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:00:08 - INFO - [server_grpc.py:142] - [Round 2] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 10:00:08 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:00:08 - INFO - [server_grpc.py:142] - [Round 2] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 10:00:08 - INFO - [server_grpc.py:137] - [Round 2] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:00:08 - INFO - [server_grpc.py:142] - [Round 2] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 10:00:08 - INFO - [server_grpc.py:146] - [Round 2] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:00:08 - INFO - [server_grpc.py:171] - 向客户端 1 提供第1轮全局模型
+2025-07-14 10:00:08 - INFO - [server_grpc.py:171] - 向客户端 3 提供第1轮全局模型
+2025-07-14 10:00:09 - INFO - [server_grpc.py:171] - 向客户端 2 提供第1轮全局模型
+2025-07-14 10:00:54 - INFO - [mpc_aggregation_strategy.py:57] - [Round 2] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:00:54 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:00:55 - INFO - [mpc_aggregation_strategy.py:57] - [Round 2] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:00:55 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:00:56 - INFO - [mpc_aggregation_strategy.py:57] - [Round 2] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:00:56 - INFO - [server_grpc.py:183] - [Round 2] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:00:56 - INFO - [mpc_aggregation_strategy.py:71] - [Round 2] 开始MPC参数聚合...
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:00:57 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:01:03 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:01:03 - INFO - [mpc_aggregation_strategy.py:131] - [Round 2] MPC参数聚合完成。
+2025-07-14 10:01:04 - INFO - [server_grpc.py:188] - [Round 2] 全局模型参数更新完成。
+2025-07-14 10:01:04 - INFO - [mpc_aggregation_strategy.py:136] - [Round 2] 开始MPC指标评估...
+2025-07-14 10:01:04 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13758000000, 'test_num': 14001000000, 'auc': 13975333486, 'loss': 41183130482844, 'train_num': 55800000000}
+2025-07-14 10:01:04 - INFO - [mpc_aggregation_strategy.py:202] - [Round 2] 全局评估 (MPC): Acc=0.9826, AUC=0.9982, Loss=738.0489
+2025-07-14 10:01:04 - INFO - [server_grpc.py:213] - 第 2 轮聚合完成，进入第 3 轮。
+2025-07-14 10:01:04 - INFO - [server_grpc.py:137] - [Round 3] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:01:04 - INFO - [server_grpc.py:142] - [Round 3] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 10:01:04 - INFO - [server_grpc.py:137] - [Round 3] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:01:04 - INFO - [server_grpc.py:142] - [Round 3] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 10:01:04 - INFO - [server_grpc.py:137] - [Round 3] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:01:04 - INFO - [server_grpc.py:142] - [Round 3] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:01:04 - INFO - [server_grpc.py:146] - [Round 3] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:01:04 - INFO - [server_grpc.py:171] - 向客户端 2 提供第2轮全局模型
+2025-07-14 10:01:04 - INFO - [server_grpc.py:171] - 向客户端 3 提供第2轮全局模型
+2025-07-14 10:01:04 - INFO - [server_grpc.py:171] - 向客户端 1 提供第2轮全局模型
+2025-07-14 10:01:50 - INFO - [mpc_aggregation_strategy.py:57] - [Round 3] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:01:50 - INFO - [server_grpc.py:137] - [Round 3] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:01:51 - INFO - [mpc_aggregation_strategy.py:57] - [Round 3] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:01:51 - INFO - [server_grpc.py:137] - [Round 3] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:01:51 - INFO - [mpc_aggregation_strategy.py:57] - [Round 3] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:01:51 - INFO - [server_grpc.py:183] - [Round 3] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:01:51 - INFO - [mpc_aggregation_strategy.py:71] - [Round 3] 开始MPC参数聚合...
+2025-07-14 10:01:51 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:01:51 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:01:52 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:01:52 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:01:52 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:01:52 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:01:52 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:01:58 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:01:58 - INFO - [mpc_aggregation_strategy.py:131] - [Round 3] MPC参数聚合完成。
+2025-07-14 10:01:58 - INFO - [server_grpc.py:188] - [Round 3] 全局模型参数更新完成。
+2025-07-14 10:01:58 - INFO - [mpc_aggregation_strategy.py:136] - [Round 3] 开始MPC指标评估...
+2025-07-14 10:01:58 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13739000000, 'test_num': 14001000000, 'auc': 13973960156, 'loss': 40019471108949, 'train_num': 55800000000}
+2025-07-14 10:01:58 - INFO - [mpc_aggregation_strategy.py:202] - [Round 3] 全局评估 (MPC): Acc=0.9813, AUC=0.9981, Loss=717.1948
+2025-07-14 10:01:58 - INFO - [server_grpc.py:213] - 第 3 轮聚合完成，进入第 4 轮。
+2025-07-14 10:01:58 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:01:58 - INFO - [server_grpc.py:142] - [Round 4] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 10:01:58 - INFO - [server_grpc.py:137] - [Round 4] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:01:58 - INFO - [server_grpc.py:142] - [Round 4] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:01:58 - INFO - [server_grpc.py:137] - [Round 4] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:01:58 - INFO - [server_grpc.py:142] - [Round 4] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 10:01:58 - INFO - [server_grpc.py:146] - [Round 4] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:01:58 - INFO - [server_grpc.py:171] - 向客户端 1 提供第3轮全局模型
+2025-07-14 10:01:58 - INFO - [server_grpc.py:171] - 向客户端 2 提供第3轮全局模型
+2025-07-14 10:01:58 - INFO - [server_grpc.py:171] - 向客户端 3 提供第3轮全局模型
+2025-07-14 10:02:43 - INFO - [mpc_aggregation_strategy.py:57] - [Round 4] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:02:43 - INFO - [server_grpc.py:137] - [Round 4] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:02:44 - INFO - [mpc_aggregation_strategy.py:57] - [Round 4] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:02:44 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:02:44 - INFO - [mpc_aggregation_strategy.py:57] - [Round 4] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:02:44 - INFO - [server_grpc.py:183] - [Round 4] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:02:44 - INFO - [mpc_aggregation_strategy.py:71] - [Round 4] 开始MPC参数聚合...
+2025-07-14 10:02:44 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:02:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:02:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:02:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:02:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:02:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:02:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:02:51 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:02:51 - INFO - [mpc_aggregation_strategy.py:131] - [Round 4] MPC参数聚合完成。
+2025-07-14 10:02:52 - INFO - [server_grpc.py:188] - [Round 4] 全局模型参数更新完成。
+2025-07-14 10:02:52 - INFO - [mpc_aggregation_strategy.py:136] - [Round 4] 开始MPC指标评估...
+2025-07-14 10:02:52 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13800000000, 'test_num': 14001000000, 'auc': 13982765706, 'loss': 25058213499965, 'train_num': 55800000000}
+2025-07-14 10:02:52 - INFO - [mpc_aggregation_strategy.py:202] - [Round 4] 全局评估 (MPC): Acc=0.9856, AUC=0.9987, Loss=449.0719
+2025-07-14 10:02:52 - INFO - [server_grpc.py:213] - 第 4 轮聚合完成，进入第 5 轮。
+2025-07-14 10:02:52 - INFO - [server_grpc.py:137] - [Round 5] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:02:52 - INFO - [server_grpc.py:142] - [Round 5] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:02:52 - INFO - [server_grpc.py:137] - [Round 5] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:02:52 - INFO - [server_grpc.py:142] - [Round 5] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:02:52 - INFO - [server_grpc.py:137] - [Round 5] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:02:52 - INFO - [server_grpc.py:142] - [Round 5] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:02:52 - INFO - [server_grpc.py:171] - 向客户端 3 提供第4轮全局模型
+2025-07-14 10:02:52 - INFO - [server_grpc.py:146] - [Round 5] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:02:52 - INFO - [server_grpc.py:171] - 向客户端 2 提供第4轮全局模型
+2025-07-14 10:02:52 - INFO - [server_grpc.py:171] - 向客户端 1 提供第4轮全局模型
+2025-07-14 10:03:36 - INFO - [mpc_aggregation_strategy.py:57] - [Round 5] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:03:36 - INFO - [server_grpc.py:137] - [Round 5] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:03:36 - INFO - [mpc_aggregation_strategy.py:57] - [Round 5] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:03:36 - INFO - [server_grpc.py:137] - [Round 5] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:57] - [Round 5] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:03:38 - INFO - [server_grpc.py:183] - [Round 5] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:71] - [Round 5] 开始MPC参数聚合...
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:03:38 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:03:45 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:03:45 - INFO - [mpc_aggregation_strategy.py:131] - [Round 5] MPC参数聚合完成。
+2025-07-14 10:03:45 - INFO - [server_grpc.py:188] - [Round 5] 全局模型参数更新完成。
+2025-07-14 10:03:45 - INFO - [mpc_aggregation_strategy.py:136] - [Round 5] 开始MPC指标评估...
+2025-07-14 10:03:45 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13776000000, 'test_num': 14001000000, 'auc': 13982924528, 'loss': 29181288075179, 'train_num': 55800000000}
+2025-07-14 10:03:45 - INFO - [mpc_aggregation_strategy.py:202] - [Round 5] 全局评估 (MPC): Acc=0.9839, AUC=0.9987, Loss=522.9622
+2025-07-14 10:03:45 - INFO - [server_grpc.py:213] - 第 5 轮聚合完成，进入第 6 轮。
+2025-07-14 10:03:45 - INFO - [server_grpc.py:137] - [Round 6] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:03:45 - INFO - [server_grpc.py:142] - [Round 6] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:03:45 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:03:45 - INFO - [server_grpc.py:142] - [Round 6] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:03:45 - INFO - [server_grpc.py:137] - [Round 6] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:03:45 - INFO - [server_grpc.py:142] - [Round 6] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:03:45 - INFO - [server_grpc.py:171] - 向客户端 3 提供第5轮全局模型
+2025-07-14 10:03:45 - INFO - [server_grpc.py:146] - [Round 6] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:03:45 - INFO - [server_grpc.py:171] - 向客户端 2 提供第5轮全局模型
+2025-07-14 10:03:45 - INFO - [server_grpc.py:171] - 向客户端 1 提供第5轮全局模型
+2025-07-14 10:04:31 - INFO - [mpc_aggregation_strategy.py:57] - [Round 6] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:04:31 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:04:31 - INFO - [mpc_aggregation_strategy.py:57] - [Round 6] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:04:31 - INFO - [server_grpc.py:137] - [Round 6] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:04:31 - INFO - [mpc_aggregation_strategy.py:57] - [Round 6] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:04:31 - INFO - [server_grpc.py:183] - [Round 6] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:04:31 - INFO - [mpc_aggregation_strategy.py:71] - [Round 6] 开始MPC参数聚合...
+2025-07-14 10:04:31 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:04:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:04:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:04:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:04:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:04:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:04:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:04:39 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:04:39 - INFO - [mpc_aggregation_strategy.py:131] - [Round 6] MPC参数聚合完成。
+2025-07-14 10:04:39 - INFO - [server_grpc.py:188] - [Round 6] 全局模型参数更新完成。
+2025-07-14 10:04:39 - INFO - [mpc_aggregation_strategy.py:136] - [Round 6] 开始MPC指标评估...
+2025-07-14 10:04:39 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13838000000, 'test_num': 14001000000, 'auc': 13990164868, 'loss': 14759736561584, 'train_num': 55800000000}
+2025-07-14 10:04:39 - INFO - [mpc_aggregation_strategy.py:202] - [Round 6] 全局评估 (MPC): Acc=0.9884, AUC=0.9992, Loss=264.5114
+2025-07-14 10:04:39 - INFO - [server_grpc.py:213] - 第 6 轮聚合完成，进入第 7 轮。
+2025-07-14 10:04:39 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:04:39 - INFO - [server_grpc.py:142] - [Round 7] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 10:04:39 - INFO - [server_grpc.py:137] - [Round 7] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:04:39 - INFO - [server_grpc.py:142] - [Round 7] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:04:39 - INFO - [server_grpc.py:137] - [Round 7] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:04:39 - INFO - [server_grpc.py:142] - [Round 7] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 10:04:39 - INFO - [server_grpc.py:146] - [Round 7] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:04:39 - INFO - [server_grpc.py:171] - 向客户端 1 提供第6轮全局模型
+2025-07-14 10:04:39 - INFO - [server_grpc.py:171] - 向客户端 2 提供第6轮全局模型
+2025-07-14 10:04:39 - INFO - [server_grpc.py:171] - 向客户端 3 提供第6轮全局模型
+2025-07-14 10:05:24 - INFO - [mpc_aggregation_strategy.py:57] - [Round 7] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:05:24 - INFO - [server_grpc.py:137] - [Round 7] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:05:25 - INFO - [mpc_aggregation_strategy.py:57] - [Round 7] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:05:25 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:05:25 - INFO - [mpc_aggregation_strategy.py:57] - [Round 7] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:05:25 - INFO - [server_grpc.py:183] - [Round 7] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:05:25 - INFO - [mpc_aggregation_strategy.py:71] - [Round 7] 开始MPC参数聚合...
+2025-07-14 10:05:25 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:05:26 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:05:26 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:05:26 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:05:26 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:05:26 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:05:26 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:05:32 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:05:32 - INFO - [mpc_aggregation_strategy.py:131] - [Round 7] MPC参数聚合完成。
+2025-07-14 10:05:33 - INFO - [server_grpc.py:188] - [Round 7] 全局模型参数更新完成。
+2025-07-14 10:05:33 - INFO - [mpc_aggregation_strategy.py:136] - [Round 7] 开始MPC指标评估...
+2025-07-14 10:05:33 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13834000000, 'test_num': 14001000000, 'auc': 13988495130, 'loss': 15477784996215, 'train_num': 55800000000}
+2025-07-14 10:05:33 - INFO - [mpc_aggregation_strategy.py:202] - [Round 7] 全局评估 (MPC): Acc=0.9881, AUC=0.9991, Loss=277.3797
+2025-07-14 10:05:33 - INFO - [server_grpc.py:213] - 第 7 轮聚合完成，进入第 8 轮。
+2025-07-14 10:05:33 - INFO - [server_grpc.py:137] - [Round 8] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:05:33 - INFO - [server_grpc.py:142] - [Round 8] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:05:33 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:05:33 - INFO - [server_grpc.py:142] - [Round 8] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:05:33 - INFO - [server_grpc.py:137] - [Round 8] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:05:33 - INFO - [server_grpc.py:142] - [Round 8] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:05:33 - INFO - [server_grpc.py:146] - [Round 8] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:05:33 - INFO - [server_grpc.py:171] - 向客户端 3 提供第7轮全局模型
+2025-07-14 10:05:33 - INFO - [server_grpc.py:171] - 向客户端 2 提供第7轮全局模型
+2025-07-14 10:05:33 - INFO - [server_grpc.py:171] - 向客户端 1 提供第7轮全局模型
+2025-07-14 10:06:17 - INFO - [mpc_aggregation_strategy.py:57] - [Round 8] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:06:17 - INFO - [server_grpc.py:137] - [Round 8] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:06:18 - INFO - [mpc_aggregation_strategy.py:57] - [Round 8] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:06:18 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:06:18 - INFO - [mpc_aggregation_strategy.py:57] - [Round 8] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:06:18 - INFO - [server_grpc.py:183] - [Round 8] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:06:18 - INFO - [mpc_aggregation_strategy.py:71] - [Round 8] 开始MPC参数聚合...
+2025-07-14 10:06:18 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:06:19 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:06:19 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:06:19 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:06:19 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:06:19 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:06:19 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:06:25 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:06:25 - INFO - [mpc_aggregation_strategy.py:131] - [Round 8] MPC参数聚合完成。
+2025-07-14 10:06:26 - INFO - [server_grpc.py:188] - [Round 8] 全局模型参数更新完成。
+2025-07-14 10:06:26 - INFO - [mpc_aggregation_strategy.py:136] - [Round 8] 开始MPC指标评估...
+2025-07-14 10:06:26 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13806000000, 'test_num': 14001000000, 'auc': 13986744386, 'loss': 18185829088869, 'train_num': 55800000000}
+2025-07-14 10:06:26 - INFO - [mpc_aggregation_strategy.py:202] - [Round 8] 全局评估 (MPC): Acc=0.9861, AUC=0.9990, Loss=325.9109
+2025-07-14 10:06:26 - INFO - [server_grpc.py:213] - 第 8 轮聚合完成，进入第 9 轮。
+2025-07-14 10:06:26 - INFO - [server_grpc.py:137] - [Round 9] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:06:26 - INFO - [server_grpc.py:142] - [Round 9] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:06:26 - INFO - [server_grpc.py:137] - [Round 9] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:06:26 - INFO - [server_grpc.py:142] - [Round 9] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 10:06:26 - INFO - [server_grpc.py:137] - [Round 9] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:06:26 - INFO - [server_grpc.py:142] - [Round 9] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 10:06:26 - INFO - [server_grpc.py:146] - [Round 9] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:06:26 - INFO - [server_grpc.py:171] - 向客户端 3 提供第8轮全局模型
+2025-07-14 10:06:26 - INFO - [server_grpc.py:171] - 向客户端 1 提供第8轮全局模型
+2025-07-14 10:06:26 - INFO - [server_grpc.py:171] - 向客户端 2 提供第8轮全局模型
+2025-07-14 10:07:12 - INFO - [mpc_aggregation_strategy.py:57] - [Round 9] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:07:12 - INFO - [server_grpc.py:137] - [Round 9] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:07:12 - INFO - [mpc_aggregation_strategy.py:57] - [Round 9] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:07:12 - INFO - [server_grpc.py:137] - [Round 9] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:07:13 - INFO - [mpc_aggregation_strategy.py:57] - [Round 9] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:07:13 - INFO - [server_grpc.py:183] - [Round 9] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:07:13 - INFO - [mpc_aggregation_strategy.py:71] - [Round 9] 开始MPC参数聚合...
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:07:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:07:21 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:07:21 - INFO - [mpc_aggregation_strategy.py:131] - [Round 9] MPC参数聚合完成。
+2025-07-14 10:07:21 - INFO - [server_grpc.py:188] - [Round 9] 全局模型参数更新完成。
+2025-07-14 10:07:21 - INFO - [mpc_aggregation_strategy.py:136] - [Round 9] 开始MPC指标评估...
+2025-07-14 10:07:21 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13855000000, 'test_num': 14001000000, 'auc': 13991772276, 'loss': 12331451684665, 'train_num': 55800000000}
+2025-07-14 10:07:21 - INFO - [mpc_aggregation_strategy.py:202] - [Round 9] 全局评估 (MPC): Acc=0.9896, AUC=0.9993, Loss=220.9938
+2025-07-14 10:07:21 - INFO - [server_grpc.py:213] - 第 9 轮聚合完成，进入第 10 轮。
+2025-07-14 10:07:21 - INFO - [server_grpc.py:137] - [Round 10] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:07:21 - INFO - [server_grpc.py:142] - [Round 10] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 10:07:21 - INFO - [server_grpc.py:137] - [Round 10] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:07:21 - INFO - [server_grpc.py:142] - [Round 10] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 10:07:21 - INFO - [server_grpc.py:137] - [Round 10] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:07:21 - INFO - [server_grpc.py:142] - [Round 10] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:07:21 - INFO - [server_grpc.py:171] - 向客户端 2 提供第9轮全局模型
+2025-07-14 10:07:21 - INFO - [server_grpc.py:146] - [Round 10] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:07:21 - INFO - [server_grpc.py:171] - 向客户端 3 提供第9轮全局模型
+2025-07-14 10:07:21 - INFO - [server_grpc.py:171] - 向客户端 1 提供第9轮全局模型
+2025-07-14 10:08:06 - INFO - [mpc_aggregation_strategy.py:57] - [Round 10] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:08:06 - INFO - [server_grpc.py:137] - [Round 10] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:08:07 - INFO - [mpc_aggregation_strategy.py:57] - [Round 10] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:08:07 - INFO - [server_grpc.py:137] - [Round 10] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:08:07 - INFO - [mpc_aggregation_strategy.py:57] - [Round 10] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:08:07 - INFO - [server_grpc.py:183] - [Round 10] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:08:07 - INFO - [mpc_aggregation_strategy.py:71] - [Round 10] 开始MPC参数聚合...
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:08:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:08:14 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:08:14 - INFO - [mpc_aggregation_strategy.py:131] - [Round 10] MPC参数聚合完成。
+2025-07-14 10:08:14 - INFO - [server_grpc.py:188] - [Round 10] 全局模型参数更新完成。
+2025-07-14 10:08:14 - INFO - [mpc_aggregation_strategy.py:136] - [Round 10] 开始MPC指标评估...
+2025-07-14 10:08:14 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13822000000, 'test_num': 14001000000, 'auc': 13989812202, 'loss': 15132960234852, 'train_num': 55800000000}
+2025-07-14 10:08:14 - INFO - [mpc_aggregation_strategy.py:202] - [Round 10] 全局评估 (MPC): Acc=0.9872, AUC=0.9992, Loss=271.2000
+2025-07-14 10:08:14 - INFO - [server_grpc.py:213] - 第 10 轮聚合完成，进入第 11 轮。
+2025-07-14 10:08:14 - INFO - [server_grpc.py:137] - [Round 11] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:08:14 - INFO - [server_grpc.py:142] - [Round 11] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 10:08:14 - INFO - [server_grpc.py:137] - [Round 11] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:08:14 - INFO - [server_grpc.py:142] - [Round 11] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 10:08:14 - INFO - [server_grpc.py:137] - [Round 11] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:08:14 - INFO - [server_grpc.py:142] - [Round 11] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:08:14 - INFO - [server_grpc.py:146] - [Round 11] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:08:14 - INFO - [server_grpc.py:171] - 向客户端 2 提供第10轮全局模型
+2025-07-14 10:08:14 - INFO - [server_grpc.py:171] - 向客户端 3 提供第10轮全局模型
+2025-07-14 10:08:14 - INFO - [server_grpc.py:171] - 向客户端 1 提供第10轮全局模型
+2025-07-14 10:09:00 - INFO - [mpc_aggregation_strategy.py:57] - [Round 11] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:09:00 - INFO - [server_grpc.py:137] - [Round 11] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:09:00 - INFO - [mpc_aggregation_strategy.py:57] - [Round 11] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:09:00 - INFO - [server_grpc.py:137] - [Round 11] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:57] - [Round 11] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:09:01 - INFO - [server_grpc.py:183] - [Round 11] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:71] - [Round 11] 开始MPC参数聚合...
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:09:01 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:09:08 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:09:08 - INFO - [mpc_aggregation_strategy.py:131] - [Round 11] MPC参数聚合完成。
+2025-07-14 10:09:08 - INFO - [server_grpc.py:188] - [Round 11] 全局模型参数更新完成。
+2025-07-14 10:09:08 - INFO - [mpc_aggregation_strategy.py:136] - [Round 11] 开始MPC指标评估...
+2025-07-14 10:09:08 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13859000000, 'test_num': 14001000000, 'auc': 13992694354, 'loss': 9710357015356, 'train_num': 55800000000}
+2025-07-14 10:09:08 - INFO - [mpc_aggregation_strategy.py:202] - [Round 11] 全局评估 (MPC): Acc=0.9899, AUC=0.9994, Loss=174.0207
+2025-07-14 10:09:08 - INFO - [server_grpc.py:213] - 第 11 轮聚合完成，进入第 12 轮。
+2025-07-14 10:09:08 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:09:08 - INFO - [server_grpc.py:142] - [Round 12] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 10:09:08 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:09:08 - INFO - [server_grpc.py:142] - [Round 12] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:09:08 - INFO - [server_grpc.py:137] - [Round 12] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:09:08 - INFO - [server_grpc.py:142] - [Round 12] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 10:09:08 - INFO - [server_grpc.py:146] - [Round 12] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:09:08 - INFO - [server_grpc.py:171] - 向客户端 1 提供第11轮全局模型
+2025-07-14 10:09:08 - INFO - [server_grpc.py:171] - 向客户端 2 提供第11轮全局模型
+2025-07-14 10:09:08 - INFO - [server_grpc.py:171] - 向客户端 3 提供第11轮全局模型
+2025-07-14 10:09:53 - INFO - [mpc_aggregation_strategy.py:57] - [Round 12] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:09:53 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:09:54 - INFO - [mpc_aggregation_strategy.py:57] - [Round 12] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:09:54 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:09:54 - INFO - [mpc_aggregation_strategy.py:57] - [Round 12] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:09:54 - INFO - [server_grpc.py:183] - [Round 12] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:09:54 - INFO - [mpc_aggregation_strategy.py:71] - [Round 12] 开始MPC参数聚合...
+2025-07-14 10:09:54 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:09:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:09:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:09:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:09:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:09:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:09:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:10:02 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:10:02 - INFO - [mpc_aggregation_strategy.py:131] - [Round 12] MPC参数聚合完成。
+2025-07-14 10:10:02 - INFO - [server_grpc.py:188] - [Round 12] 全局模型参数更新完成。
+2025-07-14 10:10:02 - INFO - [mpc_aggregation_strategy.py:136] - [Round 12] 开始MPC指标评估...
+2025-07-14 10:10:02 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13867000000, 'test_num': 14001000000, 'auc': 13993442681, 'loss': 9546463067071, 'train_num': 55800000000}
+2025-07-14 10:10:02 - INFO - [mpc_aggregation_strategy.py:202] - [Round 12] 全局评估 (MPC): Acc=0.9904, AUC=0.9995, Loss=171.0836
+2025-07-14 10:10:02 - INFO - [server_grpc.py:213] - 第 12 轮聚合完成，进入第 13 轮。
+2025-07-14 10:10:02 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:10:02 - INFO - [server_grpc.py:142] - [Round 13] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:10:02 - INFO - [server_grpc.py:137] - [Round 13] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:10:02 - INFO - [server_grpc.py:142] - [Round 13] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:10:02 - INFO - [server_grpc.py:137] - [Round 13] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:10:02 - INFO - [server_grpc.py:142] - [Round 13] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 10:10:02 - INFO - [server_grpc.py:146] - [Round 13] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:10:02 - INFO - [server_grpc.py:171] - 向客户端 3 提供第12轮全局模型
+2025-07-14 10:10:02 - INFO - [server_grpc.py:171] - 向客户端 2 提供第12轮全局模型
+2025-07-14 10:10:02 - INFO - [server_grpc.py:171] - 向客户端 1 提供第12轮全局模型
+2025-07-14 10:10:47 - INFO - [mpc_aggregation_strategy.py:57] - [Round 13] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:10:47 - INFO - [server_grpc.py:137] - [Round 13] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:10:47 - INFO - [mpc_aggregation_strategy.py:57] - [Round 13] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:10:47 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:10:47 - INFO - [mpc_aggregation_strategy.py:57] - [Round 13] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:10:47 - INFO - [server_grpc.py:183] - [Round 13] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:10:47 - INFO - [mpc_aggregation_strategy.py:71] - [Round 13] 开始MPC参数聚合...
+2025-07-14 10:10:47 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:10:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:10:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:10:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:10:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:10:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:10:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:10:55 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:10:55 - INFO - [mpc_aggregation_strategy.py:131] - [Round 13] MPC参数聚合完成。
+2025-07-14 10:10:55 - INFO - [server_grpc.py:188] - [Round 13] 全局模型参数更新完成。
+2025-07-14 10:10:55 - INFO - [mpc_aggregation_strategy.py:136] - [Round 13] 开始MPC指标评估...
+2025-07-14 10:10:55 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13832000000, 'test_num': 14001000000, 'auc': 13992271145, 'loss': 12180398250451, 'train_num': 55800000000}
+2025-07-14 10:10:55 - INFO - [mpc_aggregation_strategy.py:202] - [Round 13] 全局评估 (MPC): Acc=0.9879, AUC=0.9994, Loss=218.2867
+2025-07-14 10:10:55 - INFO - [server_grpc.py:213] - 第 13 轮聚合完成，进入第 14 轮。
+2025-07-14 10:10:55 - INFO - [server_grpc.py:137] - [Round 14] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:10:55 - INFO - [server_grpc.py:142] - [Round 14] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 10:10:55 - INFO - [server_grpc.py:137] - [Round 14] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:10:55 - INFO - [server_grpc.py:142] - [Round 14] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 10:10:55 - INFO - [server_grpc.py:137] - [Round 14] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:10:55 - INFO - [server_grpc.py:171] - 向客户端 1 提供第13轮全局模型
+2025-07-14 10:10:55 - INFO - [server_grpc.py:142] - [Round 14] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 10:10:55 - INFO - [server_grpc.py:171] - 向客户端 2 提供第13轮全局模型
+2025-07-14 10:10:55 - INFO - [server_grpc.py:146] - [Round 14] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:10:55 - INFO - [server_grpc.py:171] - 向客户端 3 提供第13轮全局模型
+2025-07-14 10:11:39 - INFO - [mpc_aggregation_strategy.py:57] - [Round 14] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:11:39 - INFO - [server_grpc.py:137] - [Round 14] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:11:40 - INFO - [mpc_aggregation_strategy.py:57] - [Round 14] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:11:40 - INFO - [server_grpc.py:137] - [Round 14] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:57] - [Round 14] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:11:41 - INFO - [server_grpc.py:183] - [Round 14] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:71] - [Round 14] 开始MPC参数聚合...
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:11:41 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:11:48 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:11:48 - INFO - [mpc_aggregation_strategy.py:131] - [Round 14] MPC参数聚合完成。
+2025-07-14 10:11:48 - INFO - [server_grpc.py:188] - [Round 14] 全局模型参数更新完成。
+2025-07-14 10:11:48 - INFO - [mpc_aggregation_strategy.py:136] - [Round 14] 开始MPC指标评估...
+2025-07-14 10:11:48 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13852000000, 'test_num': 14001000000, 'auc': 13991152154, 'loss': 11442483893242, 'train_num': 55800000000}
+2025-07-14 10:11:48 - INFO - [mpc_aggregation_strategy.py:202] - [Round 14] 全局评估 (MPC): Acc=0.9894, AUC=0.9993, Loss=205.0624
+2025-07-14 10:11:48 - INFO - [server_grpc.py:213] - 第 14 轮聚合完成，进入第 15 轮。
+2025-07-14 10:11:48 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:11:48 - INFO - [server_grpc.py:142] - [Round 15] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:11:48 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:11:48 - INFO - [server_grpc.py:142] - [Round 15] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 10:11:48 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:11:48 - INFO - [server_grpc.py:142] - [Round 15] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 10:11:48 - INFO - [server_grpc.py:171] - 向客户端 3 提供第14轮全局模型
+2025-07-14 10:11:48 - INFO - [server_grpc.py:146] - [Round 15] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:11:48 - INFO - [server_grpc.py:171] - 向客户端 1 提供第14轮全局模型
+2025-07-14 10:11:48 - INFO - [server_grpc.py:171] - 向客户端 2 提供第14轮全局模型
+2025-07-14 10:12:34 - INFO - [mpc_aggregation_strategy.py:57] - [Round 15] 收到客户端 1 的MPC份额更新。
+2025-07-14 10:12:34 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:12:35 - INFO - [mpc_aggregation_strategy.py:57] - [Round 15] 收到客户端 2 的MPC份额更新。
+2025-07-14 10:12:35 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:57] - [Round 15] 收到客户端 3 的MPC份额更新。
+2025-07-14 10:12:36 - INFO - [server_grpc.py:183] - [Round 15] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:71] - [Round 15] 开始MPC参数聚合...
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.bias 已通过MPC聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.weight 已通过MPC聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc.weight 已通过MPC聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.bias 已通过MPC聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv2.0.bias 已通过MPC聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.bias 已通过MPC聚合。
+2025-07-14 10:12:36 - INFO - [mpc_aggregation_strategy.py:129] - 参数 conv1.0.weight 已通过MPC聚合。
+2025-07-14 10:12:43 - INFO - [mpc_aggregation_strategy.py:129] - 参数 fc1.0.weight 已通过MPC聚合。
+2025-07-14 10:12:43 - INFO - [mpc_aggregation_strategy.py:131] - [Round 15] MPC参数聚合完成。
+2025-07-14 10:12:43 - INFO - [server_grpc.py:188] - [Round 15] 全局模型参数更新完成。
+2025-07-14 10:12:43 - INFO - [mpc_aggregation_strategy.py:136] - [Round 15] 开始MPC指标评估...
+2025-07-14 10:12:43 - INFO - [mpc_aggregation_strategy.py:165] - 解密后的聚合指标(原始值): {'test_acc': 13845000000, 'test_num': 14001000000, 'auc': 13992063280, 'loss': 10974572186137, 'train_num': 55800000000}
+2025-07-14 10:12:43 - INFO - [mpc_aggregation_strategy.py:202] - [Round 15] 全局评估 (MPC): Acc=0.9889, AUC=0.9994, Loss=196.6769
+2025-07-14 10:12:43 - INFO - [server_grpc.py:196] - 训练结束。总耗时: 812.37 秒
+2025-07-14 10:12:43 - INFO - [server_grpc.py:206] - 全局模型评估指标汇总:
+      Accuracy     AUC       Loss
+Round                            
+1       0.9743  0.9963  1317.7223
+2       0.9826  0.9982   738.0489
+3       0.9813  0.9981   717.1948
+4       0.9856  0.9987   449.0719
+5       0.9839  0.9987   522.9622
+6       0.9884  0.9992   264.5114
+7       0.9881  0.9991   277.3797
+8       0.9861  0.9990   325.9109
+9       0.9896  0.9993   220.9938
+10      0.9872  0.9992   271.2000
+11      0.9899  0.9994   174.0207
+12      0.9904  0.9995   171.0836
+13      0.9879  0.9994   218.2867
+14      0.9894  0.9993   205.0624
+15      0.9889  0.9994   196.6769
+2025-07-14 10:12:44 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 10:12:44 - INFO - [server_grpc.py:142] - [Round 15] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 10:12:44 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 10:12:44 - INFO - [server_grpc.py:142] - [Round 15] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 10:12:44 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 10:12:44 - INFO - [server_grpc.py:142] - [Round 15] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 10:12:44 - INFO - [server_grpc.py:146] - [Round 15] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 10:12:44 - INFO - [server_grpc.py:171] - 向客户端 1 提供第15轮全局模型
+2025-07-14 10:12:44 - INFO - [server_grpc.py:171] - 向客户端 3 提供第15轮全局模型
+2025-07-14 10:12:44 - INFO - [server_grpc.py:171] - 向客户端 2 提供第15轮全局模型

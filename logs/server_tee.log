@@ -1,0 +1,355 @@
+2025-07-14 09:53:07 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_tee.log
+2025-07-14 09:53:07 - INFO - [tee_aggregation_strategy.py:19] - 启动TEE模式：正在生成RSA密钥对用于模拟Enclave...
+2025-07-14 09:53:07 - INFO - [tee_aggregation_strategy.py:23] - 启动TEE模式：正在模拟生成身份指纹(MRENCLAVE)...
+2025-07-14 09:53:07 - INFO - [server_grpc.py:85] - 服务器初始化完成 (模式: tee)，等待 3 个客户端注册...
+2025-07-14 09:53:07 - INFO - [server_grpc.py:248] - 联邦学习安全服务器正在启动，监听端口: 50051
+2025-07-14 09:53:08 - INFO - [server_grpc.py:102] - 接收到客户端 3 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-14 09:53:08 - INFO - [server_grpc.py:111] - 客户端 3 注册成功。当前 1/3 个客户端。
+2025-07-14 09:53:08 - INFO - [tee_aggregation_strategy.py:28] - 向客户端 3 提供模拟的证明报告和公钥。
+2025-07-14 09:53:08 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:08 - INFO - [server_grpc.py:102] - 接收到客户端 1 的注册请求 (模型: CNN, 数据量: 18667)
+2025-07-14 09:53:08 - INFO - [server_grpc.py:111] - 客户端 1 注册成功。当前 2/3 个客户端。
+2025-07-14 09:53:08 - INFO - [tee_aggregation_strategy.py:28] - 向客户端 1 提供模拟的证明报告和公钥。
+2025-07-14 09:53:08 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:08 - INFO - [server_grpc.py:102] - 接收到客户端 2 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-14 09:53:08 - INFO - [server_grpc.py:111] - 客户端 2 注册成功。当前 3/3 个客户端。
+2025-07-14 09:53:08 - INFO - [tee_aggregation_strategy.py:28] - 向客户端 2 提供模拟的证明报告和公钥。
+2025-07-14 09:53:08 - INFO - [server_grpc.py:117] - 所有客户端已注册，设置 next_step=True，准备开始训练。
+2025-07-14 09:53:08 - INFO - [server_grpc.py:120] - 联邦学习流程计时开始
+2025-07-14 09:53:08 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:53:08 - INFO - [server_grpc.py:142] - [Round 1] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:53:09 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:53:09 - INFO - [server_grpc.py:142] - [Round 1] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:53:09 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:53:09 - INFO - [server_grpc.py:142] - [Round 1] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:53:09 - INFO - [server_grpc.py:146] - [Round 1] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:53:28 - INFO - [tee_aggregation_strategy.py:70] - [Round 1] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:53:28 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:30 - INFO - [tee_aggregation_strategy.py:70] - [Round 1] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:53:30 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:30 - INFO - [tee_aggregation_strategy.py:70] - [Round 1] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:53:30 - INFO - [server_grpc.py:183] - [Round 1] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:53:30 - INFO - [tee_aggregation_strategy.py:111] - [Round 1] TEE模式下明文参数聚合完成。
+2025-07-14 09:53:30 - INFO - [server_grpc.py:188] - [Round 1] 全局模型参数更新完成。
+2025-07-14 09:53:30 - INFO - [tee_aggregation_strategy.py:140] - [Round 1] 全局评估 (TEE): Acc=0.9743, AUC=0.9963, Loss=0.0708
+2025-07-14 09:53:30 - INFO - [server_grpc.py:213] - 第 1 轮聚合完成，进入第 2 轮。
+2025-07-14 09:53:30 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:53:30 - INFO - [server_grpc.py:142] - [Round 2] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:53:30 - INFO - [server_grpc.py:171] - 向客户端 1 提供第1轮全局模型
+2025-07-14 09:53:30 - INFO - [server_grpc.py:137] - [Round 2] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:53:30 - INFO - [server_grpc.py:142] - [Round 2] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:53:30 - INFO - [server_grpc.py:171] - 向客户端 2 提供第1轮全局模型
+2025-07-14 09:53:32 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:53:32 - INFO - [server_grpc.py:142] - [Round 2] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:53:32 - INFO - [server_grpc.py:146] - [Round 2] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:53:32 - INFO - [server_grpc.py:171] - 向客户端 3 提供第1轮全局模型
+2025-07-14 09:53:47 - INFO - [tee_aggregation_strategy.py:70] - [Round 2] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:53:47 - INFO - [server_grpc.py:137] - [Round 2] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:48 - INFO - [tee_aggregation_strategy.py:70] - [Round 2] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:53:48 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:49 - INFO - [server_grpc.py:137] - [Round 2] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:50 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:51 - INFO - [server_grpc.py:137] - [Round 2] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:53:51 - INFO - [tee_aggregation_strategy.py:70] - [Round 2] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:53:51 - INFO - [server_grpc.py:183] - [Round 2] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:53:51 - INFO - [tee_aggregation_strategy.py:111] - [Round 2] TEE模式下明文参数聚合完成。
+2025-07-14 09:53:51 - INFO - [server_grpc.py:188] - [Round 2] 全局模型参数更新完成。
+2025-07-14 09:53:51 - INFO - [tee_aggregation_strategy.py:140] - [Round 2] 全局评估 (TEE): Acc=0.9830, AUC=0.9982, Loss=0.0391
+2025-07-14 09:53:51 - INFO - [server_grpc.py:213] - 第 2 轮聚合完成，进入第 3 轮。
+2025-07-14 09:53:51 - INFO - [server_grpc.py:137] - [Round 3] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:53:51 - INFO - [server_grpc.py:142] - [Round 3] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:53:51 - INFO - [server_grpc.py:171] - 向客户端 3 提供第2轮全局模型
+2025-07-14 09:53:52 - INFO - [server_grpc.py:137] - [Round 3] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:53:52 - INFO - [server_grpc.py:142] - [Round 3] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:53:52 - INFO - [server_grpc.py:171] - 向客户端 1 提供第2轮全局模型
+2025-07-14 09:53:53 - INFO - [server_grpc.py:137] - [Round 3] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:53:53 - INFO - [server_grpc.py:142] - [Round 3] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:53:53 - INFO - [server_grpc.py:146] - [Round 3] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:53:53 - INFO - [server_grpc.py:171] - 向客户端 2 提供第2轮全局模型
+2025-07-14 09:54:11 - INFO - [tee_aggregation_strategy.py:70] - [Round 3] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:54:11 - INFO - [server_grpc.py:137] - [Round 3] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:12 - INFO - [tee_aggregation_strategy.py:70] - [Round 3] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:54:12 - INFO - [server_grpc.py:137] - [Round 3] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:12 - INFO - [tee_aggregation_strategy.py:70] - [Round 3] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:54:12 - INFO - [server_grpc.py:183] - [Round 3] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:54:12 - INFO - [tee_aggregation_strategy.py:111] - [Round 3] TEE模式下明文参数聚合完成。
+2025-07-14 09:54:12 - INFO - [server_grpc.py:188] - [Round 3] 全局模型参数更新完成。
+2025-07-14 09:54:12 - INFO - [tee_aggregation_strategy.py:140] - [Round 3] 全局评估 (TEE): Acc=0.9816, AUC=0.9980, Loss=0.0401
+2025-07-14 09:54:12 - INFO - [server_grpc.py:213] - 第 3 轮聚合完成，进入第 4 轮。
+2025-07-14 09:54:12 - INFO - [server_grpc.py:137] - [Round 4] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:54:12 - INFO - [server_grpc.py:142] - [Round 4] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:54:12 - INFO - [server_grpc.py:171] - 向客户端 2 提供第3轮全局模型
+2025-07-14 09:54:13 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:54:13 - INFO - [server_grpc.py:142] - [Round 4] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:54:13 - INFO - [server_grpc.py:171] - 向客户端 1 提供第3轮全局模型
+2025-07-14 09:54:14 - INFO - [server_grpc.py:137] - [Round 4] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:54:14 - INFO - [server_grpc.py:142] - [Round 4] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:54:14 - INFO - [server_grpc.py:146] - [Round 4] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:54:14 - INFO - [server_grpc.py:171] - 向客户端 3 提供第3轮全局模型
+2025-07-14 09:54:30 - INFO - [tee_aggregation_strategy.py:70] - [Round 4] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:54:30 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:30 - INFO - [tee_aggregation_strategy.py:70] - [Round 4] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:54:30 - INFO - [server_grpc.py:137] - [Round 4] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:32 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:32 - INFO - [server_grpc.py:137] - [Round 4] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:33 - INFO - [tee_aggregation_strategy.py:70] - [Round 4] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:54:33 - INFO - [server_grpc.py:183] - [Round 4] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:54:33 - INFO - [tee_aggregation_strategy.py:111] - [Round 4] TEE模式下明文参数聚合完成。
+2025-07-14 09:54:33 - INFO - [server_grpc.py:188] - [Round 4] 全局模型参数更新完成。
+2025-07-14 09:54:33 - INFO - [tee_aggregation_strategy.py:140] - [Round 4] 全局评估 (TEE): Acc=0.9859, AUC=0.9987, Loss=0.0240
+2025-07-14 09:54:33 - INFO - [server_grpc.py:213] - 第 4 轮聚合完成，进入第 5 轮。
+2025-07-14 09:54:33 - INFO - [server_grpc.py:137] - [Round 5] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:54:33 - INFO - [server_grpc.py:142] - [Round 5] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:54:33 - INFO - [server_grpc.py:171] - 向客户端 3 提供第4轮全局模型
+2025-07-14 09:54:34 - INFO - [server_grpc.py:137] - [Round 5] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:54:34 - INFO - [server_grpc.py:142] - [Round 5] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:54:34 - INFO - [server_grpc.py:171] - 向客户端 1 提供第4轮全局模型
+2025-07-14 09:54:34 - INFO - [server_grpc.py:137] - [Round 5] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:54:34 - INFO - [server_grpc.py:142] - [Round 5] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:54:34 - INFO - [server_grpc.py:146] - [Round 5] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:54:34 - INFO - [server_grpc.py:171] - 向客户端 2 提供第4轮全局模型
+2025-07-14 09:54:51 - INFO - [tee_aggregation_strategy.py:70] - [Round 5] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:54:51 - INFO - [server_grpc.py:137] - [Round 5] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:51 - INFO - [tee_aggregation_strategy.py:70] - [Round 5] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:54:51 - INFO - [server_grpc.py:137] - [Round 5] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:54:53 - INFO - [tee_aggregation_strategy.py:70] - [Round 5] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:54:53 - INFO - [server_grpc.py:183] - [Round 5] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:54:53 - INFO - [tee_aggregation_strategy.py:111] - [Round 5] TEE模式下明文参数聚合完成。
+2025-07-14 09:54:53 - INFO - [server_grpc.py:188] - [Round 5] 全局模型参数更新完成。
+2025-07-14 09:54:53 - INFO - [tee_aggregation_strategy.py:140] - [Round 5] 全局评估 (TEE): Acc=0.9832, AUC=0.9987, Loss=0.0290
+2025-07-14 09:54:53 - INFO - [server_grpc.py:213] - 第 5 轮聚合完成，进入第 6 轮。
+2025-07-14 09:54:53 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:54:53 - INFO - [server_grpc.py:142] - [Round 6] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:54:53 - INFO - [server_grpc.py:171] - 向客户端 2 提供第5轮全局模型
+2025-07-14 09:54:53 - INFO - [server_grpc.py:137] - [Round 6] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:54:53 - INFO - [server_grpc.py:142] - [Round 6] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:54:53 - INFO - [server_grpc.py:171] - 向客户端 1 提供第5轮全局模型
+2025-07-14 09:54:53 - INFO - [server_grpc.py:137] - [Round 6] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:54:53 - INFO - [server_grpc.py:142] - [Round 6] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:54:53 - INFO - [server_grpc.py:146] - [Round 6] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:54:53 - INFO - [server_grpc.py:171] - 向客户端 3 提供第5轮全局模型
+2025-07-14 09:55:12 - INFO - [tee_aggregation_strategy.py:70] - [Round 6] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:55:12 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:13 - INFO - [tee_aggregation_strategy.py:70] - [Round 6] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:55:13 - INFO - [server_grpc.py:137] - [Round 6] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:14 - INFO - [tee_aggregation_strategy.py:70] - [Round 6] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:55:14 - INFO - [server_grpc.py:183] - [Round 6] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:55:14 - INFO - [tee_aggregation_strategy.py:111] - [Round 6] TEE模式下明文参数聚合完成。
+2025-07-14 09:55:14 - INFO - [server_grpc.py:188] - [Round 6] 全局模型参数更新完成。
+2025-07-14 09:55:14 - INFO - [tee_aggregation_strategy.py:140] - [Round 6] 全局评估 (TEE): Acc=0.9882, AUC=0.9992, Loss=0.0149
+2025-07-14 09:55:14 - INFO - [server_grpc.py:213] - 第 6 轮聚合完成，进入第 7 轮。
+2025-07-14 09:55:14 - INFO - [server_grpc.py:137] - [Round 7] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:55:14 - INFO - [server_grpc.py:142] - [Round 7] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:55:14 - INFO - [server_grpc.py:171] - 向客户端 3 提供第6轮全局模型
+2025-07-14 09:55:14 - INFO - [server_grpc.py:137] - [Round 7] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:55:14 - INFO - [server_grpc.py:142] - [Round 7] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:55:14 - INFO - [server_grpc.py:171] - 向客户端 2 提供第6轮全局模型
+2025-07-14 09:55:15 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:55:15 - INFO - [server_grpc.py:142] - [Round 7] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:55:15 - INFO - [server_grpc.py:146] - [Round 7] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:55:15 - INFO - [server_grpc.py:171] - 向客户端 1 提供第6轮全局模型
+2025-07-14 09:55:30 - INFO - [tee_aggregation_strategy.py:70] - [Round 7] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:55:30 - INFO - [server_grpc.py:137] - [Round 7] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:32 - INFO - [tee_aggregation_strategy.py:70] - [Round 7] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:55:32 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:32 - INFO - [server_grpc.py:137] - [Round 7] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:32 - INFO - [tee_aggregation_strategy.py:70] - [Round 7] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:55:32 - INFO - [server_grpc.py:183] - [Round 7] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:55:32 - INFO - [tee_aggregation_strategy.py:111] - [Round 7] TEE模式下明文参数聚合完成。
+2025-07-14 09:55:32 - INFO - [server_grpc.py:188] - [Round 7] 全局模型参数更新完成。
+2025-07-14 09:55:32 - INFO - [tee_aggregation_strategy.py:140] - [Round 7] 全局评估 (TEE): Acc=0.9869, AUC=0.9990, Loss=0.0162
+2025-07-14 09:55:32 - INFO - [server_grpc.py:213] - 第 7 轮聚合完成，进入第 8 轮。
+2025-07-14 09:55:32 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:55:32 - INFO - [server_grpc.py:142] - [Round 8] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:55:32 - INFO - [server_grpc.py:171] - 向客户端 2 提供第7轮全局模型
+2025-07-14 09:55:34 - INFO - [server_grpc.py:137] - [Round 8] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:55:34 - INFO - [server_grpc.py:142] - [Round 8] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:55:34 - INFO - [server_grpc.py:171] - 向客户端 1 提供第7轮全局模型
+2025-07-14 09:55:34 - INFO - [server_grpc.py:137] - [Round 8] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:55:34 - INFO - [server_grpc.py:142] - [Round 8] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:55:34 - INFO - [server_grpc.py:146] - [Round 8] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:55:34 - INFO - [server_grpc.py:171] - 向客户端 3 提供第7轮全局模型
+2025-07-14 09:55:50 - INFO - [tee_aggregation_strategy.py:70] - [Round 8] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:55:50 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:51 - INFO - [tee_aggregation_strategy.py:70] - [Round 8] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:55:51 - INFO - [server_grpc.py:137] - [Round 8] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:52 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:53 - INFO - [server_grpc.py:137] - [Round 8] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:55:53 - INFO - [tee_aggregation_strategy.py:70] - [Round 8] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:55:53 - INFO - [server_grpc.py:183] - [Round 8] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:55:53 - INFO - [tee_aggregation_strategy.py:111] - [Round 8] TEE模式下明文参数聚合完成。
+2025-07-14 09:55:53 - INFO - [server_grpc.py:188] - [Round 8] 全局模型参数更新完成。
+2025-07-14 09:55:53 - INFO - [tee_aggregation_strategy.py:140] - [Round 8] 全局评估 (TEE): Acc=0.9869, AUC=0.9991, Loss=0.0159
+2025-07-14 09:55:53 - INFO - [server_grpc.py:213] - 第 8 轮聚合完成，进入第 9 轮。
+2025-07-14 09:55:53 - INFO - [server_grpc.py:137] - [Round 9] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:55:53 - INFO - [server_grpc.py:142] - [Round 9] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:55:53 - INFO - [server_grpc.py:171] - 向客户端 3 提供第8轮全局模型
+2025-07-14 09:55:54 - INFO - [server_grpc.py:137] - [Round 9] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:55:54 - INFO - [server_grpc.py:142] - [Round 9] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:55:54 - INFO - [server_grpc.py:171] - 向客户端 2 提供第8轮全局模型
+2025-07-14 09:55:55 - INFO - [server_grpc.py:137] - [Round 9] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:55:55 - INFO - [server_grpc.py:142] - [Round 9] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:55:55 - INFO - [server_grpc.py:146] - [Round 9] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:55:55 - INFO - [server_grpc.py:171] - 向客户端 1 提供第8轮全局模型
+2025-07-14 09:56:11 - INFO - [tee_aggregation_strategy.py:70] - [Round 9] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:56:11 - INFO - [server_grpc.py:137] - [Round 9] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:12 - INFO - [tee_aggregation_strategy.py:70] - [Round 9] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:56:12 - INFO - [server_grpc.py:137] - [Round 9] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:13 - INFO - [server_grpc.py:137] - [Round 9] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:14 - INFO - [tee_aggregation_strategy.py:70] - [Round 9] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:56:14 - INFO - [server_grpc.py:183] - [Round 9] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:56:14 - INFO - [tee_aggregation_strategy.py:111] - [Round 9] TEE模式下明文参数聚合完成。
+2025-07-14 09:56:14 - INFO - [server_grpc.py:188] - [Round 9] 全局模型参数更新完成。
+2025-07-14 09:56:14 - INFO - [tee_aggregation_strategy.py:140] - [Round 9] 全局评估 (TEE): Acc=0.9894, AUC=0.9993, Loss=0.0121
+2025-07-14 09:56:14 - INFO - [server_grpc.py:213] - 第 9 轮聚合完成，进入第 10 轮。
+2025-07-14 09:56:14 - INFO - [server_grpc.py:137] - [Round 10] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:56:14 - INFO - [server_grpc.py:142] - [Round 10] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:56:14 - INFO - [server_grpc.py:171] - 向客户端 1 提供第9轮全局模型
+2025-07-14 09:56:14 - INFO - [server_grpc.py:137] - [Round 10] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:56:14 - INFO - [server_grpc.py:142] - [Round 10] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:56:14 - INFO - [server_grpc.py:171] - 向客户端 3 提供第9轮全局模型
+2025-07-14 09:56:15 - INFO - [server_grpc.py:137] - [Round 10] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:56:15 - INFO - [server_grpc.py:142] - [Round 10] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:56:15 - INFO - [server_grpc.py:146] - [Round 10] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:56:15 - INFO - [server_grpc.py:171] - 向客户端 2 提供第9轮全局模型
+2025-07-14 09:56:30 - INFO - [tee_aggregation_strategy.py:70] - [Round 10] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:56:30 - INFO - [server_grpc.py:137] - [Round 10] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:32 - INFO - [server_grpc.py:137] - [Round 10] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:33 - INFO - [tee_aggregation_strategy.py:70] - [Round 10] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:56:33 - INFO - [server_grpc.py:137] - [Round 10] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:33 - INFO - [tee_aggregation_strategy.py:70] - [Round 10] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:56:33 - INFO - [server_grpc.py:183] - [Round 10] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:56:33 - INFO - [tee_aggregation_strategy.py:111] - [Round 10] TEE模式下明文参数聚合完成。
+2025-07-14 09:56:33 - INFO - [server_grpc.py:188] - [Round 10] 全局模型参数更新完成。
+2025-07-14 09:56:33 - INFO - [tee_aggregation_strategy.py:140] - [Round 10] 全局评估 (TEE): Acc=0.9878, AUC=0.9991, Loss=0.0146
+2025-07-14 09:56:33 - INFO - [server_grpc.py:213] - 第 10 轮聚合完成，进入第 11 轮。
+2025-07-14 09:56:33 - INFO - [server_grpc.py:137] - [Round 11] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:56:33 - INFO - [server_grpc.py:142] - [Round 11] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:56:33 - INFO - [server_grpc.py:171] - 向客户端 3 提供第10轮全局模型
+2025-07-14 09:56:34 - INFO - [server_grpc.py:137] - [Round 11] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:56:34 - INFO - [server_grpc.py:142] - [Round 11] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:56:34 - INFO - [server_grpc.py:171] - 向客户端 1 提供第10轮全局模型
+2025-07-14 09:56:35 - INFO - [server_grpc.py:137] - [Round 11] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:56:35 - INFO - [server_grpc.py:142] - [Round 11] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:56:35 - INFO - [server_grpc.py:146] - [Round 11] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:56:35 - INFO - [server_grpc.py:171] - 向客户端 2 提供第10轮全局模型
+2025-07-14 09:56:52 - INFO - [tee_aggregation_strategy.py:70] - [Round 11] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:56:52 - INFO - [server_grpc.py:137] - [Round 11] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:53 - INFO - [tee_aggregation_strategy.py:70] - [Round 11] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:56:53 - INFO - [server_grpc.py:137] - [Round 11] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:56:53 - INFO - [tee_aggregation_strategy.py:70] - [Round 11] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:56:53 - INFO - [server_grpc.py:183] - [Round 11] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:56:53 - INFO - [tee_aggregation_strategy.py:111] - [Round 11] TEE模式下明文参数聚合完成。
+2025-07-14 09:56:53 - INFO - [server_grpc.py:188] - [Round 11] 全局模型参数更新完成。
+2025-07-14 09:56:53 - INFO - [tee_aggregation_strategy.py:140] - [Round 11] 全局评估 (TEE): Acc=0.9898, AUC=0.9994, Loss=0.0083
+2025-07-14 09:56:53 - INFO - [server_grpc.py:213] - 第 11 轮聚合完成，进入第 12 轮。
+2025-07-14 09:56:53 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:56:53 - INFO - [server_grpc.py:142] - [Round 12] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:56:53 - INFO - [server_grpc.py:171] - 向客户端 2 提供第11轮全局模型
+2025-07-14 09:56:55 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:56:55 - INFO - [server_grpc.py:142] - [Round 12] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:56:55 - INFO - [server_grpc.py:171] - 向客户端 1 提供第11轮全局模型
+2025-07-14 09:56:55 - INFO - [server_grpc.py:137] - [Round 12] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:56:55 - INFO - [server_grpc.py:142] - [Round 12] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:56:55 - INFO - [server_grpc.py:146] - [Round 12] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:56:55 - INFO - [server_grpc.py:171] - 向客户端 3 提供第11轮全局模型
+2025-07-14 09:57:11 - INFO - [tee_aggregation_strategy.py:70] - [Round 12] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:57:11 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:12 - INFO - [tee_aggregation_strategy.py:70] - [Round 12] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:57:12 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:13 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:14 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:14 - INFO - [tee_aggregation_strategy.py:70] - [Round 12] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:57:14 - INFO - [server_grpc.py:183] - [Round 12] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:57:14 - INFO - [tee_aggregation_strategy.py:111] - [Round 12] TEE模式下明文参数聚合完成。
+2025-07-14 09:57:14 - INFO - [server_grpc.py:188] - [Round 12] 全局模型参数更新完成。
+2025-07-14 09:57:14 - INFO - [tee_aggregation_strategy.py:140] - [Round 12] 全局评估 (TEE): Acc=0.9896, AUC=0.9994, Loss=0.0082
+2025-07-14 09:57:14 - INFO - [server_grpc.py:213] - 第 12 轮聚合完成，进入第 13 轮。
+2025-07-14 09:57:14 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:57:14 - INFO - [server_grpc.py:142] - [Round 13] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:57:14 - INFO - [server_grpc.py:171] - 向客户端 3 提供第12轮全局模型
+2025-07-14 09:57:15 - INFO - [server_grpc.py:137] - [Round 13] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:57:15 - INFO - [server_grpc.py:142] - [Round 13] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:57:15 - INFO - [server_grpc.py:171] - 向客户端 2 提供第12轮全局模型
+2025-07-14 09:57:16 - INFO - [server_grpc.py:137] - [Round 13] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:57:16 - INFO - [server_grpc.py:142] - [Round 13] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:57:16 - INFO - [server_grpc.py:146] - [Round 13] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:57:16 - INFO - [server_grpc.py:171] - 向客户端 1 提供第12轮全局模型
+2025-07-14 09:57:34 - INFO - [tee_aggregation_strategy.py:70] - [Round 13] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:57:34 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:35 - INFO - [tee_aggregation_strategy.py:70] - [Round 13] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:57:35 - INFO - [server_grpc.py:137] - [Round 13] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:35 - INFO - [tee_aggregation_strategy.py:70] - [Round 13] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:57:35 - INFO - [server_grpc.py:183] - [Round 13] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:57:35 - INFO - [tee_aggregation_strategy.py:111] - [Round 13] TEE模式下明文参数聚合完成。
+2025-07-14 09:57:35 - INFO - [server_grpc.py:188] - [Round 13] 全局模型参数更新完成。
+2025-07-14 09:57:35 - INFO - [tee_aggregation_strategy.py:140] - [Round 13] 全局评估 (TEE): Acc=0.9896, AUC=0.9995, Loss=0.0084
+2025-07-14 09:57:35 - INFO - [server_grpc.py:213] - 第 13 轮聚合完成，进入第 14 轮。
+2025-07-14 09:57:35 - INFO - [server_grpc.py:137] - [Round 14] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:57:35 - INFO - [server_grpc.py:142] - [Round 14] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:57:35 - INFO - [server_grpc.py:171] - 向客户端 2 提供第13轮全局模型
+2025-07-14 09:57:36 - INFO - [server_grpc.py:137] - [Round 14] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:57:36 - INFO - [server_grpc.py:142] - [Round 14] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:57:36 - INFO - [server_grpc.py:171] - 向客户端 3 提供第13轮全局模型
+2025-07-14 09:57:37 - INFO - [server_grpc.py:137] - [Round 14] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:57:37 - INFO - [server_grpc.py:142] - [Round 14] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:57:37 - INFO - [server_grpc.py:146] - [Round 14] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:57:37 - INFO - [server_grpc.py:171] - 向客户端 1 提供第13轮全局模型
+2025-07-14 09:57:54 - INFO - [tee_aggregation_strategy.py:70] - [Round 14] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:57:54 - INFO - [server_grpc.py:137] - [Round 14] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:55 - INFO - [tee_aggregation_strategy.py:70] - [Round 14] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:57:55 - INFO - [server_grpc.py:137] - [Round 14] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:57:56 - INFO - [tee_aggregation_strategy.py:70] - [Round 14] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:57:56 - INFO - [server_grpc.py:183] - [Round 14] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:57:56 - INFO - [tee_aggregation_strategy.py:111] - [Round 14] TEE模式下明文参数聚合完成。
+2025-07-14 09:57:56 - INFO - [server_grpc.py:188] - [Round 14] 全局模型参数更新完成。
+2025-07-14 09:57:56 - INFO - [tee_aggregation_strategy.py:140] - [Round 14] 全局评估 (TEE): Acc=0.9904, AUC=0.9994, Loss=0.0069
+2025-07-14 09:57:56 - INFO - [server_grpc.py:213] - 第 14 轮聚合完成，进入第 15 轮。
+2025-07-14 09:57:56 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:57:56 - INFO - [server_grpc.py:142] - [Round 15] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:57:56 - INFO - [server_grpc.py:171] - 向客户端 1 提供第14轮全局模型
+2025-07-14 09:57:56 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:57:56 - INFO - [server_grpc.py:142] - [Round 15] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:57:56 - INFO - [server_grpc.py:171] - 向客户端 3 提供第14轮全局模型
+2025-07-14 09:57:57 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:57:57 - INFO - [server_grpc.py:142] - [Round 15] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:57:57 - INFO - [server_grpc.py:146] - [Round 15] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:57:57 - INFO - [server_grpc.py:171] - 向客户端 2 提供第14轮全局模型
+2025-07-14 09:58:14 - INFO - [tee_aggregation_strategy.py:70] - [Round 15] 收到并解密了客户端 1 的TEE模式更新。
+2025-07-14 09:58:14 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:58:16 - INFO - [tee_aggregation_strategy.py:70] - [Round 15] 收到并解密了客户端 2 的TEE模式更新。
+2025-07-14 09:58:16 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:58:16 - INFO - [tee_aggregation_strategy.py:70] - [Round 15] 收到并解密了客户端 3 的TEE模式更新。
+2025-07-14 09:58:16 - INFO - [server_grpc.py:183] - [Round 15] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:58:16 - INFO - [tee_aggregation_strategy.py:111] - [Round 15] TEE模式下明文参数聚合完成。
+2025-07-14 09:58:16 - INFO - [server_grpc.py:188] - [Round 15] 全局模型参数更新完成。
+2025-07-14 09:58:16 - INFO - [tee_aggregation_strategy.py:140] - [Round 15] 全局评估 (TEE): Acc=0.9886, AUC=0.9994, Loss=0.0058
+2025-07-14 09:58:16 - INFO - [server_grpc.py:196] - 训练结束。总耗时: 307.78 秒
+2025-07-14 09:58:16 - INFO - [server_grpc.py:206] - 全局模型评估指标汇总:
+      Accuracy     AUC    Loss
+Round                         
+1       0.9743  0.9963  0.0708
+2       0.9830  0.9982  0.0391
+3       0.9816  0.9980  0.0401
+4       0.9859  0.9987  0.0240
+5       0.9832  0.9987  0.0290
+6       0.9882  0.9992  0.0149
+7       0.9869  0.9990  0.0162
+8       0.9869  0.9991  0.0159
+9       0.9894  0.9993  0.0121
+10      0.9878  0.9991  0.0146
+11      0.9898  0.9994  0.0083
+12      0.9896  0.9994  0.0082
+13      0.9896  0.9995  0.0084
+14      0.9904  0.9994  0.0069
+15      0.9886  0.9994  0.0058
+2025-07-14 09:58:17 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:58:17 - INFO - [server_grpc.py:142] - [Round 15] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:58:17 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:58:17 - INFO - [server_grpc.py:142] - [Round 15] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:58:17 - INFO - [server_grpc.py:171] - 向客户端 3 提供第15轮全局模型
+2025-07-14 09:58:17 - INFO - [server_grpc.py:171] - 向客户端 1 提供第15轮全局模型
+2025-07-14 09:58:18 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:58:18 - INFO - [server_grpc.py:142] - [Round 15] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:58:18 - INFO - [server_grpc.py:146] - [Round 15] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:58:18 - INFO - [server_grpc.py:171] - 向客户端 2 提供第15轮全局模型

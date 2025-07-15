@@ -46,7 +46,7 @@ from src.strategies.server.he_aggregation_strategy import HeAggregationStrategy
 from src.strategies.server.tee_aggregation_strategy import TeeAggregationStrategy
 from src.strategies.server.mpc_aggregation_strategy import MpcAggregationStrategy
 
-logger = get_logger()
+logger = get_logger(create_file=True)
 set_seed(config['base']['random_seed'])
 
 class ClientState:
@@ -189,10 +189,22 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 
                 self.evaluate(round_num) 
 
-                if self.converged or self.current_round >= self.max_rounds:
+                if self.converged or self.current_round + 1 == self.max_rounds:
+                    self.next_step = True
                     self.end_time = time.time()
                     elapsed = self.end_time - self.start_time
                     logger.info(f"训练结束。总耗时: {elapsed:.2f} 秒")
+
+                    # 创建并打印评估指标表格
+                    eval_results = {
+                        "Round": [i + 1 for i in range(len(self.rs_test_acc))],
+                        "Accuracy": [f"{acc:.4f}" for acc in self.rs_test_acc],
+                        "AUC": [f"{auc:.4f}" for auc in self.rs_auc],
+                        "Loss": [f"{loss:.4f}" for loss in self.rs_train_loss]
+                    }
+                    df = pd.DataFrame(eval_results).set_index("Round")
+                    logger.info("全局模型评估指标汇总:\n" + df.to_string())
+
                     prefix = f"{self.privacy_mode}_"
                     plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc, prefix=prefix)
                 else:
@@ -206,12 +218,12 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         """评估所有客户端的平均指标，并检查收敛"""
         self.aggregation_strategy.evaluate_metrics(round_num)
 
-        if len(self.rs_test_acc) >= self.converge_window:
-            recent_accs = self.rs_test_acc[-(self.converge_window):]
-            acc_delta = max(recent_accs) - min(recent_accs)
-            if acc_delta < self.acc_delta_threshold:
-                self.converged = True
-                logger.info(f"[Round {round_num}] 训练已收敛，准确率变化 ({acc_delta:.6f}) 小于阈值 ({self.acc_delta_threshold})。")
+        # if len(self.rs_test_acc) >= self.converge_window:
+        #     recent_accs = self.rs_test_acc[-(self.converge_window):]
+        #     acc_delta = max(recent_accs) - min(recent_accs)
+        #     if acc_delta < self.acc_delta_threshold:
+        #         self.converged = True
+        #         logger.info(f"[Round {round_num}] 训练已收敛，准确率变化 ({acc_delta:.6f}) 小于阈值 ({self.acc_delta_threshold})。")
 
 
 def serve():

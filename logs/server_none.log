@@ -1,0 +1,351 @@
+2025-07-14 09:47:05 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_none.log
+2025-07-14 09:47:05 - INFO - [server_grpc.py:85] - 服务器初始化完成 (模式: none)，等待 3 个客户端注册...
+2025-07-14 09:47:05 - INFO - [server_grpc.py:248] - 联邦学习安全服务器正在启动，监听端口: 50051
+2025-07-14 09:47:06 - INFO - [server_grpc.py:102] - 接收到客户端 1 的注册请求 (模型: CNN, 数据量: 18667)
+2025-07-14 09:47:06 - INFO - [server_grpc.py:111] - 客户端 1 注册成功。当前 1/3 个客户端。
+2025-07-14 09:47:06 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:06 - INFO - [server_grpc.py:102] - 接收到客户端 3 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-14 09:47:06 - INFO - [server_grpc.py:111] - 客户端 3 注册成功。当前 2/3 个客户端。
+2025-07-14 09:47:06 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:06 - INFO - [server_grpc.py:102] - 接收到客户端 2 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-14 09:47:06 - INFO - [server_grpc.py:111] - 客户端 2 注册成功。当前 3/3 个客户端。
+2025-07-14 09:47:06 - INFO - [server_grpc.py:117] - 所有客户端已注册，设置 next_step=True，准备开始训练。
+2025-07-14 09:47:06 - INFO - [server_grpc.py:120] - 联邦学习流程计时开始
+2025-07-14 09:47:06 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:47:06 - INFO - [server_grpc.py:142] - [Round 1] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:47:07 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:47:07 - INFO - [server_grpc.py:142] - [Round 1] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:47:07 - INFO - [server_grpc.py:137] - [Round 1] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:47:07 - INFO - [server_grpc.py:142] - [Round 1] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:47:07 - INFO - [server_grpc.py:146] - [Round 1] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:47:31 - INFO - [none_aggregation_strategy.py:40] - [Round 1] 收到客户端 1 的明文更新。
+2025-07-14 09:47:31 - INFO - [server_grpc.py:137] - [Round 1] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:32 - INFO - [none_aggregation_strategy.py:40] - [Round 1] 收到客户端 2 的明文更新。
+2025-07-14 09:47:32 - INFO - [server_grpc.py:137] - [Round 1] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:32 - INFO - [none_aggregation_strategy.py:40] - [Round 1] 收到客户端 3 的明文更新。
+2025-07-14 09:47:32 - INFO - [server_grpc.py:183] - [Round 1] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:47:32 - INFO - [none_aggregation_strategy.py:82] - [Round 1] 明文参数聚合完成。
+2025-07-14 09:47:32 - INFO - [server_grpc.py:188] - [Round 1] 全局模型参数更新完成。
+2025-07-14 09:47:32 - INFO - [none_aggregation_strategy.py:111] - [Round 1] 全局评估: Acc=0.9743, AUC=0.9963, Loss=0.0708
+2025-07-14 09:47:32 - INFO - [server_grpc.py:213] - 第 1 轮聚合完成，进入第 2 轮。
+2025-07-14 09:47:32 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:47:32 - INFO - [server_grpc.py:142] - [Round 2] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:47:32 - INFO - [server_grpc.py:171] - 向客户端 3 提供第1轮全局模型
+2025-07-14 09:47:33 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:47:33 - INFO - [server_grpc.py:142] - [Round 2] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:47:33 - INFO - [server_grpc.py:171] - 向客户端 1 提供第1轮全局模型
+2025-07-14 09:47:34 - INFO - [server_grpc.py:137] - [Round 2] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:47:34 - INFO - [server_grpc.py:142] - [Round 2] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:47:34 - INFO - [server_grpc.py:146] - [Round 2] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:47:34 - INFO - [server_grpc.py:171] - 向客户端 2 提供第1轮全局模型
+2025-07-14 09:47:49 - INFO - [none_aggregation_strategy.py:40] - [Round 2] 收到客户端 3 的明文更新。
+2025-07-14 09:47:49 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:51 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:53 - INFO - [none_aggregation_strategy.py:40] - [Round 2] 收到客户端 1 的明文更新。
+2025-07-14 09:47:53 - INFO - [server_grpc.py:137] - [Round 2] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:53 - INFO - [server_grpc.py:137] - [Round 2] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:47:53 - INFO - [none_aggregation_strategy.py:40] - [Round 2] 收到客户端 2 的明文更新。
+2025-07-14 09:47:53 - INFO - [server_grpc.py:183] - [Round 2] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:47:53 - INFO - [none_aggregation_strategy.py:82] - [Round 2] 明文参数聚合完成。
+2025-07-14 09:47:53 - INFO - [server_grpc.py:188] - [Round 2] 全局模型参数更新完成。
+2025-07-14 09:47:53 - INFO - [none_aggregation_strategy.py:111] - [Round 2] 全局评估: Acc=0.9826, AUC=0.9982, Loss=0.0397
+2025-07-14 09:47:53 - INFO - [server_grpc.py:213] - 第 2 轮聚合完成，进入第 3 轮。
+2025-07-14 09:47:53 - INFO - [server_grpc.py:137] - [Round 3] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:47:53 - INFO - [server_grpc.py:142] - [Round 3] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:47:53 - INFO - [server_grpc.py:171] - 向客户端 2 提供第2轮全局模型
+2025-07-14 09:47:55 - INFO - [server_grpc.py:137] - [Round 3] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:47:55 - INFO - [server_grpc.py:142] - [Round 3] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:47:55 - INFO - [server_grpc.py:171] - 向客户端 1 提供第2轮全局模型
+2025-07-14 09:47:55 - INFO - [server_grpc.py:137] - [Round 3] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:47:55 - INFO - [server_grpc.py:142] - [Round 3] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:47:55 - INFO - [server_grpc.py:146] - [Round 3] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:47:55 - INFO - [server_grpc.py:171] - 向客户端 3 提供第2轮全局模型
+2025-07-14 09:48:12 - INFO - [none_aggregation_strategy.py:40] - [Round 3] 收到客户端 2 的明文更新。
+2025-07-14 09:48:12 - INFO - [server_grpc.py:137] - [Round 3] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:12 - INFO - [none_aggregation_strategy.py:40] - [Round 3] 收到客户端 3 的明文更新。
+2025-07-14 09:48:12 - INFO - [server_grpc.py:137] - [Round 3] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:13 - INFO - [none_aggregation_strategy.py:40] - [Round 3] 收到客户端 1 的明文更新。
+2025-07-14 09:48:13 - INFO - [server_grpc.py:183] - [Round 3] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:48:13 - INFO - [none_aggregation_strategy.py:82] - [Round 3] 明文参数聚合完成。
+2025-07-14 09:48:13 - INFO - [server_grpc.py:188] - [Round 3] 全局模型参数更新完成。
+2025-07-14 09:48:13 - INFO - [none_aggregation_strategy.py:111] - [Round 3] 全局评估: Acc=0.9829, AUC=0.9982, Loss=0.0369
+2025-07-14 09:48:13 - INFO - [server_grpc.py:213] - 第 3 轮聚合完成，进入第 4 轮。
+2025-07-14 09:48:13 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:48:13 - INFO - [server_grpc.py:142] - [Round 4] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:48:13 - INFO - [server_grpc.py:171] - 向客户端 1 提供第3轮全局模型
+2025-07-14 09:48:14 - INFO - [server_grpc.py:137] - [Round 4] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:48:14 - INFO - [server_grpc.py:142] - [Round 4] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:48:14 - INFO - [server_grpc.py:171] - 向客户端 2 提供第3轮全局模型
+2025-07-14 09:48:14 - INFO - [server_grpc.py:137] - [Round 4] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:48:14 - INFO - [server_grpc.py:142] - [Round 4] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:48:14 - INFO - [server_grpc.py:146] - [Round 4] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:48:14 - INFO - [server_grpc.py:171] - 向客户端 3 提供第3轮全局模型
+2025-07-14 09:48:29 - INFO - [none_aggregation_strategy.py:40] - [Round 4] 收到客户端 1 的明文更新。
+2025-07-14 09:48:29 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:31 - INFO - [none_aggregation_strategy.py:40] - [Round 4] 收到客户端 3 的明文更新。
+2025-07-14 09:48:31 - INFO - [server_grpc.py:137] - [Round 4] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:31 - INFO - [server_grpc.py:137] - [Round 4] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:32 - INFO - [none_aggregation_strategy.py:40] - [Round 4] 收到客户端 2 的明文更新。
+2025-07-14 09:48:32 - INFO - [server_grpc.py:183] - [Round 4] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:48:32 - INFO - [none_aggregation_strategy.py:82] - [Round 4] 明文参数聚合完成。
+2025-07-14 09:48:32 - INFO - [server_grpc.py:188] - [Round 4] 全局模型参数更新完成。
+2025-07-14 09:48:32 - INFO - [none_aggregation_strategy.py:111] - [Round 4] 全局评估: Acc=0.9857, AUC=0.9988, Loss=0.0240
+2025-07-14 09:48:32 - INFO - [server_grpc.py:213] - 第 4 轮聚合完成，进入第 5 轮。
+2025-07-14 09:48:32 - INFO - [server_grpc.py:137] - [Round 5] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:48:32 - INFO - [server_grpc.py:142] - [Round 5] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:48:32 - INFO - [server_grpc.py:171] - 向客户端 2 提供第4轮全局模型
+2025-07-14 09:48:33 - INFO - [server_grpc.py:137] - [Round 5] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:48:33 - INFO - [server_grpc.py:142] - [Round 5] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:48:33 - INFO - [server_grpc.py:171] - 向客户端 3 提供第4轮全局模型
+2025-07-14 09:48:33 - INFO - [server_grpc.py:137] - [Round 5] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:48:33 - INFO - [server_grpc.py:142] - [Round 5] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:48:33 - INFO - [server_grpc.py:146] - [Round 5] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:48:33 - INFO - [server_grpc.py:171] - 向客户端 1 提供第4轮全局模型
+2025-07-14 09:48:49 - INFO - [none_aggregation_strategy.py:40] - [Round 5] 收到客户端 2 的明文更新。
+2025-07-14 09:48:49 - INFO - [server_grpc.py:137] - [Round 5] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:51 - INFO - [server_grpc.py:137] - [Round 5] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:52 - INFO - [none_aggregation_strategy.py:40] - [Round 5] 收到客户端 1 的明文更新。
+2025-07-14 09:48:52 - INFO - [server_grpc.py:137] - [Round 5] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:48:52 - INFO - [none_aggregation_strategy.py:40] - [Round 5] 收到客户端 3 的明文更新。
+2025-07-14 09:48:52 - INFO - [server_grpc.py:183] - [Round 5] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:48:52 - INFO - [none_aggregation_strategy.py:82] - [Round 5] 明文参数聚合完成。
+2025-07-14 09:48:52 - INFO - [server_grpc.py:188] - [Round 5] 全局模型参数更新完成。
+2025-07-14 09:48:52 - INFO - [none_aggregation_strategy.py:111] - [Round 5] 全局评估: Acc=0.9832, AUC=0.9988, Loss=0.0284
+2025-07-14 09:48:52 - INFO - [server_grpc.py:213] - 第 5 轮聚合完成，进入第 6 轮。
+2025-07-14 09:48:52 - INFO - [server_grpc.py:137] - [Round 6] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:48:52 - INFO - [server_grpc.py:142] - [Round 6] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:48:52 - INFO - [server_grpc.py:171] - 向客户端 3 提供第5轮全局模型
+2025-07-14 09:48:53 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:48:53 - INFO - [server_grpc.py:142] - [Round 6] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:48:53 - INFO - [server_grpc.py:171] - 向客户端 2 提供第5轮全局模型
+2025-07-14 09:48:54 - INFO - [server_grpc.py:137] - [Round 6] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:48:54 - INFO - [server_grpc.py:142] - [Round 6] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:48:54 - INFO - [server_grpc.py:146] - [Round 6] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:48:54 - INFO - [server_grpc.py:171] - 向客户端 1 提供第5轮全局模型
+2025-07-14 09:49:11 - INFO - [none_aggregation_strategy.py:40] - [Round 6] 收到客户端 2 的明文更新。
+2025-07-14 09:49:11 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:12 - INFO - [none_aggregation_strategy.py:40] - [Round 6] 收到客户端 3 的明文更新。
+2025-07-14 09:49:12 - INFO - [server_grpc.py:137] - [Round 6] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:13 - INFO - [server_grpc.py:137] - [Round 6] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:14 - INFO - [server_grpc.py:137] - [Round 6] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:14 - INFO - [none_aggregation_strategy.py:40] - [Round 6] 收到客户端 1 的明文更新。
+2025-07-14 09:49:14 - INFO - [server_grpc.py:183] - [Round 6] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:49:14 - INFO - [none_aggregation_strategy.py:82] - [Round 6] 明文参数聚合完成。
+2025-07-14 09:49:14 - INFO - [server_grpc.py:188] - [Round 6] 全局模型参数更新完成。
+2025-07-14 09:49:14 - INFO - [none_aggregation_strategy.py:111] - [Round 6] 全局评估: Acc=0.9879, AUC=0.9992, Loss=0.0160
+2025-07-14 09:49:14 - INFO - [server_grpc.py:213] - 第 6 轮聚合完成，进入第 7 轮。
+2025-07-14 09:49:14 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:49:14 - INFO - [server_grpc.py:142] - [Round 7] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:49:14 - INFO - [server_grpc.py:171] - 向客户端 1 提供第6轮全局模型
+2025-07-14 09:49:15 - INFO - [server_grpc.py:137] - [Round 7] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:49:15 - INFO - [server_grpc.py:142] - [Round 7] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:49:15 - INFO - [server_grpc.py:171] - 向客户端 2 提供第6轮全局模型
+2025-07-14 09:49:16 - INFO - [server_grpc.py:137] - [Round 7] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:49:16 - INFO - [server_grpc.py:142] - [Round 7] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:49:16 - INFO - [server_grpc.py:146] - [Round 7] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:49:16 - INFO - [server_grpc.py:171] - 向客户端 3 提供第6轮全局模型
+2025-07-14 09:49:33 - INFO - [none_aggregation_strategy.py:40] - [Round 7] 收到客户端 1 的明文更新。
+2025-07-14 09:49:33 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:35 - INFO - [none_aggregation_strategy.py:40] - [Round 7] 收到客户端 2 的明文更新。
+2025-07-14 09:49:35 - INFO - [server_grpc.py:137] - [Round 7] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:35 - INFO - [server_grpc.py:137] - [Round 7] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:36 - INFO - [none_aggregation_strategy.py:40] - [Round 7] 收到客户端 3 的明文更新。
+2025-07-14 09:49:36 - INFO - [server_grpc.py:183] - [Round 7] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:49:36 - INFO - [none_aggregation_strategy.py:82] - [Round 7] 明文参数聚合完成。
+2025-07-14 09:49:36 - INFO - [server_grpc.py:188] - [Round 7] 全局模型参数更新完成。
+2025-07-14 09:49:36 - INFO - [none_aggregation_strategy.py:111] - [Round 7] 全局评估: Acc=0.9870, AUC=0.9991, Loss=0.0176
+2025-07-14 09:49:36 - INFO - [server_grpc.py:213] - 第 7 轮聚合完成，进入第 8 轮。
+2025-07-14 09:49:36 - INFO - [server_grpc.py:137] - [Round 8] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:49:36 - INFO - [server_grpc.py:142] - [Round 8] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:49:36 - INFO - [server_grpc.py:171] - 向客户端 3 提供第7轮全局模型
+2025-07-14 09:49:37 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:49:37 - INFO - [server_grpc.py:142] - [Round 8] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:49:37 - INFO - [server_grpc.py:171] - 向客户端 2 提供第7轮全局模型
+2025-07-14 09:49:37 - INFO - [server_grpc.py:137] - [Round 8] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:49:37 - INFO - [server_grpc.py:142] - [Round 8] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:49:37 - INFO - [server_grpc.py:146] - [Round 8] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:49:37 - INFO - [server_grpc.py:171] - 向客户端 1 提供第7轮全局模型
+2025-07-14 09:49:53 - INFO - [none_aggregation_strategy.py:40] - [Round 8] 收到客户端 3 的明文更新。
+2025-07-14 09:49:53 - INFO - [server_grpc.py:137] - [Round 8] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:55 - INFO - [none_aggregation_strategy.py:40] - [Round 8] 收到客户端 2 的明文更新。
+2025-07-14 09:49:55 - INFO - [server_grpc.py:137] - [Round 8] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:55 - INFO - [server_grpc.py:137] - [Round 8] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:49:56 - INFO - [none_aggregation_strategy.py:40] - [Round 8] 收到客户端 1 的明文更新。
+2025-07-14 09:49:56 - INFO - [server_grpc.py:183] - [Round 8] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:49:56 - INFO - [none_aggregation_strategy.py:82] - [Round 8] 明文参数聚合完成。
+2025-07-14 09:49:56 - INFO - [server_grpc.py:188] - [Round 8] 全局模型参数更新完成。
+2025-07-14 09:49:56 - INFO - [none_aggregation_strategy.py:111] - [Round 8] 全局评估: Acc=0.9874, AUC=0.9990, Loss=0.0161
+2025-07-14 09:49:56 - INFO - [server_grpc.py:213] - 第 8 轮聚合完成，进入第 9 轮。
+2025-07-14 09:49:56 - INFO - [server_grpc.py:137] - [Round 9] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:49:56 - INFO - [server_grpc.py:142] - [Round 9] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:49:56 - INFO - [server_grpc.py:171] - 向客户端 1 提供第8轮全局模型
+2025-07-14 09:49:57 - INFO - [server_grpc.py:137] - [Round 9] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:49:57 - INFO - [server_grpc.py:142] - [Round 9] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:49:57 - INFO - [server_grpc.py:171] - 向客户端 2 提供第8轮全局模型
+2025-07-14 09:49:57 - INFO - [server_grpc.py:137] - [Round 9] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:49:57 - INFO - [server_grpc.py:142] - [Round 9] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:49:57 - INFO - [server_grpc.py:146] - [Round 9] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:49:57 - INFO - [server_grpc.py:171] - 向客户端 3 提供第8轮全局模型
+2025-07-14 09:50:14 - INFO - [none_aggregation_strategy.py:40] - [Round 9] 收到客户端 1 的明文更新。
+2025-07-14 09:50:14 - INFO - [server_grpc.py:137] - [Round 9] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:16 - INFO - [server_grpc.py:137] - [Round 9] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:16 - INFO - [none_aggregation_strategy.py:40] - [Round 9] 收到客户端 2 的明文更新。
+2025-07-14 09:50:16 - INFO - [server_grpc.py:137] - [Round 9] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:16 - INFO - [none_aggregation_strategy.py:40] - [Round 9] 收到客户端 3 的明文更新。
+2025-07-14 09:50:16 - INFO - [server_grpc.py:183] - [Round 9] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:50:16 - INFO - [none_aggregation_strategy.py:82] - [Round 9] 明文参数聚合完成。
+2025-07-14 09:50:16 - INFO - [server_grpc.py:188] - [Round 9] 全局模型参数更新完成。
+2025-07-14 09:50:16 - INFO - [none_aggregation_strategy.py:111] - [Round 9] 全局评估: Acc=0.9893, AUC=0.9993, Loss=0.0132
+2025-07-14 09:50:16 - INFO - [server_grpc.py:213] - 第 9 轮聚合完成，进入第 10 轮。
+2025-07-14 09:50:16 - INFO - [server_grpc.py:137] - [Round 10] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:50:16 - INFO - [server_grpc.py:142] - [Round 10] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:50:16 - INFO - [server_grpc.py:171] - 向客户端 3 提供第9轮全局模型
+2025-07-14 09:50:18 - INFO - [server_grpc.py:137] - [Round 10] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:50:18 - INFO - [server_grpc.py:142] - [Round 10] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:50:18 - INFO - [server_grpc.py:171] - 向客户端 1 提供第9轮全局模型
+2025-07-14 09:50:18 - INFO - [server_grpc.py:137] - [Round 10] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:50:18 - INFO - [server_grpc.py:142] - [Round 10] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:50:18 - INFO - [server_grpc.py:146] - [Round 10] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:50:18 - INFO - [server_grpc.py:171] - 向客户端 2 提供第9轮全局模型
+2025-07-14 09:50:32 - INFO - [none_aggregation_strategy.py:40] - [Round 10] 收到客户端 3 的明文更新。
+2025-07-14 09:50:32 - INFO - [server_grpc.py:137] - [Round 10] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:34 - INFO - [server_grpc.py:137] - [Round 10] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:34 - INFO - [none_aggregation_strategy.py:40] - [Round 10] 收到客户端 2 的明文更新。
+2025-07-14 09:50:34 - INFO - [server_grpc.py:137] - [Round 10] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:35 - INFO - [none_aggregation_strategy.py:40] - [Round 10] 收到客户端 1 的明文更新。
+2025-07-14 09:50:35 - INFO - [server_grpc.py:183] - [Round 10] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:50:35 - INFO - [none_aggregation_strategy.py:82] - [Round 10] 明文参数聚合完成。
+2025-07-14 09:50:35 - INFO - [server_grpc.py:188] - [Round 10] 全局模型参数更新完成。
+2025-07-14 09:50:35 - INFO - [none_aggregation_strategy.py:111] - [Round 10] 全局评估: Acc=0.9883, AUC=0.9992, Loss=0.0136
+2025-07-14 09:50:35 - INFO - [server_grpc.py:213] - 第 10 轮聚合完成，进入第 11 轮。
+2025-07-14 09:50:35 - INFO - [server_grpc.py:137] - [Round 11] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:50:35 - INFO - [server_grpc.py:142] - [Round 11] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:50:35 - INFO - [server_grpc.py:171] - 向客户端 1 提供第10轮全局模型
+2025-07-14 09:50:36 - INFO - [server_grpc.py:137] - [Round 11] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:50:36 - INFO - [server_grpc.py:142] - [Round 11] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:50:36 - INFO - [server_grpc.py:171] - 向客户端 3 提供第10轮全局模型
+2025-07-14 09:50:36 - INFO - [server_grpc.py:137] - [Round 11] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:50:36 - INFO - [server_grpc.py:142] - [Round 11] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:50:36 - INFO - [server_grpc.py:146] - [Round 11] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:50:36 - INFO - [server_grpc.py:171] - 向客户端 2 提供第10轮全局模型
+2025-07-14 09:50:58 - INFO - [none_aggregation_strategy.py:40] - [Round 11] 收到客户端 1 的明文更新。
+2025-07-14 09:50:58 - INFO - [server_grpc.py:137] - [Round 11] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:58 - INFO - [none_aggregation_strategy.py:40] - [Round 11] 收到客户端 3 的明文更新。
+2025-07-14 09:50:58 - INFO - [server_grpc.py:137] - [Round 11] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:50:58 - INFO - [none_aggregation_strategy.py:40] - [Round 11] 收到客户端 2 的明文更新。
+2025-07-14 09:50:58 - INFO - [server_grpc.py:183] - [Round 11] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:50:58 - INFO - [none_aggregation_strategy.py:82] - [Round 11] 明文参数聚合完成。
+2025-07-14 09:50:58 - INFO - [server_grpc.py:188] - [Round 11] 全局模型参数更新完成。
+2025-07-14 09:50:58 - INFO - [none_aggregation_strategy.py:111] - [Round 11] 全局评估: Acc=0.9897, AUC=0.9994, Loss=0.0094
+2025-07-14 09:50:58 - INFO - [server_grpc.py:213] - 第 11 轮聚合完成，进入第 12 轮。
+2025-07-14 09:50:58 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:50:58 - INFO - [server_grpc.py:142] - [Round 12] 客户端 2 获得训练许可，count增加到 1/3
+2025-07-14 09:50:58 - INFO - [server_grpc.py:171] - 向客户端 2 提供第11轮全局模型
+2025-07-14 09:51:00 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:51:00 - INFO - [server_grpc.py:142] - [Round 12] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-14 09:51:00 - INFO - [server_grpc.py:171] - 向客户端 1 提供第11轮全局模型
+2025-07-14 09:51:00 - INFO - [server_grpc.py:137] - [Round 12] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:51:00 - INFO - [server_grpc.py:142] - [Round 12] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:51:00 - INFO - [server_grpc.py:146] - [Round 12] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:51:00 - INFO - [server_grpc.py:171] - 向客户端 3 提供第11轮全局模型
+2025-07-14 09:51:16 - INFO - [none_aggregation_strategy.py:40] - [Round 12] 收到客户端 2 的明文更新。
+2025-07-14 09:51:16 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:51:18 - INFO - [server_grpc.py:137] - [Round 12] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:51:19 - INFO - [none_aggregation_strategy.py:40] - [Round 12] 收到客户端 1 的明文更新。
+2025-07-14 09:51:19 - INFO - [server_grpc.py:137] - [Round 12] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:51:20 - INFO - [none_aggregation_strategy.py:40] - [Round 12] 收到客户端 3 的明文更新。
+2025-07-14 09:51:20 - INFO - [server_grpc.py:183] - [Round 12] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:51:20 - INFO - [none_aggregation_strategy.py:82] - [Round 12] 明文参数聚合完成。
+2025-07-14 09:51:20 - INFO - [server_grpc.py:188] - [Round 12] 全局模型参数更新完成。
+2025-07-14 09:51:20 - INFO - [none_aggregation_strategy.py:111] - [Round 12] 全局评估: Acc=0.9891, AUC=0.9994, Loss=0.0084
+2025-07-14 09:51:20 - INFO - [server_grpc.py:213] - 第 12 轮聚合完成，进入第 13 轮。
+2025-07-14 09:51:20 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:51:20 - INFO - [server_grpc.py:142] - [Round 13] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:51:20 - INFO - [server_grpc.py:171] - 向客户端 3 提供第12轮全局模型
+2025-07-14 09:51:20 - INFO - [server_grpc.py:137] - [Round 13] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:51:20 - INFO - [server_grpc.py:142] - [Round 13] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:51:20 - INFO - [server_grpc.py:171] - 向客户端 2 提供第12轮全局模型
+2025-07-14 09:51:21 - INFO - [server_grpc.py:137] - [Round 13] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:51:21 - INFO - [server_grpc.py:142] - [Round 13] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:51:21 - INFO - [server_grpc.py:146] - [Round 13] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:51:21 - INFO - [server_grpc.py:171] - 向客户端 1 提供第12轮全局模型
+2025-07-14 09:51:42 - INFO - [none_aggregation_strategy.py:40] - [Round 13] 收到客户端 3 的明文更新。
+2025-07-14 09:51:42 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:51:44 - INFO - [none_aggregation_strategy.py:40] - [Round 13] 收到客户端 2 的明文更新。
+2025-07-14 09:51:44 - INFO - [server_grpc.py:137] - [Round 13] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:51:44 - INFO - [server_grpc.py:137] - [Round 13] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:51:44 - INFO - [none_aggregation_strategy.py:40] - [Round 13] 收到客户端 1 的明文更新。
+2025-07-14 09:51:44 - INFO - [server_grpc.py:183] - [Round 13] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:51:44 - INFO - [none_aggregation_strategy.py:82] - [Round 13] 明文参数聚合完成。
+2025-07-14 09:51:44 - INFO - [server_grpc.py:188] - [Round 13] 全局模型参数更新完成。
+2025-07-14 09:51:44 - INFO - [none_aggregation_strategy.py:111] - [Round 13] 全局评估: Acc=0.9884, AUC=0.9993, Loss=0.0107
+2025-07-14 09:51:44 - INFO - [server_grpc.py:213] - 第 13 轮聚合完成，进入第 14 轮。
+2025-07-14 09:51:44 - INFO - [server_grpc.py:137] - [Round 14] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:51:44 - INFO - [server_grpc.py:142] - [Round 14] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:51:44 - INFO - [server_grpc.py:171] - 向客户端 1 提供第13轮全局模型
+2025-07-14 09:51:46 - INFO - [server_grpc.py:137] - [Round 14] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:51:46 - INFO - [server_grpc.py:142] - [Round 14] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:51:46 - INFO - [server_grpc.py:171] - 向客户端 2 提供第13轮全局模型
+2025-07-14 09:51:46 - INFO - [server_grpc.py:137] - [Round 14] 客户端 3 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:51:46 - INFO - [server_grpc.py:142] - [Round 14] 客户端 3 获得训练许可，count增加到 3/3
+2025-07-14 09:51:46 - INFO - [server_grpc.py:146] - [Round 14] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:51:46 - INFO - [server_grpc.py:171] - 向客户端 3 提供第13轮全局模型
+2025-07-14 09:52:08 - INFO - [none_aggregation_strategy.py:40] - [Round 14] 收到客户端 2 的明文更新。
+2025-07-14 09:52:08 - INFO - [server_grpc.py:137] - [Round 14] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:52:09 - INFO - [none_aggregation_strategy.py:40] - [Round 14] 收到客户端 1 的明文更新。
+2025-07-14 09:52:09 - INFO - [server_grpc.py:137] - [Round 14] 客户端 1 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:52:09 - INFO - [none_aggregation_strategy.py:40] - [Round 14] 收到客户端 3 的明文更新。
+2025-07-14 09:52:09 - INFO - [server_grpc.py:183] - [Round 14] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:52:09 - INFO - [none_aggregation_strategy.py:82] - [Round 14] 明文参数聚合完成。
+2025-07-14 09:52:09 - INFO - [server_grpc.py:188] - [Round 14] 全局模型参数更新完成。
+2025-07-14 09:52:09 - INFO - [none_aggregation_strategy.py:111] - [Round 14] 全局评估: Acc=0.9886, AUC=0.9992, Loss=0.0119
+2025-07-14 09:52:09 - INFO - [server_grpc.py:213] - 第 14 轮聚合完成，进入第 15 轮。
+2025-07-14 09:52:09 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:52:09 - INFO - [server_grpc.py:142] - [Round 15] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-14 09:52:09 - INFO - [server_grpc.py:171] - 向客户端 3 提供第14轮全局模型
+2025-07-14 09:52:10 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:52:10 - INFO - [server_grpc.py:142] - [Round 15] 客户端 2 获得训练许可，count增加到 2/3
+2025-07-14 09:52:10 - INFO - [server_grpc.py:171] - 向客户端 2 提供第14轮全局模型
+2025-07-14 09:52:11 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:52:11 - INFO - [server_grpc.py:142] - [Round 15] 客户端 1 获得训练许可，count增加到 3/3
+2025-07-14 09:52:11 - INFO - [server_grpc.py:146] - [Round 15] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:52:11 - INFO - [server_grpc.py:171] - 向客户端 1 提供第14轮全局模型
+2025-07-14 09:52:29 - INFO - [none_aggregation_strategy.py:40] - [Round 15] 收到客户端 3 的明文更新。
+2025-07-14 09:52:29 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:52:31 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:52:32 - INFO - [none_aggregation_strategy.py:40] - [Round 15] 收到客户端 2 的明文更新。
+2025-07-14 09:52:32 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=False, count=0
+2025-07-14 09:52:32 - INFO - [none_aggregation_strategy.py:40] - [Round 15] 收到客户端 1 的明文更新。
+2025-07-14 09:52:32 - INFO - [server_grpc.py:183] - [Round 15] 所有客户端参数已收集完毕，开始聚合。
+2025-07-14 09:52:32 - INFO - [none_aggregation_strategy.py:82] - [Round 15] 明文参数聚合完成。
+2025-07-14 09:52:32 - INFO - [server_grpc.py:188] - [Round 15] 全局模型参数更新完成。
+2025-07-14 09:52:32 - INFO - [none_aggregation_strategy.py:111] - [Round 15] 全局评估: Acc=0.9871, AUC=0.9993, Loss=0.0104
+2025-07-14 09:52:32 - INFO - [server_grpc.py:196] - 训练结束。总耗时: 325.82 秒
+2025-07-14 09:52:32 - INFO - [server_grpc.py:206] - 全局模型评估指标汇总:
+      Accuracy     AUC    Loss
+Round                         
+1       0.9743  0.9963  0.0708
+2       0.9826  0.9982  0.0397
+3       0.9829  0.9982  0.0369
+4       0.9857  0.9988  0.0240
+5       0.9832  0.9988  0.0284
+6       0.9879  0.9992  0.0160
+7       0.9870  0.9991  0.0176
+8       0.9874  0.9990  0.0161
+9       0.9893  0.9993  0.0132
+10      0.9883  0.9992  0.0136
+11      0.9897  0.9994  0.0094
+12      0.9891  0.9994  0.0084
+13      0.9884  0.9993  0.0107
+14      0.9886  0.9992  0.0119
+15      0.9871  0.9993  0.0104
+2025-07-14 09:52:33 - INFO - [server_grpc.py:137] - [Round 15] 客户端 1 检查训练状态，当前next_step=True, count=0
+2025-07-14 09:52:33 - INFO - [server_grpc.py:142] - [Round 15] 客户端 1 获得训练许可，count增加到 1/3
+2025-07-14 09:52:33 - INFO - [server_grpc.py:137] - [Round 15] 客户端 3 检查训练状态，当前next_step=True, count=1
+2025-07-14 09:52:33 - INFO - [server_grpc.py:142] - [Round 15] 客户端 3 获得训练许可，count增加到 2/3
+2025-07-14 09:52:33 - INFO - [server_grpc.py:171] - 向客户端 1 提供第15轮全局模型
+2025-07-14 09:52:33 - INFO - [server_grpc.py:171] - 向客户端 3 提供第15轮全局模型
+2025-07-14 09:52:34 - INFO - [server_grpc.py:137] - [Round 15] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-14 09:52:34 - INFO - [server_grpc.py:142] - [Round 15] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-14 09:52:34 - INFO - [server_grpc.py:146] - [Round 15] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-14 09:52:34 - INFO - [server_grpc.py:171] - 向客户端 2 提供第15轮全局模型

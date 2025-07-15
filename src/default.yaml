@@ -10,9 +10,9 @@ federation:
   # "he"   - 使用同态加密保护模型参数。
   # "tee"  - 使用TEE（可信执行环境）在服务器端保护明文聚合。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
-  privacy_mode: "mpc" # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "he" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
-  max_rounds: 100
+  max_rounds: 15
   convergence:
     acc_delta_threshold: 0.001
     window: 3

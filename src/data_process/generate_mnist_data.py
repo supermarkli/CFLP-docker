@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(PROJECT_ROOT)
@@ -83,6 +84,17 @@ def split_data_for_federation(X, y, num_clients=3):
     
     logger.info(f"为 {num_clients} 个客户端分割数据集完成。")
 
+def delete_raw_data(directory):
+    """删除指定的目录及其所有内容"""
+    if os.path.exists(directory):
+        try:
+            shutil.rmtree(directory)
+            logger.info(f"成功删除目录: {directory}")
+        except OSError as e:
+            logger.error(f"删除目录 {directory} 时出错: {e}")
+    else:
+        logger.warning(f"目录不存在，无法删除: {directory}")
+
 def generate_mnist_data():
     logger.info("开始加载MNIST数据集...")
     X_train, y_train, X_test, y_test = load_mnist_data(DOWNLOAD_DIR, normalize=NORMALIZE)
@@ -93,6 +105,10 @@ def generate_mnist_data():
     
     # 为联邦学习划分数据
     split_data_for_federation(X, y, num_clients=3)
+    
+    # 删除原始数据
+    delete_raw_data(DOWNLOAD_DIR)
+    
     logger.info("MNIST数据处理完成！")
 
 if __name__ == '__main__':
