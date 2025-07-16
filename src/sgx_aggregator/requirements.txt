@@ -1,0 +1,5 @@
+# src/sgx_aggregator/requirements.txt
+
+numpy
+cryptography
+

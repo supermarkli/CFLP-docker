@@ -110,7 +110,5 @@ class NoneAggregationStrategy(AggregationStrategy):
         self.server.rs_auc.append(avg_auc)
         logger.info(f"[Round {round_num+1}] 全局评估: Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
 
-        # 清理本轮的参数
-        # Note: HE模式下这个清理需要晚于指标评估，所以放在这里统一处理
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num] 

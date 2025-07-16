@@ -1,0 +1,64 @@
+# SGX聚合器Enclave的Dockerfile
+
+# 使用预装了Gramine和SGX依赖的基础镜像。
+# 使用预构建的镜像可以节省大量的构建时间。
+FROM gramine/gramine:1.6.1 as builder
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装Python和依赖项
+# 更换为清华大学的apt镜像源以加速下载
+RUN sed -i 's@deb.debian.org@mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list || true
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制 aggregator 的 requirements 文件并安装依赖
+COPY src/sgx_aggregator/requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# 复制项目源代码
+# enclave 需要访问 src/grpc 和 src/utils 才能正确反序列化
+COPY src/ /app/src
+
+# 复制聚合器代码和清单模板
+COPY src/sgx_aggregator/enclave.py .
+COPY src/sgx_aggregator/aggregator.manifest.template .
+
+# 生成用于签署enclave的私钥
+RUN openssl genrsa -3 -out enclave-key.pem 3072
+
+# 从模板生成清单文件
+# 注意：我们在这里没有使用模板变量，但这展示了该过程。
+RUN gramine-manifest aggregator.manifest.template aggregator.manifest
+
+# 签署清单文件以创建enclave文件
+RUN gramine-sgx-sign \
+    --manifest aggregator.manifest \
+    --output aggregator.manifest.sgx \
+    --key enclave-key.pem
+
+# --- 最终镜像 ---
+# 采用多阶段构建，最终镜像只包含运行所需的文件，体积更小
+FROM gramine/gramine:1.6.1
+
+# 设置工作目录
+WORKDIR /app
+
+# 从构建器阶段复制已构建的enclave和相关文件
+COPY --from=builder /app/enclave.py .
+COPY --from=builder /app/aggregator.manifest.sgx .
+COPY --from=builder /app/aggregator.manifest .
+COPY --from=builder /app/enclave-key.pem .
+COPY --from=builder /app/src /app/src  # 确保源代码也被复制到最终镜像中
+COPY --from=builder /usr/bin/python3 /usr/bin/python3
+COPY --from=builder /usr/local/lib/python3.9/dist-packages /usr/local/lib/python3.9/dist-packages
+COPY --from=builder /lib/x86_64-linux-gnu /lib/x86_64-linux-gnu
+COPY --from=builder /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
+COPY --from=builder /usr/lib/python3.9 /usr/lib/python3.9
+
+
+# 在SGX enclave内部运行聚合器的命令
+CMD ["gramine-sgx", "aggregator.manifest"] 

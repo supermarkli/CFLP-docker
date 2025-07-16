@@ -19,9 +19,26 @@ class HeClientStrategy(ClientStrategy):
         self.he_public_key = pickle.loads(he_public_key_bytes)
         logger.info(f"客户端 {self.client.client_id} 的 HE 策略已初始化并加载了公钥。")
 
+    def _encrypt_layer_generator(self, layer_flat_values, chunk_size, scaling_factor, ciphertext_bytes_len):
+        """一个生成器，逐块加密一个扁平化的层。"""
+        total = len(layer_flat_values)
+        for i in range(0, total, chunk_size):
+            chunk = layer_flat_values[i:i + chunk_size]
+            encrypted_part = [
+                self.he_public_key.encrypt(int(v * scaling_factor)).ciphertext().to_bytes(ciphertext_bytes_len, 'big')
+                for v in chunk
+            ]
+            for item in encrypted_part:
+                yield item
+            
+            progress = min(i + chunk_size, total)
+            logger.info(f"加密进度: {progress}/{total} ({(progress/total)*100:.1f}%)")
+            del chunk, encrypted_part
+            gc.collect()
+
     def prepare_update_request(self, current_round, model_parameters, metrics):
         """创建参数更新消息（HE密文）"""
-        encrypted_parameters = {}
+        proto_params = {}
         chunk_size = config['encryption']['chunk_size']
         ciphertext_bytes_len = (self.he_public_key.nsquare.bit_length() + 7) // 8
         scaling_factor = 1e6 # 与服务器端一致
@@ -29,32 +46,31 @@ class HeClientStrategy(ClientStrategy):
         for key, value in model_parameters.items():
             if isinstance(value, np.ndarray):
                 flat = value.flatten()
-                encrypted_chunks = []
                 total = len(flat)
-                logger.info(f"HE策略: 开始加密参数 {key}, 形状: {value.shape}, 总量: {total}, 分块大小: {chunk_size}")
+                logger.info(f"HE策略: 开始流式加密参数 {key}, 形状: {value.shape}, 总量: {total}")
 
-                for i in range(0, total, chunk_size):
-                    chunk = flat[i:i+chunk_size]
-                    # 将浮点数参数转换为定点整数进行加密
-                    encrypted_part = [self.he_public_key.encrypt(int(v * scaling_factor)).ciphertext().to_bytes(ciphertext_bytes_len, 'big') for v in chunk]
-                    encrypted_chunks.extend(encrypted_part)
-                    
-                    progress = min(i + chunk_size, total)
-                    logger.info(f"参数 {key} 加密进度: {progress}/{total} ({(progress/total)*100:.1f}%)")
-
-                    del chunk, encrypted_part
-                    gc.collect()
+                encryption_generator = self._encrypt_layer_generator(
+                    flat, chunk_size, scaling_factor, ciphertext_bytes_len
+                )
                 
-                encrypted_parameters[key] = {
-                    'data': encrypted_chunks, 'shape': list(value.shape)
-                }
+                # 直接从生成器创建Protobuf消息，避免在内存中创建完整的列表
+                encrypted_array_proto = federation_pb2.EncryptedNumpyArray(
+                    data=encryption_generator,
+                    shape=list(value.shape)
+                )
+                proto_params[key] = encrypted_array_proto
+                
+                logger.info(f"参数 {key} 已完成流式加密。")
+                del flat, encryption_generator, encrypted_array_proto
+                gc.collect()
+
             else: # scalar
                 encrypted_value = self.he_public_key.encrypt(int(value * scaling_factor))
-                encrypted_parameters[key] = {
-                    'data': [encrypted_value.ciphertext().to_bytes(ciphertext_bytes_len, 'big')], 'shape': [1]
-                }
+                proto_params[key] = federation_pb2.EncryptedNumpyArray(
+                    data=[encrypted_value.ciphertext().to_bytes(ciphertext_bytes_len, 'big')], 
+                    shape=[1]
+                )
         
-        proto_params = {k: federation_pb2.EncryptedNumpyArray(data=v['data'], shape=v['shape']) for k, v in encrypted_parameters.items()}
         encrypted_model_params = federation_pb2.EncryptedModelParameters(parameters=proto_params)
 
         # --- 加密训练指标 ---

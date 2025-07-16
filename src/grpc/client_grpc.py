@@ -35,6 +35,7 @@ from src.strategies.client.none_strategy import NoneClientStrategy
 from src.strategies.client.he_strategy import HeClientStrategy
 from src.strategies.client.tee_strategy import TeeClientStrategy
 from src.strategies.client.mpc_strategy import MpcClientStrategy
+from src.strategies.client.sgx_strategy import SgxStrategy
 
 logger = get_logger()
 random.seed(config['base']['random_seed'])
@@ -111,12 +112,15 @@ class FederatedLearningClient:
         self.privacy_mode = setup_response.privacy_mode
         logger.info(f"服务器运行模式为: {self.privacy_mode.upper()}")
 
+        # 1. Create the strategy based on the mode
         self.strategy = self._create_strategy(setup_response)
-        if not self.strategy:
-            raise ValueError(f"不支持的隐私模式: {self.privacy_mode}")
+        
+        # 2. Call the setup method on the strategy with the full response
+        # self.strategy.setup(setup_response) # This line is now handled in _create_strategy
 
-        initial_params = deserialize_parameters(setup_response.initial_model.parameters)
-        self.model.set_parameters(initial_params)
+        # 3. Deserialize the initial model
+        initial_parameters = deserialize_parameters(setup_response.initial_model.parameters)
+        self.model.set_parameters(initial_parameters)
         logger.info(f"客户端{self.client_id}已设置初始模型参数。")
 
     def _create_strategy(self, setup_response):
@@ -124,13 +128,19 @@ class FederatedLearningClient:
         if self.privacy_mode == 'none':
             return NoneClientStrategy(self)
         elif self.privacy_mode == 'he':
-            # 策略类自己处理反序列化
+            # 保持现有HE策略的加载方式不变
             return HeClientStrategy(self, setup_response.he_public_key)
         elif self.privacy_mode == 'tee':
-            # 策略类自己处理验证和反序列化
+            # 保持现有TEE策略的加载方式不变
             return TeeClientStrategy(self, setup_response.tee_attestation_report, setup_response.tee_public_key)
         elif self.privacy_mode == 'mpc':
             return MpcClientStrategy(self)
+        elif self.privacy_mode == 'sgx':
+            # 为新的SGX策略添加特殊处理逻辑
+            # 这是唯一一个使用 setup 方法进行配置的策略
+            strategy = SgxStrategy(self)
+            strategy.setup(setup_response)
+            return strategy
         else:
             logger.error(f"接收到未知的隐私模式: {self.privacy_mode}")
             return None

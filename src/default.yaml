@@ -42,6 +42,11 @@ mpc:
   # 为所有MPC操作定义的全局素数域，必须足够大以容纳所有秘密的总和
   prime_mod: "170141183460469231731687303715884105727" # 2^127 - 1
 
+sgx:
+  # 客户端用于验证聚合器Enclave身份的MRENCLAVE值。
+  # 这个值是在 'gramine-sgx-sign' 过程中打印出来的，需要用真实值替换。
+  expected_mrenclave: "a_very_secure_hash_of_the_enclave_code_and_data"
+
 tee:
   # 客户端用于验证服务端TEE身份的“代码指纹”。
   expected_mrenclave: "08a4668e1b5055c8dea11d8631ffa5ae51db16dbf3741cc5c7c0d69f1b66708b"

@@ -1,0 +1,52 @@
+# 这是一个独立的Compose文件，用于以SGX模式启动完整的服务器端。
+# 使用命令: docker-compose -f src/docker/docker-compose.sgx.yml up
+
+version: "3.8"
+
+volumes:
+  # 定义一个共享卷，用于 server 和 aggregator 之间的IPC（进程间通信）套接字。
+  ipc-socket:
+
+networks:
+  # 定义所有服务将连接到的网络。
+  federated-network:
+    driver: bridge
+
+services:
+  # Server服务的完整定义
+  server:
+    container_name: fl-server
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile.server
+    ports:
+      - "50051:50051"
+    environment:
+      - GRPC_SERVER_PORT=50051
+    volumes:
+      - ../../certs/server:/app/certs:ro
+      - ../../logs:/app/logs
+      - ../../out:/app/out
+      # 添加用于IPC的共享卷挂载。
+      - ipc-socket:/tmp/ipc
+    networks:
+      - federated-network
+    depends_on:
+      # server服务应等待aggregator服务准备就绪后再启动。
+      - aggregator 
+
+  # 全新的 'aggregator' 服务定义
+  aggregator:
+    container_name: sgx-aggregator
+    build:
+      context: ../..
+      dockerfile: src/sgx_aggregator/Dockerfile.aggregator
+    # aggregator服务需要访问主机的SGX设备。
+    devices:
+      - "/dev/sgx_enclave:/dev/sgx_enclave"
+      - "/dev/sgx_provision:/dev/sgx_provision"
+    volumes:
+      # 挂载用于IPC的同一个共享卷。
+      - ipc-socket:/tmp/ipc
+    networks:
+      - federated-network 

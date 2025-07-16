@@ -38,6 +38,7 @@ message SetupResponse {
     // 模拟的 TEE 证明报告，在真实场景中由 TEE 硬件生成
     bytes tee_attestation_report = 4;
     bytes tee_public_key = 5;
+    bytes sgx_quote = 6; // 新增字段，用于携带 DCAP Quote
 }
 
 // 训练状态检查的响应
