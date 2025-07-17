@@ -74,16 +74,24 @@ class FederatedLearningClient:
             credentials = grpc.ssl_channel_credentials(root_certificates=ca_cert)
             channel = grpc.secure_channel(
                 f"{self.server_host}:{self.server_port}", credentials,
-                options=[('grpc.max_send_message_length', 500 * 1024 * 1024),
-                         ('grpc.max_receive_message_length', 500 * 1024 * 1024)]
+                options=[
+                    ('grpc.max_send_message_length', 500 * 1024 * 1024),
+                    ('grpc.max_receive_message_length', 500 * 1024 * 1024),
+                    ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
+                    ('grpc.compression_level', grpc.CompressionLevel.high)
+                ]
             )
             logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器。")
         except FileNotFoundError:
             logger.warning(f"未找到CA证书，使用不安全通道连接服务器。")
             channel = grpc.insecure_channel(
                 f"{self.server_host}:{self.server_port}",
-                options=[('grpc.max_send_message_length', 500 * 1024 * 1024),
-                         ('grpc.max_receive_message_length', 500 * 1024 * 1024)]
+                options=[
+                    ('grpc.max_send_message_length', 500 * 1024 * 1024),
+                    ('grpc.max_receive_message_length', 500 * 1024 * 1024),
+                    ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
+                    ('grpc.compression_level', grpc.CompressionLevel.high)
+                ]
             )
         self.channel = channel
         self.stub = federation_pb2_grpc.FederatedLearningStub(self.channel)

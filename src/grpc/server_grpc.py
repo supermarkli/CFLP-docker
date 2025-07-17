@@ -235,6 +235,8 @@ def serve():
         options=[
             ('grpc.max_send_message_length', 500 * 1024 * 1024),
             ('grpc.max_receive_message_length', 500 * 1024 * 1024),
+            ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
+            ('grpc.compression_level', grpc.CompressionLevel.high)
         ]
     )
     federation_pb2_grpc.add_FederatedLearningServicer_to_server(FederatedLearningServicer(), server)

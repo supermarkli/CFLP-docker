@@ -24,16 +24,14 @@ class HeClientStrategy(ClientStrategy):
         total = len(layer_flat_values)
         for i in range(0, total, chunk_size):
             chunk = layer_flat_values[i:i + chunk_size]
-            encrypted_part = [
-                self.he_public_key.encrypt(int(v * scaling_factor)).ciphertext().to_bytes(ciphertext_bytes_len, 'big')
-                for v in chunk
-            ]
-            for item in encrypted_part:
-                yield item
+            for v in chunk:
+                yield self.he_public_key.encrypt(
+                    int(v * scaling_factor)
+                ).ciphertext().to_bytes(ciphertext_bytes_len, 'big')
             
             progress = min(i + chunk_size, total)
             logger.info(f"加密进度: {progress}/{total} ({(progress/total)*100:.1f}%)")
-            del chunk, encrypted_part
+            del chunk
             gc.collect()
 
     def prepare_update_request(self, current_round, model_parameters, metrics):
