@@ -54,6 +54,11 @@ class FederatedLearningStub(object):
                 request_serializer=federation__pb2.ClientUpdate.SerializeToString,
                 response_deserializer=federation__pb2.ServerUpdate.FromString,
                 _registered_method=True)
+        self.SubmitUpdateHeStream = channel.stream_unary(
+                '/federation.FederatedLearning/SubmitUpdateHeStream',
+                request_serializer=federation__pb2.HeClientUpdateChunk.SerializeToString,
+                response_deserializer=federation__pb2.ServerUpdate.FromString,
+                _registered_method=True)
         self.GetGlobalModel = channel.unary_unary(
                 '/federation.FederatedLearning/GetGlobalModel',
                 request_serializer=federation__pb2.GetModelRequest.SerializeToString,
@@ -86,6 +91,13 @@ class FederatedLearningServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SubmitUpdateHeStream(self, request_iterator, context):
+        """HE模式专用的客户端流式更新接口
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetGlobalModel(self, request, context):
         """客户端获取全局模型
         """
@@ -109,6 +121,11 @@ def add_FederatedLearningServicer_to_server(servicer, server):
             'SubmitUpdate': grpc.unary_unary_rpc_method_handler(
                     servicer.SubmitUpdate,
                     request_deserializer=federation__pb2.ClientUpdate.FromString,
+                    response_serializer=federation__pb2.ServerUpdate.SerializeToString,
+            ),
+            'SubmitUpdateHeStream': grpc.stream_unary_rpc_method_handler(
+                    servicer.SubmitUpdateHeStream,
+                    request_deserializer=federation__pb2.HeClientUpdateChunk.FromString,
                     response_serializer=federation__pb2.ServerUpdate.SerializeToString,
             ),
             'GetGlobalModel': grpc.unary_unary_rpc_method_handler(
@@ -198,6 +215,33 @@ class FederatedLearning(object):
             target,
             '/federation.FederatedLearning/SubmitUpdate',
             federation__pb2.ClientUpdate.SerializeToString,
+            federation__pb2.ServerUpdate.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SubmitUpdateHeStream(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_unary(
+            request_iterator,
+            target,
+            '/federation.FederatedLearning/SubmitUpdateHeStream',
+            federation__pb2.HeClientUpdateChunk.SerializeToString,
             federation__pb2.ServerUpdate.FromString,
             options,
             channel_credentials,

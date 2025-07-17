@@ -166,6 +166,18 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         """
         return self.aggregation_strategy.aggregate(request, context)
 
+    def SubmitUpdateHeStream(self, request_iterator, context):
+        """
+        HE模式专用的流式更新入口。
+        将请求流直接转发给当前加载的聚合策略进行处理。
+        """
+        if self.privacy_mode != 'he':
+            logger.error("非HE模式下调用了SubmitUpdateHeStream")
+            return federation_pb2.ServerUpdate(code=400, message="此接口仅在HE模式下可用。")
+        
+        # 将请求流和上下文直接传递给策略进行处理
+        return self.aggregation_strategy.aggregate_stream(request_iterator, context)
+
     def GetGlobalModel(self, request, context):
         """提供当前全局模型参数"""
         client_id = request.client_id
@@ -236,7 +248,6 @@ def serve():
             ('grpc.max_send_message_length', 500 * 1024 * 1024),
             ('grpc.max_receive_message_length', 500 * 1024 * 1024),
             ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
-            ('grpc.compression_level', grpc.CompressionLevel.high)
         ]
     )
     federation_pb2_grpc.add_FederatedLearningServicer_to_server(FederatedLearningServicer(), server)

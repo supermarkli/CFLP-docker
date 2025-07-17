@@ -78,7 +78,6 @@ class FederatedLearningClient:
                     ('grpc.max_send_message_length', 500 * 1024 * 1024),
                     ('grpc.max_receive_message_length', 500 * 1024 * 1024),
                     ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
-                    ('grpc.compression_level', grpc.CompressionLevel.high)
                 ]
             )
             logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器。")
@@ -90,7 +89,6 @@ class FederatedLearningClient:
                     ('grpc.max_send_message_length', 500 * 1024 * 1024),
                     ('grpc.max_receive_message_length', 500 * 1024 * 1024),
                     ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
-                    ('grpc.compression_level', grpc.CompressionLevel.high)
                 ]
             )
         self.channel = channel
@@ -282,6 +280,24 @@ class FederatedLearningClient:
         
         raise RuntimeError(f"{log_prefix} 多次尝试后仍无法提交更新。")
 
+    def _submit_update_stream_with_retry(self, update_generator):
+        """带重试逻辑的流式提交更新。"""
+        log_prefix = f"[HE Stream] [轮次 {self.current_round + 1}]"
+        try:
+            server_response = self.stub.SubmitUpdateHeStream(update_generator())
+            if server_response.code == 200:
+                logger.info(f"{log_prefix} 客户端 {self.client_id} 已成功提交流式更新。")
+                return True
+            else:
+                logger.error(f"{log_prefix} 提交流式更新失败，服务器返回错误: code={server_response.code}, message='{server_response.message}'")
+                return False
+        except grpc._channel._InactiveRpcError as e:
+            logger.error(f"{log_prefix} 提交流式更新时发生gRPC连接错误: {e.details()}")
+            return False
+        except Exception as e:
+            logger.error(f"{log_prefix} 提交流式更新时发生未知错误: {str(e)}", exc_info=True)
+            return False
+
     def participate_in_training(self):
         """参与联邦学习训练"""
         self.setup_connection_and_register()
@@ -302,9 +318,21 @@ class FederatedLearningClient:
             
             metrics_data = self.get_metrics()
             
-            update_request = self.strategy.prepare_update_request(self.current_round, self.model.get_parameters(), metrics_data)
-
-            self._submit_update_with_retry(update_request)
+            model_parameters = self.model.get_parameters()
+            
+            if self.privacy_mode == 'he':
+                # HE模式使用新的流式接口
+                update_generator = self.strategy.prepare_stream_update_request(self.current_round, model_parameters, metrics_data)
+                success = self._submit_update_stream_with_retry(update_generator)
+                if not success:
+                    logger.error(f"[Round {self.current_round+1}] HE流式提交失败，终止训练。")
+                    self.continue_training = False
+                    # 这里可以添加更复杂的错误处理，例如重试整个轮次
+                    continue # 直接进入下一轮的循环检查（实际上会因为continue_training=False而退出）
+            else:
+                # 其他模式使用原有的接口
+                update_request = self.strategy.prepare_update_request(self.current_round, model_parameters, metrics_data)
+                self._submit_update_with_retry(update_request)
 
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
 

@@ -15,6 +15,9 @@ service FederatedLearning {
     // 客户端提交更新（统一接口）
     rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate);
 
+    // HE模式专用的客户端流式更新接口
+    rpc SubmitUpdateHeStream(stream HeClientUpdateChunk) returns (ServerUpdate);
+
     // 客户端获取全局模型
     rpc GetGlobalModel(GetModelRequest) returns (ModelParameters);
 }
@@ -197,4 +200,24 @@ message EncryptedTrainingMetrics {
     bytes auc = 3;
     bytes loss = 4;
     bytes train_num = 5;
+}
+
+// HE流式更新的单个数据块
+message HeClientUpdateChunk {
+    // --- 元数据: 仅在第一个块中发送 ---
+    string client_id = 1;
+    int32 round = 2;
+    // 加密的训练指标, 仅在第一个块中发送
+    EncryptedTrainingMetrics metrics = 3;
+
+    // --- 载荷: 每个块都包含 ---
+    // 模型参数的一个数据块。
+    // 对于第一个块，这可以是第一个层。
+    // 对于后续的块，这是接下来的层。
+    // 键是层的名称。
+    map<string, EncryptedNumpyArray> parameters_chunk = 4;
+    
+    // --- 流控制元数据 ---
+    string layer_name = 5; // 当前块所属的层名称
+    bool is_last_chunk_for_layer = 6; // 标记是否为当前层的最后一个块
 } 

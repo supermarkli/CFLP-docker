@@ -31,8 +31,9 @@ training:
 
 # 仅在 privacy_mode = "he" 时生效
 encryption:
-  key_size: 2048 # HE Paillier 密钥长度 或 TEE RSA 密钥长度
-  chunk_size: 1000 # HE 加密时，每次处理的numpy数组块大小
+  key_size: 2048 # Paillier 密钥长度 (bits)
+  chunk_size: 50000 # HE加密时，每批处理的元素数量
+  scaling_factor: 1000000 # HE加密时，浮点数转定点数的缩放因子
 
 mpc:
   shamir_k: 3 # 恢复秘密需要的最小份额数

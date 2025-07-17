@@ -1,0 +1,38 @@
+2025-07-17 03:47:18 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_he.log
+2025-07-17 03:47:18 - INFO - [he_aggregation_strategy.py:19] - 启动HE模式：正在生成Paillier密钥对...
+2025-07-17 03:47:18 - INFO - [he_aggregation_strategy.py:23] - Paillier密钥对生成完毕 (密钥长度: 2048 bits)。
+2025-07-17 03:47:19 - INFO - [server_grpc.py:86] - 服务器初始化完成 (模式: he)，等待 3 个客户端注册...
+2025-07-17 03:47:19 - INFO - [server_grpc.py:264] - 联邦学习安全服务器正在启动，监听端口: 50051
+2025-07-17 03:47:19 - INFO - [server_grpc.py:105] - 接收到客户端 3 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-17 03:47:19 - INFO - [server_grpc.py:114] - 客户端 3 注册成功。当前 1/3 个客户端。
+2025-07-17 03:47:19 - INFO - [he_aggregation_strategy.py:34] - 向客户端 3 提供HE公钥。
+2025-07-17 03:47:19 - INFO - [server_grpc.py:105] - 接收到客户端 2 的注册请求 (模型: CNN, 数据量: 18666)
+2025-07-17 03:47:19 - INFO - [server_grpc.py:114] - 客户端 2 注册成功。当前 2/3 个客户端。
+2025-07-17 03:47:19 - INFO - [he_aggregation_strategy.py:34] - 向客户端 2 提供HE公钥。
+2025-07-17 03:47:19 - INFO - [server_grpc.py:105] - 接收到客户端 1 的注册请求 (模型: CNN, 数据量: 18667)
+2025-07-17 03:47:19 - INFO - [server_grpc.py:114] - 客户端 1 注册成功。当前 3/3 个客户端。
+2025-07-17 03:47:19 - INFO - [he_aggregation_strategy.py:34] - 向客户端 1 提供HE公钥。
+2025-07-17 03:47:19 - INFO - [server_grpc.py:120] - 所有客户端已注册，设置 next_step=True，准备开始训练。
+2025-07-17 03:47:19 - INFO - [server_grpc.py:123] - 联邦学习流程计时开始
+2025-07-17 03:47:20 - INFO - [server_grpc.py:140] - [Round 1] 客户端 3 检查训练状态，当前next_step=True, count=0
+2025-07-17 03:47:20 - INFO - [server_grpc.py:145] - [Round 1] 客户端 3 获得训练许可，count增加到 1/3
+2025-07-17 03:47:20 - INFO - [server_grpc.py:140] - [Round 1] 客户端 1 检查训练状态，当前next_step=True, count=1
+2025-07-17 03:47:20 - INFO - [server_grpc.py:145] - [Round 1] 客户端 1 获得训练许可，count增加到 2/3
+2025-07-17 03:47:20 - INFO - [server_grpc.py:140] - [Round 1] 客户端 2 检查训练状态，当前next_step=True, count=2
+2025-07-17 03:47:20 - INFO - [server_grpc.py:145] - [Round 1] 客户端 2 获得训练许可，count增加到 3/3
+2025-07-17 03:47:20 - INFO - [server_grpc.py:149] - [Round 1] 所有客户端已获得训练许可，重置next_step=False, count=0
+2025-07-17 03:47:42 - INFO - [he_aggregation_strategy.py:99] - [Round 1] 开始接收来自客户端 3 的流式更新...
+2025-07-17 03:47:43 - INFO - [he_aggregation_strategy.py:99] - [Round 1] 开始接收来自客户端 2 的流式更新...
+2025-07-17 03:47:43 - INFO - [he_aggregation_strategy.py:99] - [Round 1] 开始接收来自客户端 1 的流式更新...
+2025-07-17 03:47:51 - INFO - [he_aggregation_strategy.py:120] - [Round 1] 客户端 3 的层 conv1.0.weight 数据接收完毕，开始重构...
+2025-07-17 03:47:51 - INFO - [he_aggregation_strategy.py:138] - [Round 1] 层 conv1.0.weight 重构并存储成功。
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:120] - [Round 1] 客户端 2 的层 conv1.0.weight 数据接收完毕，开始重构...
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:138] - [Round 1] 层 conv1.0.weight 重构并存储成功。
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:120] - [Round 1] 客户端 3 的层 conv1.0.bias 数据接收完毕，开始重构...
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:138] - [Round 1] 层 conv1.0.bias 重构并存储成功。
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:120] - [Round 1] 客户端 1 的层 conv1.0.weight 数据接收完毕，开始重构...
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:138] - [Round 1] 层 conv1.0.weight 重构并存储成功。
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:120] - [Round 1] 客户端 2 的层 conv1.0.bias 数据接收完毕，开始重构...
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:138] - [Round 1] 层 conv1.0.bias 重构并存储成功。
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:120] - [Round 1] 客户端 1 的层 conv1.0.bias 数据接收完毕，开始重构...
+2025-07-17 03:47:52 - INFO - [he_aggregation_strategy.py:138] - [Round 1] 层 conv1.0.bias 重构并存储成功。
