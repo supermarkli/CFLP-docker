@@ -10,9 +10,10 @@ from src.grpc.generated import federation_pb2
 from src.utils.parameter_utils import deserialize_parameters, serialize_parameters
 
 # --- 配置 ---
-SOCKET_PATH = "/tmp/ipc/aggregator.sock"
+ENCLAVE_HOST = "aggregator"
+ENCLAVE_PORT = 8000
 RETRY_INTERVAL = 2
-MAX_RETRIES = 15
+MAX_RETRIES = 20
 
 class SgxAggregationStrategy(AggregationStrategy):
     """
@@ -27,20 +28,16 @@ class SgxAggregationStrategy(AggregationStrategy):
         self.last_aggregated_metrics = None # 用于存储从enclave返回的指标
 
     def _connect_to_enclave(self):
-        """建立到聚合器enclave的Unix套接-字连接。"""
-        self.server.logger.info("正在尝试连接到SGX聚合器enclave...")
+        """建立到聚合器enclave的TCP套接字连接。"""
+        self.server.logger.info(f"正在尝试连接到SGX聚合器enclave at {ENCLAVE_HOST}:{ENCLAVE_PORT}...")
         for i in range(MAX_RETRIES):
-            if os.path.exists(SOCKET_PATH):
-                try:
-                    client_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                    client_socket.connect(SOCKET_PATH)
-                    self.server.logger.info("✅ 成功连接到SGX聚合器enclave。")
-                    return client_socket
-                except Exception as e:
-                    self.server.logger.warning(f"连接enclave失败: {e}。将在 {RETRY_INTERVAL} 秒后重试...")
-                    time.sleep(RETRY_INTERVAL)
-            else:
-                self.server.logger.info(f"在 {SOCKET_PATH} 未找到套接字。等待聚合器启动... ({i+1}/{MAX_RETRIES})")
+            try:
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.connect((ENCLAVE_HOST, ENCLAVE_PORT))
+                self.server.logger.info("✅ 成功连接到SGX聚合器enclave。")
+                return client_socket
+            except (socket.error, ConnectionRefusedError) as e:
+                self.server.logger.warning(f"连接enclave失败: {e}。等待聚合器启动... ({i+1}/{MAX_RETRIES})")
                 time.sleep(RETRY_INTERVAL)
         raise ConnectionError("❌ 多次重试后未能连接到SGX聚合器enclave。")
 
@@ -105,7 +102,6 @@ class SgxAggregationStrategy(AggregationStrategy):
             
             num_samples = self.server.clients[client_id].data_size
             
-            # 修改：不再发送整个TeePayload，而是提取其核心字节，实现Enclave的完全解耦
             encrypted_key = update_payload.encrypted_symmetric_key
             nonce = update_payload.nonce
             encrypted_data = update_payload.encrypted_payload

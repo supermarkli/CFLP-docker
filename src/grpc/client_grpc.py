@@ -52,9 +52,11 @@ class FederatedLearningClient:
         self.num_classes = 10
         self.current_round = 0
         self.batch_size = config['training']['batch_size']
-        self.server_host = config['grpc']['server_host']
+        # self.server_host = config['grpc']['server_host']
+        self.server_host = "10.16.56.126"
         self.server_port = config['grpc']['server_port']
         self._init_data(data)
+        self.logger = logger  #  <--- 添加这一行
 
         self.stub = None
         self.channel = None
@@ -75,12 +77,13 @@ class FederatedLearningClient:
             channel = grpc.secure_channel(
                 f"{self.server_host}:{self.server_port}", credentials,
                 options=[
+                    ('grpc.ssl_target_name_override', 'server'), # Override for certificate validation
                     ('grpc.max_send_message_length', 500 * 1024 * 1024),
                     ('grpc.max_receive_message_length', 500 * 1024 * 1024),
                     ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
                 ]
             )
-            logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器。")
+            logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器{self.server_host}:{self.server_port}。")
         except FileNotFoundError:
             logger.warning(f"未找到CA证书，使用不安全通道连接服务器。")
             channel = grpc.insecure_channel(
@@ -109,10 +112,10 @@ class FederatedLearningClient:
                 break 
             except grpc._channel._InactiveRpcError as e:
                 if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
-                    logger.warning(f"无法连接到服务器，将在 {retry_interval} 秒后重试 ({attempt+1}/{max_retries})...")
+                    logger.warning(f"无法连接到服务器 (详情: {e.details()})，将在 {retry_interval} 秒后重试 ({attempt+1}/{max_retries})...")
                     time.sleep(retry_interval)
                 else:
-                    logger.error("多次尝试后仍无法连接到服务器，放弃连接。")
+                    logger.error(f"多次尝试后仍无法连接到服务器，放弃连接。详情: {e.details()}")
                     raise e
         
         self.privacy_mode = setup_response.privacy_mode
@@ -142,11 +145,10 @@ class FederatedLearningClient:
         elif self.privacy_mode == 'mpc':
             return MpcClientStrategy(self)
         elif self.privacy_mode == 'sgx':
-            # 为新的SGX策略添加特殊处理逻辑
-            # 这是唯一一个使用 setup 方法进行配置的策略
-            strategy = SgxStrategy(self)
-            strategy.setup(setup_response)
-            return strategy
+            # SGX 策略需要先实例化，再用服务器返回的数据进行 setup
+            sgx_strategy = SgxStrategy(self)
+            sgx_strategy.setup(setup_response)
+            return sgx_strategy
         else:
             logger.error(f"接收到未知的隐私模式: {self.privacy_mode}")
             return None

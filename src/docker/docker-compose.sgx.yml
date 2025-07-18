@@ -1,12 +1,3 @@
-# 这是一个独立的Compose文件，用于以SGX模式启动完整的服务器端。
-# 使用命令: docker-compose -f src/docker/docker-compose.sgx.yml up
-
-version: "3.8"
-
-volumes:
-  # 定义一个共享卷，用于 server 和 aggregator 之间的IPC（进程间通信）套接字。
-  ipc-socket:
-
 networks:
   # 定义所有服务将连接到的网络。
   federated-network:
@@ -27,8 +18,6 @@ services:
       - ../../certs/server:/app/certs:ro
       - ../../logs:/app/logs
       - ../../out:/app/out
-      # 添加用于IPC的共享卷挂载。
-      - ipc-socket:/tmp/ipc
     networks:
       - federated-network
     depends_on:
@@ -46,7 +35,6 @@ services:
       - "/dev/sgx_enclave:/dev/sgx_enclave"
       - "/dev/sgx_provision:/dev/sgx_provision"
     volumes:
-      # 挂载用于IPC的同一个共享卷。
-      - ipc-socket:/tmp/ipc
+      - "/var/run/aesmd:/var/run/aesmd"
     networks:
       - federated-network 

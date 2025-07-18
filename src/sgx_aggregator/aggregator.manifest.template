@@ -1,41 +1,33 @@
-# This is a manifest template for the Python-based aggregator enclave.
+libos.entrypoint = "/usr/bin/python3.10"
 
-loader.entrypoint = "/usr/bin/python3"
-
-loader.argv = ["python3", "/app/enclave.py"]
+loader.argv = ["/usr/bin/python3.10", "/app/enclave.py"]
 loader.env.LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu"
-loader.log_level = "debug"
+loader.log_level = "error"
 
-# Mount the necessary files and directories for the Python script to run.
 fs.mounts = [
-  { path = "/usr/bin/python3", uri = "file:/usr/bin/python3" },
-  { path = "/app/enclave.py", uri = "file:/app/enclave.py" },
-  
-  # Mount Python's system libraries
-  { path = "/usr/lib/python3.9", uri = "file:/usr/lib/python3.9" },
-  { path = "/usr/local/lib/python3.9/dist-packages", uri = "file:/usr/local/lib/python3.9/dist-packages" },
-  
-  # Mount system libraries
-  { path = "/lib/x86_64-linux-gnu", uri = "file:/lib/x86_64-linux-gnu" },
+  { path = "/lib", uri = "file:/lib" },
+  { path = "/usr/lib", uri = "file:/usr/lib" },
+  { path = "/usr/bin/python3.10", uri = "file:/usr/bin/python3.10" },
+  { path = "/usr/include/python3.10", uri = "file:/usr/include/python3.10" },
+  { path = "/usr/local/lib/python3.10/dist-packages", uri = "file:/usr/local/lib/python3.10/dist-packages" },
+  { path = "/app", uri = "file:/app" },
+  { path = "/tmp", uri = "file:/tmp" },
+  { path = "/dev", uri = "file:/dev" },
   { path = "/usr/lib/x86_64-linux-gnu", uri = "file:/usr/lib/x86_64-linux-gnu" },
-  
-  # Mount for IPC socket
-  { type = "passthrough", path = "/tmp" },
 ]
 
-# Define the enclave's security properties.
-sgx.enclave_size = "1G"
+sgx.enclave_size = "512M"
 sgx.max_threads = 8
 sgx.debug = true
 sgx.remote_attestation = "dcap"
 
-# List all files that contribute to the enclave's identity (MRENCLAVE).
-# This is crucial for remote attestation.
 sgx.trusted_files = [
-  "file:/app/enclave.py",
-  "file:/usr/bin/python3",
-  "file:/usr/lib/python3.9/",
-  "file:/usr/local/lib/python3.9/dist-packages/",
-  "file:/lib/x86_64-linux-gnu/",
+  "file:/app/",
+  "file:/usr/bin/python3.10",
+  "file:/usr/local/lib/python3.10/dist-packages/",
+  "file:/usr/lib/python3.10/",
   "file:/usr/lib/x86_64-linux-gnu/",
+  "file:/lib/",
+  "file:/usr/lib/",
+  "file:/dev/attestation/quote",
 ] 

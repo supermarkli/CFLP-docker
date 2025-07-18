@@ -1,0 +1,48 @@
+# Docker Compose configuration for federated learning clients
+
+services:
+  client1:
+    container_name: fl-client-1
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile.client
+    environment:
+      - CLIENT_ID=1
+    volumes:
+      - ../../data/client1:/app/data
+      - ../../certs/client:/app/certs:ro
+      - ../../logs:/app/logs
+    networks:
+      - federated-network
+
+  client2:
+    container_name: fl-client-2
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile.client
+    environment:
+      - CLIENT_ID=2
+    volumes:
+      - ../../data/client2:/app/data
+      - ../../certs/client:/app/certs:ro
+      - ../../logs:/app/logs
+    networks:
+      - federated-network
+
+  client3:
+    container_name: fl-client-3
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile.client
+    environment:
+      - CLIENT_ID=3
+    volumes:
+      - ../../data/client3:/app/data
+      - ../../certs/client:/app/certs:ro
+      - ../../logs:/app/logs
+    networks:
+      - federated-network
+
+networks:
+  federated-network:
+    driver: bridge 

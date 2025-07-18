@@ -143,8 +143,10 @@ class HeAggregationStrategy(AggregationStrategy):
             # --- 流处理结束，检查是否所有客户端都已提交 ---
             with self.server.lock:
                 logger.info(f"[Round {round_num+1}] 已成功处理客户端 {client_id} 的所有流式数据。")
-                submitted_clients = len(self.server.client_parameters.get(round_num, {}))
-                if submitted_clients >= self.server.expected_clients:
+                self.server.completed_clients[round_num].add(client_id)
+                
+                completed_clients_count = len(self.server.completed_clients[round_num])
+                if completed_clients_count >= self.server.expected_clients:
                     logger.info(f"[Round {round_num+1}] 所有客户端更新完毕，触发聚合。")
                     threading.Thread(target=self.server.process_round_completion, args=(round_num,)).start()
 

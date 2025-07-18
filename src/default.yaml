@@ -8,9 +8,10 @@ federation:
   # 隐私保护模式:
   # "none" - 标准联邦学习，明文传输。
   # "he"   - 使用同态加密保护模型参数。
-  # "tee"  - 使用TEE（可信执行环境）在服务器端保护明文聚合。
+  # "tee"  - 使用TDX（可信执行环境）在服务器端保护明文聚合。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
-  privacy_mode: "he" # <--- 总开关，可在此处切换实验模式
+  # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
+  privacy_mode: "sgx" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 15
   convergence:
@@ -18,7 +19,8 @@ federation:
     window: 3
 
 grpc:
-  server_host: "localhost"
+  server_host: "10.16.56.126"
+  # server_host: "localhost"
   server_port: 50051
   max_retries: 5
   retry_interval: 1
@@ -46,7 +48,7 @@ mpc:
 sgx:
   # 客户端用于验证聚合器Enclave身份的MRENCLAVE值。
   # 这个值是在 'gramine-sgx-sign' 过程中打印出来的，需要用真实值替换。
-  expected_mrenclave: "a_very_secure_hash_of_the_enclave_code_and_data"
+  expected_mrenclave: "11403bebc6ccf54d6da6cb62d24f5ea813677a10738e600bd4dcf82ac36263a0"
 
 tee:
   # 客户端用于验证服务端TEE身份的“代码指纹”。

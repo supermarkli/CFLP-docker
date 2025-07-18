@@ -66,7 +66,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.clients = {}
         self.current_round = 0
         self.lock = threading.Lock()
-        self.client_parameters = defaultdict(dict)
+        self.client_parameters = defaultdict(dict) 
+        self.completed_clients = defaultdict(set) 
         self.converged = False
         self.start_time = None
         self.end_time = None
@@ -78,6 +79,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.max_rounds = config['federation']['max_rounds']
         self.acc_delta_threshold = config['federation']['convergence']['acc_delta_threshold']
         self.converge_window = config['federation']['convergence']['window']
+        self.logger=logger
         
         self.aggregation_strategy = self._create_aggregation_strategy()
         if not self.aggregation_strategy:
@@ -260,7 +262,7 @@ def serve():
         with open('/app/certs/server.crt', 'rb') as f:
             certificate_chain = f.read()
         server_credentials = grpc.ssl_server_credentials([(private_key, certificate_chain)])
-        server.add_secure_port(f"[::]:{port}", server_credentials)
+        server.add_secure_port(f"0.0.0.0:{port}", server_credentials)
         logger.info(f"联邦学习安全服务器正在启动，监听端口: {port}")
     except FileNotFoundError:
         server.add_insecure_port(f"[::]:{port}")
