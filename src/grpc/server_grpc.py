@@ -80,6 +80,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.acc_delta_threshold = config['federation']['convergence']['acc_delta_threshold']
         self.converge_window = config['federation']['convergence']['window']
         self.logger=logger
+        self.communication_costs = {} # <-- 新增：用于存储每轮各客户端的通信开销
         
         self.aggregation_strategy = self._create_aggregation_strategy()
         if not self.aggregation_strategy:
@@ -166,6 +167,17 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         统一的更新提交入口。
         将请求直接转发给当前加载的聚合策略进行处理。
         """
+        # 计算并记录通信开销
+        client_id = request.client_id
+        current_round = request.round
+        request_size = request.ByteSize()
+
+        if current_round not in self.communication_costs:
+            self.communication_costs[current_round] = {}
+        self.communication_costs[current_round][client_id] = request_size
+        
+        logger.info(f"[Round {current_round+1}] 收到来自客户端 {client_id} 的更新，数据大小: {request_size / 1024:.2f} KB")
+
         return self.aggregation_strategy.aggregate(request, context)
 
     def SubmitUpdateHeStream(self, request_iterator, context):
@@ -173,12 +185,42 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         HE模式专用的流式更新入口。
         将请求流直接转发给当前加载的聚合策略进行处理。
         """
+        # --- 通信开销统计 Start ---
+        total_size = 0
+        client_id = None
+        current_round = None
+
+        # 使用一个生成器表达式来包装原始迭代器，以便在迭代时计算大小
+        def size_tracking_iterator(iterator):
+            nonlocal total_size, client_id, current_round
+            first_chunk = True
+            for chunk in iterator:
+                chunk_size = chunk.ByteSize()
+                total_size += chunk_size
+                if first_chunk:
+                    client_id = chunk.client_id
+                    current_round = chunk.round
+                    first_chunk = False
+                yield chunk
+
+        tracked_iterator = size_tracking_iterator(request_iterator)
+        # --- 通信开销统计 End ---
+
         if self.privacy_mode != 'he':
             logger.error("非HE模式下调用了SubmitUpdateHeStream")
             return federation_pb2.ServerUpdate(code=400, message="此接口仅在HE模式下可用。")
         
-        # 将请求流和上下文直接传递给策略进行处理
-        return self.aggregation_strategy.aggregate_stream(request_iterator, context)
+        # 将 *新的、带追踪的* 请求流和上下文直接传递给策略进行处理
+        response = self.aggregation_strategy.aggregate_stream(tracked_iterator, context)
+
+        # 在聚合完成后，记录总大小
+        if client_id and current_round is not None:
+            if current_round not in self.communication_costs:
+                self.communication_costs[current_round] = {}
+            self.communication_costs[current_round][client_id] = total_size
+            logger.info(f"[Round {current_round+1}] 收到来自客户端 {client_id} 的流式更新，数据总大小: {total_size / 1024:.2f} KB")
+
+        return response
 
     def GetGlobalModel(self, request, context):
         """提供当前全局模型参数"""
@@ -211,6 +253,23 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     self.end_time = time.time()
                     elapsed = self.end_time - self.start_time
                     logger.info(f"训练结束。总耗时: {elapsed:.2f} 秒")
+
+                    # --- 保存通信开销 ---
+                    try:
+                        costs_df = pd.DataFrame(self.communication_costs).sort_index()
+                        costs_df.index.name = "Round"
+                        costs_df = costs_df.reindex(sorted(costs_df.columns), axis=1) 
+                        # 计算每轮总和与平均值
+                        costs_df['Total_Bytes'] = costs_df.sum(axis=1)
+                        costs_df['Total_KB'] = costs_df['Total_Bytes'] / 1024
+                        # 计算所有轮次的总和
+                        total_row = costs_df.sum().to_frame().T
+                        total_row.index = ['Total']
+                        costs_df = pd.concat([costs_df, total_row])
+                        logger.info("通信开销 (KB) 汇总:\n" + costs_df[['Total_KB']].to_string())
+                    except Exception as e:
+                        logger.error(f"计算通信开销失败: {e}")
+                    # --- 保存通信开销 End ---
 
                     # 创建并打印评估指标表格
                     eval_results = {

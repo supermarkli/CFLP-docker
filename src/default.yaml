@@ -13,15 +13,15 @@ federation:
   # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
   privacy_mode: "he" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
-  max_rounds: 15
+  max_rounds: 10
   convergence:
     acc_delta_threshold: 0.001
     window: 3
 
 grpc:
-  # server_host: "10.16.56.126"
-  server_host: "localhost"
-  server_port: 50051
+  server_host: "10.16.56.126"
+  # server_host: "localhost"
+  server_port: 50052
   max_retries: 5
   retry_interval: 1
   max_workers: 10

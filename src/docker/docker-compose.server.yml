@@ -1,0 +1,22 @@
+# Docker Compose configuration for federated learning server
+
+services:
+  server:
+    container_name: fl-server
+    build:
+      context: ../..
+      dockerfile: src/docker/Dockerfile.server
+    ports:
+      - "50052:50052"
+    environment:
+      - GRPC_SERVER_PORT=50052
+    volumes:
+      - ../../certs/server:/app/certs:ro
+      - ../../logs:/app/logs
+      - ../../out:/app/out
+    networks:
+      - federated-network
+
+networks:
+  federated-network:
+    driver: bridge 
