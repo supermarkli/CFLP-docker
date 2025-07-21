@@ -52,8 +52,8 @@ class FederatedLearningClient:
         self.num_classes = 10
         self.current_round = 0
         self.batch_size = config['training']['batch_size']
-        # self.server_host = config['grpc']['server_host']
-        self.server_host = "10.16.56.126"
+        self.server_host = config['grpc']['server_host']
+        # self.server_host = "10.16.56.126"
         self.server_port = config['grpc']['server_port']
         self._init_data(data)
         self.logger = logger  #  <--- 添加这一行

@@ -1,6 +1,6 @@
 # CFLP-docker: 可配置的隐私联邦学习平台
 
-CFLP-docker (Configurable Federated Learning Platform) 是一个基于 Docker 和 gRPC 的联邦学习框架，专为研究和比较不同的隐私增强技术 (Privacy-Enhancing Technologies, PETs) 而设计。它提供了一个模块化的平台，让开发者和研究人员可以轻松地在多种隐私保护策略下进行联邦学习实验。
+CFLP-docker (COMPASS Federated Learning Platform) 是一个基于 Docker 和 gRPC 的联邦学习框架，专为研究和比较不同的隐私增强技术 (Privacy-Enhancing Technologies, PETs) 而设计。它提供了一个模块化的平台，让开发者和研究人员可以轻松地在多种隐私保护策略下进行联邦学习实验。
 
 ## 主要特性
 
@@ -8,7 +8,8 @@ CFLP-docker (Configurable Federated Learning Platform) 是一个基于 Docker �
   - `none`: 标准联邦学习，用于性能基准测试。
   - `he`: 基于 Paillier 同态加密 (Homomorphic Encryption) 的方案，在客户端加密梯度后上传。
   - `mpc`: 基于 Shamir 秘密共享的安全多方计算 (Multi-Party Computation) 方案，允许多方协同计算而不泄露各自的私有数据。
-  - `tee`: 基于可信执行环境 (Trusted Execution Environment) 的模拟方案，数据在服务器端的安全区域内进行处理。
+  - `tee`: 基于TDX（Trusted Domain Extensions）的可信执行环境方案，数据在服务器端的安全区域内进行处理。
+  - `sgx`: 基于真实 SGX（Software Guard Extensions）的方案，数据在服务器端的安全区域内进行处理。
 - **容器化部署**: 使用 Docker 和 Docker Compose，一键即可启动整个联邦学习环境，包括一个中心服务器和多个客户端，极大地简化了部署和测试流程。
 - **gRPC 通信**: 客户端与服务器之间采用高性能的 gRPC 框架进行通信，协议在 `federation.proto` 中清晰定义，保证了通信的效率和稳定性。
 - **高度可配置**: 所有的实验参数，从联邦学习的轮次、客户端数量到特定隐私方案的参数（如加密密钥长度、MPC 秘密共享阈值等），都可以在一个中心化的 `default.yaml` 文件中进行配置。
@@ -71,7 +72,7 @@ CFLP-docker (Configurable Federated Learning Platform) 是一个基于 Docker �
 
 ## 隐私策略详解
 
-本项目实现了四种不同的隐私保护等级，通过 `federation.privacy_mode` 进行切换。
+本项目实现了五种不同的隐私保护等级，通过 `federation.privacy_mode` 进行切换。
 
 ### 1. `none` - 无保护
 - **原理**: 标准的联邦平均 (FedAvg) 算法。
@@ -95,7 +96,7 @@ CFLP-docker (Configurable Federated Learning Platform) 是一个基于 Docker �
     4.  服务器将聚合份额组合，恢复出最终的**明文**聚合梯度，并用其更新全局模型。
     - *库依赖*: `pyseltongue`
 
-### 4. `tee` - 可信执行环境 (模拟)
+### 4. `tee` - TDX 可信执行环境 
 - **原理**: TEE（如 Intel SGX）可以在服务器的 CPU 中创建一个硬件隔离的“安全区”（Enclave）。代码和数据在此区域内执行时，即使是服务器的操作系统也无法窥探。
 - **实现 (模拟流程)**:
     1.  服务器模拟一个持有非对称密钥对的 Enclave，并将其**公钥**分发给客户端。
@@ -104,6 +105,20 @@ CFLP-docker (Configurable Federated Learning Platform) 是一个基于 Docker �
     4.  客户端将“加密后的对称密钥”和“加密后的梯度”一同发送给服务器。
     5.  服务器模拟在 Enclave 内部，使用其私钥解密对称密钥，然后再用解密出的对称密钥解密梯度，得到明文梯度。
     6.  所有明文梯度都在 Enclave 内部被安全地聚合。
+
+### 5. `sgx` - 真实 SGX  可信执行环境  
+- **原理**: 基于硬件级 Intel SGX (或下一代 TDX) 的隔离执行区，将聚合逻辑运行在真正的 Enclave 内，进一步提升机密性与完整性。  
+- **实现**:  
+    1.  项目提供了独立的 `sgx-aggregator` 服务（`src/sgx_aggregator/`），内部运行 `enclave.py` 并在启动时生成 RSA 密钥及 DCAP Quote。  
+    2.  `fl-server` 在 `RegisterAndSetup` 阶段向客户端分发 Quote 与 RSA 公钥；客户端可校验 `expected_mrenclave` 并完成远程证明。  
+    3.  客户端采用 **混合加密**（RSA-OAEP + AES-GCM）加密梯度和指标后上传；服务器仅保存密文并转发至 Enclave。  
+    4.  Enclave 内部解密并执行安全聚合，将明文结果返回服务器，服务器更新全局模型。  
+- **依赖**: 需要支持 SGX/TDX 的 CPU、Intel DCAP 驱动，以及 Gramine 运行时。  
+- **启动**: 见下文“SGX 启动示例”或执行  
+    ```bash
+    docker-compose -f src/docker/docker-compose.sgx.yml   up --build -d   # server + enclave
+    docker-compose -f src/docker/docker-compose.clients.yml up --build -d # clients
+    ```
 
 ## 快速开始
 
@@ -140,6 +155,12 @@ CFLP-docker (Configurable Federated Learning Platform) 是一个基于 Docker �
     - 容器将会在后台启动并开始联邦学习过程。
     - 你可以通过 `docker logs -f fl-server` 查看服务器端的日志。
 
+    **SGX 启动示例**  
+    ```bash
+    docker-compose -f src/docker/docker-compose.sgx.yml   up --build -d   # server + enclave
+    docker-compose -f src/docker/docker-compose.clients.yml up --build -d # clients
+    ```
+
 5.  **查看结果**:
     训练完成后，准确率和损失曲线图将保存在 `out/` 目录下。日志文件保存在 `logs/` 目录下。
 
@@ -160,7 +181,8 @@ federation:
   # "none": 无保护，基准性能。
   # "he": 同态加密。
   # "mpc": 安全多方计算。
-  # "tee": 可信执行环境。
+  # "tee": TDX可信执行环境。
+  # "sgx": 真 SGX 可信执行环境。
   privacy_mode: "mpc" 
 ```
 
