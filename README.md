@@ -1,11 +1,11 @@
-# CFLP-docker: 可配置的隐私联邦学习平台
+# CFLP 联邦实验平台
 
-CFLP-docker (COMPASS Federated Learning Platform) 是一个基于 Docker 和 gRPC 的联邦学习框架，专为研究和比较不同的隐私增强技术 (Privacy-Enhancing Technologies, PETs) 而设计。它提供了一个模块化的平台，让开发者和研究人员可以轻松地在多种隐私保护策略下进行联邦学习实验。
+本项目是机密联邦学习平台（Confidential Federated Learning Platform, CFLP）的联邦实验平台部分，是一个基于 Docker 和 gRPC 的联邦学习框架，专为研究和比较不同的隐私增强技术 (Privacy-Enhancing Technologies, PETs) 而设计。它提供了一个模块化的平台，让开发者和研究人员可以轻松地在多种隐私保护策略下进行联邦学习实验。
 
 ## 主要特性
 
 - **模块化隐私策略**: 支持多种开箱即用的隐私保护方案，并可通过配置文件一键切换：
-  - `none`: 标准联邦学习，用于性能基准测试。
+  - `base`: 标准联邦学习，用于性能基准测试。
   - `he`: 基于 Paillier 同态加密 (Homomorphic Encryption) 的方案，在客户端加密梯度后上传。
   - `mpc`: 基于 Shamir 秘密共享的安全多方计算 (Multi-Party Computation) 方案，允许多方协同计算而不泄露各自的私有数据。
   - `tee`: 基于TDX（Trusted Domain Extensions）的可信执行环境方案，数据在服务器端的安全区域内进行处理。
@@ -74,7 +74,7 @@ CFLP-docker (COMPASS Federated Learning Platform) 是一个基于 Docker 和 gRP
 
 本项目实现了五种不同的隐私保护等级，通过 `federation.privacy_mode` 进行切换。
 
-### 1. `none` - 无保护
+### 1. `base` - 无保护
 - **原理**: 标准的联邦平均 (FedAvg) 算法。
 - **实现**: 客户端在本地训练后，将**明文**的模型权重或梯度直接发送给服务器。服务器以明文形式进行平均聚合。此模式主要用作性能基准。
 
@@ -178,7 +178,7 @@ CFLP-docker (COMPASS Federated Learning Platform) 是一个基于 Docker 和 gRP
 修改 `federation.privacy_mode` 字段为你想要的模式：
 ```yaml
 federation:
-  # "none": 无保护，基准性能。
+  # "base": 无保护，基准性能。
   # "he": 同态加密。
   # "mpc": 安全多方计算。
   # "tee": TDX可信执行环境。

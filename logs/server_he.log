@@ -20,3 +20,44 @@ Round
 9       0.9868  0.9991  0.0152
 10      0.9884  0.9993  0.0094
 -----
+fl-server  | 2025-07-24 10:50:50 - INFO - [server_grpc.py:255] - 训练结束。总耗时: 81309.65 秒
+fl-server  | 2025-07-24 10:50:50 - INFO - [server_grpc.py:269] - 通信开销 (KB) 汇总:
+fl-server  |            Total_KB
+fl-server  | 1      2.927214e+06
+fl-server  | 2      2.927214e+06
+fl-server  | 3      2.927214e+06
+fl-server  | Total  8.781643e+06
+fl-server  | 2025-07-24 10:50:50 - INFO - [server_grpc.py:282] - 全局模型评估指标汇总:
+fl-server  |       Accuracy     AUC    Loss
+fl-server  | Round                         
+fl-server  | 1       0.9742  0.9969  0.0666
+fl-server  | 2       0.9773  0.9974  0.0523
+fl-server  | 3       0.9839  0.9986  0.0342
+fl-server  | 4       0.9829  0.9986  0.0299
+fl-server  | 5       0.9834  0.9988  0.0255
+fl-server  | 6       0.9855  0.9989  0.0218
+fl-server  | 7       0.9871  0.9991  0.0155
+fl-server  | 8       0.9871  0.9990  0.0163
+fl-server  | 9       0.9886  0.9993  0.0087
+fl-server  | 10      0.9871  0.9991  0.0126
+---
+fl-server  | 2025-07-25 09:38:33 - INFO - [server_grpc.py:255] - 训练结束。总耗时: 81652.96 秒
+fl-server  | 2025-07-25 09:38:33 - INFO - [server_grpc.py:269] - 通信开销 (KB) 汇总:
+fl-server  |            Total_KB
+fl-server  | 1      2.927214e+06
+fl-server  | 2      2.927214e+06
+fl-server  | 3      2.927214e+06
+fl-server  | Total  8.781643e+06
+fl-server  | 2025-07-25 09:38:33 - INFO - [server_grpc.py:282] - 全局模型评估指标汇总:
+fl-server  |       Accuracy     AUC    Loss
+fl-server  | Round                         
+fl-server  | 1       0.9710  0.9964  0.0737
+fl-server  | 2       0.9792  0.9974  0.0499
+fl-server  | 3       0.9830  0.9984  0.0313
+fl-server  | 4       0.9836  0.9983  0.0315
+fl-server  | 5       0.9836  0.9986  0.0241
+fl-server  | 6       0.9849  0.9985  0.0223
+fl-server  | 7       0.9888  0.9989  0.0140
+fl-server  | 8       0.9866  0.9987  0.0150
+fl-server  | 9       0.9899  0.9992  0.0090
+fl-server  | 10      0.9876  0.9991  0.0130
