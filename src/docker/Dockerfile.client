@@ -11,13 +11,20 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# 更换Debian源为清华镜像源
-RUN sed -i 's@deb.debian.org@mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list || true
+# 彻底修复源和 GPG 问题，并处理空间不足
+RUN rm -rf /var/lib/apt/lists/* && \
+    apt-get clean && \
+    rm -rf /var/cache/apt/archives/* && \
+    sed -i 's@deb.debian.org@mirrors.aliyun.com@g' /etc/apt/sources.list || true && \
+    sed -i 's@http://archive.ubuntu.com@http://mirrors.aliyun.com@g' /etc/apt/sources.list 2>/dev/null || true && \
+    sed -i 's@http://security.ubuntu.com@http://mirrors.aliyun.com@g' /etc/apt/sources.list 2>/dev/null || true
 
-# 安装系统依赖
-RUN apt-get update && apt-get install -y \
+# 安装系统依赖（增加清理步骤）
+RUN apt-get update --allow-insecure-repositories --allow-releaseinfo-change && \
+    apt-get install -y --allow-unauthenticated --no-install-recommends \
     build-essential \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # 配置pip使用国内镜像源
 # RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple

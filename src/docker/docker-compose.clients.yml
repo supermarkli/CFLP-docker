@@ -8,12 +8,20 @@ services:
       dockerfile: src/docker/Dockerfile.client
     environment:
       - CLIENT_ID=1
+      - CUDA_VISIBLE_DEVICES=0
     volumes:
       - ../../data/client1:/app/data
       - ../../certs/client:/app/certs:ro
       - ../../logs:/app/logs
     networks:
       - federated-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   client2:
     container_name: fl-client-2
@@ -22,12 +30,20 @@ services:
       dockerfile: src/docker/Dockerfile.client
     environment:
       - CLIENT_ID=2
+      - CUDA_VISIBLE_DEVICES=0
     volumes:
       - ../../data/client2:/app/data
       - ../../certs/client:/app/certs:ro
       - ../../logs:/app/logs
     networks:
       - federated-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   client3:
     container_name: fl-client-3
@@ -36,13 +52,21 @@ services:
       dockerfile: src/docker/Dockerfile.client
     environment:
       - CLIENT_ID=3
+      - CUDA_VISIBLE_DEVICES=0
     volumes:
       - ../../data/client3:/app/data
       - ../../certs/client:/app/certs:ro
       - ../../logs:/app/logs
     networks:
       - federated-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 networks:
   federated-network:
-    driver: bridge 
+    driver: bridge
