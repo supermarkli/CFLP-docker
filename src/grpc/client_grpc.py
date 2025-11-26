@@ -58,9 +58,7 @@ class FederatedLearningClient:
         self.current_round = 0
         self.batch_size = config['training']['batch_size']
         self.server_host = config['grpc']['server_host']
-        # self.server_host = "10.16.56.126"
         self.server_port = config['grpc']['server_port']
-        # self.server_port = 50052
         self._init_data(data)
         self.logger = logger 
 
@@ -306,19 +304,53 @@ class FederatedLearningClient:
             logger.error(f"{log_prefix} 提交流式更新时发生未知错误: {str(e)}", exc_info=True)
             return False
 
+    def _wait_for_training_status(self, wait_for_code=200):
+        """
+        使用服务端流订阅训练状态，替代轮询机制。
+        
+        Args:
+            wait_for_code: 期望的状态码，200表示可以继续训练，默认等待200
+        
+        Returns:
+            status_response: 最终收到的状态响应
+        """
+        status_request = federation_pb2.ClientInfo(client_id=self.client_id)
+        
+        try:
+            # 使用流式 RPC 订阅状态
+            for status_response in self.stub.SubscribeTrainingStatus(status_request):
+                if status_response.code == 200:
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}收到训练许可")
+                    return status_response
+                elif status_response.code == 300:
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}检测到服务器收敛信号")
+                    return status_response
+                elif status_response.code == 100:
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待中 (进度: {status_response.submitted_clients}/{status_response.total_clients})")
+                    # 继续等待下一个流式响应，无需 sleep
+                else:
+                    logger.warning(f"[Round {self.current_round+1}] 客户端{self.client_id}收到未知状态码 {status_response.code}")
+        except grpc.RpcError as e:
+            logger.error(f"订阅训练状态时发生 gRPC 错误: {e.code()} - {e.details()}")
+            # 发生错误时返回一个表示需要重试的响应
+            return federation_pb2.TrainingStatusResponse(code=500, message="gRPC连接错误")
+        
+        # 流正常结束但未收到预期响应
+        return federation_pb2.TrainingStatusResponse(code=100, message="流结束")
+
     def participate_in_training(self):
         """参与联邦学习训练"""
         self.setup_connection_and_register()
         
-        while True:
-            status_request = federation_pb2.ClientInfo(client_id=self.client_id)
-            status_response = self.stub.CheckTrainingStatus(status_request)
-
-            if status_response.code == 100:
-                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待其他客户注册 (当前进度: {status_response.registered_clients}/{status_response.total_clients})")
-                time.sleep(1)  
-            else:
-                break
+        # 使用流式订阅等待所有客户端注册完成
+        logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待所有客户端注册...")
+        status_response = self._wait_for_training_status()
+        if status_response.code == 300:
+            logger.info("训练已收敛，客户端退出。")
+            return
+        elif status_response.code == 500:
+            logger.error("注册阶段发生连接错误，客户端退出。")
+            return
 
         while self.continue_training:
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}开始训练...")
@@ -344,24 +376,15 @@ class FederatedLearningClient:
 
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
 
-            poll_interval = 1.0  # 初始轮询间隔
-            max_interval = 5.0   # 最大轮询间隔
-            while True:
-                status_request = federation_pb2.ClientInfo(client_id=self.client_id)
-                status_response = self.stub.CheckTrainingStatus(status_request)
-                if status_response.code == 200:
-                    break
-                if status_response.code == 300:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}检测到服务器收敛信号，终止训练。")
-                    self.continue_training = False
-                    break
-                elif status_response.code == 100:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待服务器聚合 (进度: {status_response.submitted_clients}/{status_response.total_clients})")
-                    time.sleep(poll_interval)
-                    poll_interval = min(poll_interval * 1.5, max_interval)  # 指数退避
-                else:
-                    logger.warning(f"[Round {self.current_round+1}] 客户端{self.client_id}收到未知状态码 {status_response.code}，等待中...")
-                    time.sleep(poll_interval)
+            # 使用流式订阅等待服务器聚合完成（替代原来的轮询循环）
+            status_response = self._wait_for_training_status()
+            
+            if status_response.code == 300:
+                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}检测到服务器收敛信号，终止训练。")
+                self.continue_training = False
+            elif status_response.code == 500:
+                logger.error(f"[Round {self.current_round+1}] 连接错误，终止训练。")
+                self.continue_training = False
                 
             global_model_request = federation_pb2.GetModelRequest(client_id=self.client_id, round=self.current_round)
             global_model_response = self.stub.GetGlobalModel(global_model_request)

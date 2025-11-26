@@ -6,3 +6,5 @@
 # *.crt
 logs/
 out/
+__pycache__/
+*.pyc

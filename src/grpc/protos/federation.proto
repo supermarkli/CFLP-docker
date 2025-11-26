@@ -9,8 +9,8 @@ service FederatedLearning {
     // 客户端注册自己，获取初始模型、运行模式和所需的安全材料
     rpc RegisterAndSetup(ClientInfo) returns (SetupResponse);
 
-    // 客户端循环查询训练是否可以开始
-    rpc CheckTrainingStatus(ClientInfo) returns (TrainingStatusResponse);
+    // 客户端订阅训练状态，服务器流式推送
+    rpc SubscribeTrainingStatus(ClientInfo) returns (stream TrainingStatusResponse);
     
     // 客户端提交更新（统一接口）
     rpc SubmitUpdate(ClientUpdate) returns (ServerUpdate);

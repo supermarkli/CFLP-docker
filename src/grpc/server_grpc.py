@@ -73,6 +73,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.clients = {}
         self.current_round = 0
         self.lock = threading.Lock()
+        # 新增：使用 Condition 替代单独的 Lock，用于状态变化通知
+        self.status_condition = threading.Condition(self.lock)
         self.client_parameters = defaultdict(dict) 
         self.completed_clients = defaultdict(set) 
         self.converged = False
@@ -114,7 +116,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         client_id = request.client_id
         logger.info(f"接收到客户端 {client_id} 的注册请求 (模型: {request.model_type}, 数据量: {request.data_size})")
 
-        with self.lock:
+        with self.status_condition:  # 使用 Condition 替代 Lock
             if client_id not in self.clients:
                 self.clients[client_id] = ClientState(
                     client_id=client_id,
@@ -131,49 +133,69 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 if self.start_time is None:
                     self.start_time = time.time()
                     logger.info("联邦学习流程计时开始")
+                # 唤醒所有等待状态更新的客户端
+                self.status_condition.notify_all()
 
             return response
 
-    def CheckTrainingStatus(self, request, context):
+    def SubscribeTrainingStatus(self, request, context):
+        """
+        新增：流式RPC - 客户端订阅训练状态，服务器在状态变化时推送。
+        使用 Condition 变量实现高效的等待/通知机制，消除轮询导致的锁竞争。
+        """
         client_id = request.client_id
+        logger.info(f"客户端 {client_id} 开始订阅训练状态")
         
-        # 最小化锁持有时间，快速读取和更新状态
-        with self.lock:
-            converged = self.converged
-            next_step = self.next_step
-            current_round = self.current_round
-            count = self.count
-            expected = self.expected_clients
-            submitted = len(self.client_parameters.get(current_round, {}))
+        while context.is_active():
+            with self.status_condition:
+                # 使用 wait_for 模式：在循环中等待直到条件满足
+                # 短超时(0.5秒)确保即使错过notify也能快速响应
+                while not (self.converged or self.next_step):
+                    # wait() 会自动释放锁，被唤醒后重新获取锁
+                    self.status_condition.wait(timeout=0.5)
+                    # 检查连接是否仍然活跃
+                    if not context.is_active():
+                        logger.debug(f"客户端 {client_id} 连接已断开")
+                        return
+                
+                # 到这里说明 converged 或 next_step 为 True
+                converged = self.converged
+                next_step = self.next_step
+                current_round = self.current_round
+                expected = self.expected_clients
+                submitted = len(self.client_parameters.get(current_round, {}))
+                
+                if converged:
+                    code = 300
+                    message = "训练已收敛，提前终止"
+                elif next_step:
+                    code = 200
+                    message = "可以开始训练"
+                    self.count += 1
+                    if self.count >= expected:
+                        self.next_step = False
+                        self.count = 0
             
-            if converged:
-                code = 300
-                message = "训练已收敛，提前终止"
-            elif next_step:
-                code = 200
-                message = "可以开始训练"
-                self.count += 1
-                count = self.count  # 更新本地变量用于日志
-                if self.count >= expected:
-                    self.next_step = False
-                    self.count = 0
-            else:
-                code = 100
-                message = f"[Round {current_round+1}] 等待其他客户端"
+            # 构建并推送状态响应（在锁外进行 yield）
+            response = federation_pb2.TrainingStatusResponse(
+                code=code,
+                message=message,
+                registered_clients=self.count,
+                total_clients=expected,
+                submitted_clients=submitted
+            )
+            
+            try:
+                yield response
+            except Exception as e:
+                logger.warning(f"客户端 {client_id} 订阅连接中断: {e}")
+                break
+            
+            # 推送完成后退出（每次订阅只等待一个状态变化）
+            logger.debug(f"客户端 {client_id} 状态订阅结束 (code={code})")
+            break
         
-        # 在锁外进行日志记录，避免长时间持有锁
-        if code == 200:
-            logger.info(f"[Round {current_round+1}] 客户端 {client_id} 获得训练许可 ({count}/{expected})")
-        elif code == 100:
-            logger.debug(f"[Round {current_round+1}] 客户端 {client_id} 等待中 (next_step={next_step}, submitted={submitted}/{expected})")
-
-        return federation_pb2.TrainingStatusResponse(
-            code=code,
-            message=message,
-            registered_clients=count,
-            total_clients=expected,
-            submitted_clients=submitted
-        )
+        logger.debug(f"客户端 {client_id} 状态订阅流已关闭")
 
     def SubmitUpdate(self, request, context):
         """
@@ -251,7 +273,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
     def process_round_completion(self, round_num):
         """处理轮次完成，聚合参数并更新全局模型"""
         try:
-            with self.lock:
+            with self.status_condition:  # 使用 Condition 替代 Lock
                 logger.info(f"[Round {round_num+1}] 所有客户端参数已收集完毕，开始聚合。")
                 
                 # --- 通用资源监控 Start ---
@@ -284,6 +306,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
                 if self.converged or self.current_round + 1 == self.max_rounds:
                     self.next_step = True
+                    # 唤醒所有等待状态更新的客户端（训练结束或收敛）
+                    self.status_condition.notify_all()
                     self.end_time = time.time()
                     elapsed = self.end_time - self.start_time
                     logger.info(f"训练结束。总耗时: {elapsed:.2f} 秒")
@@ -320,6 +344,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 else:
                     self.current_round += 1
                     self.next_step = True
+                    # 唤醒所有等待状态更新的客户端（进入下一轮）
+                    self.status_condition.notify_all()
                     logger.info(f"第 {round_num+1} 轮聚合完成，进入第 {self.current_round+1} 轮。")
         except Exception as e:
             logger.error(f"处理轮次 {round_num} 完成时出错: {e}", exc_info=True)

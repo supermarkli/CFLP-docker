@@ -9,7 +9,7 @@ import src.grpc.generated.federation_pb2 as federation__pb2
 
 
 
-GRPC_GENERATED_VERSION = '1.73.0'
+GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -22,7 +22,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in federation_pb2_grpc.py depends on'
+        + ' but the generated code in federation_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -44,8 +44,8 @@ class FederatedLearningStub(object):
                 request_serializer=federation__pb2.ClientInfo.SerializeToString,
                 response_deserializer=federation__pb2.SetupResponse.FromString,
                 _registered_method=True)
-        self.CheckTrainingStatus = channel.unary_unary(
-                '/federation.FederatedLearning/CheckTrainingStatus',
+        self.SubscribeTrainingStatus = channel.unary_stream(
+                '/federation.FederatedLearning/SubscribeTrainingStatus',
                 request_serializer=federation__pb2.ClientInfo.SerializeToString,
                 response_deserializer=federation__pb2.TrainingStatusResponse.FromString,
                 _registered_method=True)
@@ -77,8 +77,8 @@ class FederatedLearningServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CheckTrainingStatus(self, request, context):
-        """客户端循环查询训练是否可以开始
+    def SubscribeTrainingStatus(self, request, context):
+        """客户端订阅训练状态，服务器流式推送
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -113,8 +113,8 @@ def add_FederatedLearningServicer_to_server(servicer, server):
                     request_deserializer=federation__pb2.ClientInfo.FromString,
                     response_serializer=federation__pb2.SetupResponse.SerializeToString,
             ),
-            'CheckTrainingStatus': grpc.unary_unary_rpc_method_handler(
-                    servicer.CheckTrainingStatus,
+            'SubscribeTrainingStatus': grpc.unary_stream_rpc_method_handler(
+                    servicer.SubscribeTrainingStatus,
                     request_deserializer=federation__pb2.ClientInfo.FromString,
                     response_serializer=federation__pb2.TrainingStatusResponse.SerializeToString,
             ),
@@ -173,7 +173,7 @@ class FederatedLearning(object):
             _registered_method=True)
 
     @staticmethod
-    def CheckTrainingStatus(request,
+    def SubscribeTrainingStatus(request,
             target,
             options=(),
             channel_credentials=None,
@@ -183,10 +183,10 @@ class FederatedLearning(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_stream(
             request,
             target,
-            '/federation.FederatedLearning/CheckTrainingStatus',
+            '/federation.FederatedLearning/SubscribeTrainingStatus',
             federation__pb2.ClientInfo.SerializeToString,
             federation__pb2.TrainingStatusResponse.FromString,
             options,
