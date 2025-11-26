@@ -1,5 +1,9 @@
 data:
+  dataset: "cifar10" # "mnist" or "cifar10"
   test_size: 0.2
+
+model:
+  name: "resnet18" # "cnn", "resnet18", "vgg16"
 
 base:
   random_seed: 2
@@ -20,14 +24,13 @@ federation:
 
 grpc:
   server_host: "10.16.56.126"
-  # server_host: "localhost"
   server_port: 50052
   max_retries: 5
   retry_interval: 1
   max_workers: 10
 
 training:
-  batch_size: 100
+  batch_size: 256
   learning_rate: 0.001
   epochs: 1
 
@@ -53,6 +56,3 @@ sgx:
 tee:
   # 客户端用于验证服务端TEE身份的“代码指纹”。
   expected_mrenclave: "08a4668e1b5055c8dea11d8631ffa5ae51db16dbf3741cc5c7c0d69f1b66708b"
-
-
-

@@ -14,6 +14,7 @@ import hashlib
 import json
 import pickle
 import gc
+import psutil
 
 from phe import paillier
 from cryptography.hazmat.primitives import serialization
@@ -35,7 +36,7 @@ def set_seed(seed=42):
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from src.utils.logging_config import get_logger
-from src.models.models import FedAvgCNN
+from src.models.models import get_model
 from src.grpc.generated import federation_pb2
 from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
@@ -62,7 +63,13 @@ class ClientState:
 class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
     def __init__(self):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.global_model = FedAvgCNN().to(self.device)
+        
+        # 从配置中读取数据集和模型名称
+        self.dataset_name = config['data']['dataset']
+        self.model_name = config['model']['name']
+        logger.info(f"服务器配置: Dataset={self.dataset_name}, Model={self.model_name}")
+
+        self.global_model = get_model(self.model_name, self.dataset_name).to(self.device)
         self.clients = {}
         self.current_round = 0
         self.lock = threading.Lock()
@@ -129,38 +136,44 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
     def CheckTrainingStatus(self, request, context):
         client_id = request.client_id
+        
+        # 最小化锁持有时间，快速读取和更新状态
         with self.lock:
-            if self.converged:
+            converged = self.converged
+            next_step = self.next_step
+            current_round = self.current_round
+            count = self.count
+            expected = self.expected_clients
+            submitted = len(self.client_parameters.get(current_round, {}))
+            
+            if converged:
                 code = 300
                 message = "训练已收敛，提前终止"
-                return federation_pb2.TrainingStatusResponse(
-                    code=code,
-                    message=message,
-                    registered_clients=self.count,
-                    total_clients=self.expected_clients,
-                    submitted_clients=len(self.client_parameters.get(self.current_round, {}))
-                )
-            logger.info(f"[Round {self.current_round+1}] 客户端 {client_id} 检查训练状态，当前next_step={self.next_step}, count={self.count}")
-            if self.next_step:
+            elif next_step:
                 code = 200
                 message = "可以开始训练"
                 self.count += 1
-                logger.info(f"[Round {self.current_round+1}] 客户端 {client_id} 获得训练许可，count增加到 {self.count}/{self.expected_clients}")
-                if self.count >= self.expected_clients:
+                count = self.count  # 更新本地变量用于日志
+                if self.count >= expected:
                     self.next_step = False
                     self.count = 0
-                    logger.info(f"[Round {self.current_round+1}] 所有客户端已获得训练许可，重置next_step={self.next_step}, count={self.count}")
             else:
                 code = 100
-                message = f"[Round {self.current_round+1}] 等待其他客户端, 当前{self.count}/{self.expected_clients}个客户端"
+                message = f"[Round {current_round+1}] 等待其他客户端"
+        
+        # 在锁外进行日志记录，避免长时间持有锁
+        if code == 200:
+            logger.info(f"[Round {current_round+1}] 客户端 {client_id} 获得训练许可 ({count}/{expected})")
+        elif code == 100:
+            logger.debug(f"[Round {current_round+1}] 客户端 {client_id} 等待中 (next_step={next_step}, submitted={submitted}/{expected})")
 
-            return federation_pb2.TrainingStatusResponse(
-                code=code,
-                message=message,
-                registered_clients=self.count,
-                total_clients=self.expected_clients,
-                submitted_clients=len(self.client_parameters.get(self.current_round, {}))
-            )
+        return federation_pb2.TrainingStatusResponse(
+            code=code,
+            message=message,
+            registered_clients=count,
+            total_clients=expected,
+            submitted_clients=submitted
+        )
 
     def SubmitUpdate(self, request, context):
         """
@@ -241,8 +254,29 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             with self.lock:
                 logger.info(f"[Round {round_num+1}] 所有客户端参数已收集完毕，开始聚合。")
                 
+                # --- 通用资源监控 Start ---
+                process = psutil.Process()
+                start_cpu_time = process.cpu_times().user + process.cpu_times().system
+                start_memory = process.memory_info().rss
+                # --- 通用资源监控 End ---
+
                 aggregated_params = self.aggregation_strategy.aggregate_parameters(round_num)
                 
+                # --- 通用资源监控 End & Log ---
+                end_cpu_time = process.cpu_times().user + process.cpu_times().system
+                current_memory = process.memory_info().rss
+                
+                cpu_time_used = end_cpu_time - start_cpu_time
+                memory_usage = current_memory
+                
+                # 对于非 SGX 模式，记录主进程的资源消耗
+                if self.privacy_mode != 'sgx':
+                    logger.info(f"[Round {round_num+1}] Server Aggregation Resources - CPU Time: {cpu_time_used:.4f}s, Memory Usage: {memory_usage / 1024 / 1024:.2f} MB")
+                else:
+                    # SGX 模式下，主要计算在 Enclave 中，主进程开销较小，但记录下来也无妨，作为对比
+                    logger.info(f"[Round {round_num+1}] Server Process (Host) Resources - CPU Time: {cpu_time_used:.4f}s, Memory Usage: {memory_usage / 1024 / 1024:.2f} MB (See previous log for Enclave resources)")
+                # --- 通用资源监控 End ---
+
                 self.global_model.set_parameters(aggregated_params)
                 logger.info(f"[Round {round_num+1}] 全局模型参数更新完成。")
                 

@@ -4,6 +4,8 @@ import pickle
 import numpy as np
 import hashlib
 import logging
+import psutil
+import time
 
 # --- 日志配置 ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s')
@@ -60,6 +62,13 @@ def get_attestation_report():
 def handle_aggregation_request(data):
     """处理经混合加密的聚合请求。"""
     logging.info("Enclave: 已收到聚合请求。")
+    
+    # 资源监控起始点
+    process = psutil.Process()
+    start_cpu_time = process.cpu_times().user + process.cpu_times().system
+    # 记录初始内存
+    start_memory = process.memory_info().rss
+    
     try:
         updates = pickle.loads(data)
         
@@ -111,14 +120,26 @@ def handle_aggregation_request(data):
             
             total_test_num = aggregated_metrics['test_num']
             total_train_num = aggregated_metrics['train_num']
+            
+            # 资源监控结束点
+            end_cpu_time = process.cpu_times().user + process.cpu_times().system
+            current_memory = process.memory_info().rss
+            
+            cpu_time_used = end_cpu_time - start_cpu_time
+            # 这里的内存监控比较简单，记录的是聚合后的内存使用量。
+            # 更精确的峰值监控需要独立线程，但在Enclave单线程模型下较难实现。
+            memory_usage = current_memory
+            
             # 构建最终返回的指标字典
             final_metrics = {
                 'test_acc': aggregated_metrics['test_acc'] / total_test_num if total_test_num > 0 else 0,
                 'auc': aggregated_metrics['auc'] / total_test_num if total_test_num > 0 else 0,
                 'loss': aggregated_metrics['loss'] / total_train_num if total_train_num > 0 else 0,
-                'total_samples': total_samples_for_params 
+                'total_samples': total_samples_for_params,
+                'server_cpu_time': cpu_time_used,
+                'server_memory_usage': memory_usage
             }
-            logging.info("✅ 聚合成功。")
+            logging.info(f"✅ 聚合成功。CPU耗时: {cpu_time_used:.4f}s, 内存使用: {memory_usage / 1024 / 1024:.2f} MB")
             return pickle.dumps({"params": final_params, "metrics": final_metrics})
         else:
             raise ValueError("没有可聚合的数据。")

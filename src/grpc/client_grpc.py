@@ -29,7 +29,7 @@ from src.utils.logging_config import get_logger
 from src.grpc.generated import federation_pb2
 from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
-from src.models.models import FedAvgCNN
+from src.models.models import get_model
 from src.utils.config_utils import config
 from src.strategies.client.none_strategy import NoneClientStrategy
 from src.strategies.client.he_strategy import HeClientStrategy
@@ -48,14 +48,19 @@ class FederatedLearningClient:
     def __init__(self, data=None):
         self.client_id = os.environ.get('CLIENT_ID') or str(uuid.uuid4())
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = FedAvgCNN().to(self.device)
+        
+        self.dataset_name = config['data']['dataset']
+        self.model_name = config['model']['name']
+        
+        self.model = get_model(self.model_name, self.dataset_name).to(self.device)
+        
         self.num_classes = 10
         self.current_round = 0
         self.batch_size = config['training']['batch_size']
-        # self.server_host = config['grpc']['server_host']
-        self.server_host = "10.16.56.126"
-        # self.server_port = config['grpc']['server_port']
-        self.server_port = 50052
+        self.server_host = config['grpc']['server_host']
+        # self.server_host = "10.16.56.126"
+        self.server_port = config['grpc']['server_port']
+        # self.server_port = 50052
         self._init_data(data)
         self.logger = logger 
 
@@ -100,7 +105,7 @@ class FederatedLearningClient:
 
         register_request = federation_pb2.ClientInfo(
             client_id=self.client_id,
-            model_type="CNN",
+            model_type=self.model_name,
             data_size=self.data_size
         )
 
@@ -339,6 +344,8 @@ class FederatedLearningClient:
 
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
 
+            poll_interval = 1.0  # 初始轮询间隔
+            max_interval = 5.0   # 最大轮询间隔
             while True:
                 status_request = federation_pb2.ClientInfo(client_id=self.client_id)
                 status_response = self.stub.CheckTrainingStatus(status_request)
@@ -349,11 +356,12 @@ class FederatedLearningClient:
                     self.continue_training = False
                     break
                 elif status_response.code == 100:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待服务器聚合 (当前进度: {status_response.submitted_clients}/{status_response.total_clients})")
-                    time.sleep(2)
+                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待服务器聚合 (进度: {status_response.submitted_clients}/{status_response.total_clients})")
+                    time.sleep(poll_interval)
+                    poll_interval = min(poll_interval * 1.5, max_interval)  # 指数退避
                 else:
                     logger.warning(f"[Round {self.current_round+1}] 客户端{self.client_id}收到未知状态码 {status_response.code}，等待中...")
-                    time.sleep(2)
+                    time.sleep(poll_interval)
                 
             global_model_request = federation_pb2.GetModelRequest(client_id=self.client_id, round=self.current_round)
             global_model_response = self.stub.GetGlobalModel(global_model_request)
@@ -393,17 +401,23 @@ class FederatedLearningClient:
 
 def load_client_data():
     """加载客户端训练集和测试集数据"""
-    train_path = "/app/data/mnist_train.npz"
-    test_path = "/app/data/mnist_test.npz"
-    train_data = np.load(train_path)
-    test_data = np.load(test_path)
-    X_train = train_data["X_train"]
-    y_train = train_data["y_train"]
-    X_test = test_data["X_test"]
-    y_test = test_data["y_test"]
-    logger.info(f"成功加载客户端训练集: {train_path}, 形状: X_train={X_train.shape}, y_train={y_train.shape}")
-    logger.info(f"成功加载客户端测试集: {test_path}, 形状: X_test={X_test.shape}, y_test={y_test.shape}")
-    return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
+    dataset_name = config['data']['dataset']
+    train_path = f"/app/data/{dataset_name}_train.npz"
+    test_path = f"/app/data/{dataset_name}_test.npz"
+    
+    try:
+        train_data = np.load(train_path)
+        test_data = np.load(test_path)
+        X_train = train_data["X_train"]
+        y_train = train_data["y_train"]
+        X_test = test_data["X_test"]
+        y_test = test_data["y_test"]
+        logger.info(f"成功加载客户端训练集: {train_path}, 形状: X_train={X_train.shape}, y_train={y_train.shape}")
+        logger.info(f"成功加载客户端测试集: {test_path}, 形状: X_test={X_test.shape}, y_test={y_test.shape}")
+        return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
+    except FileNotFoundError as e:
+        logger.error(f"无法找到数据文件: {e}")
+        return None
 
 
 def main():

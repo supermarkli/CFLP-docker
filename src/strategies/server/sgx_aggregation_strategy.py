@@ -150,10 +150,15 @@ class SgxAggregationStrategy(AggregationStrategy):
             avg_auc = self.last_aggregated_metrics.get('auc', 0)
             avg_loss = self.last_aggregated_metrics.get('loss', 0)
             
+            # 提取服务器端资源监控指标
+            server_cpu = self.last_aggregated_metrics.get('server_cpu_time', 0)
+            server_mem = self.last_aggregated_metrics.get('server_memory_usage', 0)
+            
             self.server.rs_test_acc.append(avg_acc)
             self.server.rs_auc.append(avg_auc)
             self.server.rs_train_loss.append(avg_loss)
             self.server.logger.info(f"[第 {round_num+1} 轮] 全局指标 - 准确率: {avg_acc:.4f}, AUC: {avg_auc:.4f}, 损失: {avg_loss:.4f}")
+            self.server.logger.info(f"[第 {round_num+1} 轮] Enclave资源 - CPU耗时: {server_cpu:.4f}s, 内存使用: {server_mem/1024/1024:.2f} MB")
         else:
             self.server.logger.warning(f"[第 {round_num+1} 轮] 聚合指标中总样本数为0。")
         
