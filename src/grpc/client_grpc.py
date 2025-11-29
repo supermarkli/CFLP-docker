@@ -393,9 +393,7 @@ class FederatedLearningClient:
             logger.info(f"[Round {self.current_round+1}] 成功更新全局模型。")
             
             self.current_round += 1
-            if self.current_round >= config['federation']['max_rounds']:
-                logger.info("达到最大训练轮次，结束训练。")
-                self.continue_training = False
+            # 注意：不再需要检查 max_rounds，服务器会在达到时发送 code=300 通知客户端
 
         logger.info("客户端训练流程结束。")
 

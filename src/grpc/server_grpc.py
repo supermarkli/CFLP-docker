@@ -165,7 +165,11 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 expected = self.expected_clients
                 submitted = len(self.client_parameters.get(current_round, {}))
                 
-                if converged:
+                # 检查是否达到最大轮次（训练结束）
+                if current_round + 1 >= self.max_rounds:
+                    code = 300
+                    message = f"达到最大训练轮次 ({self.max_rounds})，训练结束"
+                elif converged:
                     code = 300
                     message = "训练已收敛，提前终止"
                 elif next_step:
@@ -354,12 +358,12 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         """评估所有客户端的平均指标，并检查收敛"""
         self.aggregation_strategy.evaluate_metrics(round_num)
 
-        # if len(self.rs_test_acc) >= self.converge_window:
-        #     recent_accs = self.rs_test_acc[-(self.converge_window):]
-        #     acc_delta = max(recent_accs) - min(recent_accs)
-        #     if acc_delta < self.acc_delta_threshold:
-        #         self.converged = True
-        #         logger.info(f"[Round {round_num}] 训练已收敛，准确率变化 ({acc_delta:.6f}) 小于阈值 ({self.acc_delta_threshold})。")
+        if len(self.rs_test_acc) >= self.converge_window:
+            recent_accs = self.rs_test_acc[-(self.converge_window):]
+            acc_delta = max(recent_accs) - min(recent_accs)
+            if acc_delta < self.acc_delta_threshold:
+                self.converged = True
+                logger.info(f"[Round {round_num+1}] 训练已收敛，准确率变化 ({acc_delta:.6f}) 小于阈值 ({self.acc_delta_threshold})。")
 
 
 def serve():
