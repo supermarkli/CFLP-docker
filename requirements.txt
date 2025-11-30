@@ -5,7 +5,7 @@ matplotlib
 numpy
 pandas
 Pillow
-phe
+tenseal
 protobuf
 PyYAML
 scikit-learn

@@ -69,7 +69,11 @@ class FederatedLearningClient:
         self.continue_training = True
 
         self.loss = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=config['training']['learning_rate'])
+        self.optimizer = optim.Adam(
+            self.model.parameters(), 
+            lr=config['training']['learning_rate'],
+            weight_decay=config['training'].get('weight_decay', 5e-4)
+        )
         
 
     def setup_connection_and_register(self):

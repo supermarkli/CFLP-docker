@@ -187,13 +187,16 @@ message EncryptedModelParameters {
     map<string, EncryptedNumpyArray> parameters = 1;
 }
 
-// 加密后的Numpy数组
+// 加密后的Numpy数组 (TenSEAL CKKS)
+// 每个 data 元素是一个序列化的 CKKS 向量 (包含多个值的 SIMD 密文)
 message EncryptedNumpyArray {
-    repeated bytes data = 1; // 分块加密的数据
+    repeated bytes data = 1; // CKKS 密文块
     repeated int64 shape = 2; // 原始形状
 }
 
-// 加密的训练指标
+// 加密的训练指标 (TenSEAL CKKS)
+// 所有指标打包到一个向量 [test_acc, test_num, auc, loss, train_num]
+// 存储在 test_acc 字段中，其他字段为空
 message EncryptedTrainingMetrics {
     bytes test_acc = 1;
     bytes test_num = 2;

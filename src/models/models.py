@@ -73,7 +73,7 @@ class ResNet18(BaseModel):
     def __init__(self, in_features=3, num_classes=10):
         super().__init__()
         # 使用 torchvision 的实现但修改第一层以适配 CIFAR-10
-        self.model = models.resnet18(pretrained=False)
+        self.model = models.resnet18(weights=None)
         
         # 修改 conv1 以处理 32x32 输入 (3x3 kernel, stride 1, padding 1)
         # 原始: nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
@@ -93,7 +93,7 @@ class VGG16(BaseModel):
     def __init__(self, in_features=3, num_classes=10):
         super().__init__()
         # 使用带BN的VGG16
-        self.model = models.vgg16_bn(pretrained=False)
+        self.model = models.vgg16_bn(weights=None)
         
         # 如果输入特征数不是3，修改第一层
         if in_features != 3:
