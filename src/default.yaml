@@ -15,7 +15,7 @@ federation:
   # "tee"  - 使用TDX（可信执行环境）在服务器端保护明文聚合。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
   # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
-  privacy_mode: "tee" # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "sgx" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 10000
   convergence:
@@ -24,7 +24,7 @@ federation:
 
 grpc:
   server_host: "10.16.56.126"
-  server_port: 50052
+  server_port: 50051
   max_retries: 5
   retry_interval: 1
   max_workers: 10

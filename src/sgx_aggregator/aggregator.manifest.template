@@ -2,6 +2,8 @@ libos.entrypoint = "/usr/bin/python3.10"
 
 loader.argv = ["/usr/bin/python3.10", "/app/enclave.py"]
 loader.env.LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu"
+loader.env.OMP_NUM_THREADS = "1"
+loader.env.OPENBLAS_NUM_THREADS = "1"
 loader.log_level = "error"
 
 fs.mounts = [
@@ -12,12 +14,11 @@ fs.mounts = [
   { path = "/usr/local/lib/python3.10/dist-packages", uri = "file:/usr/local/lib/python3.10/dist-packages" },
   { path = "/app", uri = "file:/app" },
   { path = "/tmp", uri = "file:/tmp" },
-  { path = "/dev", uri = "file:/dev" },
   { path = "/usr/lib/x86_64-linux-gnu", uri = "file:/usr/lib/x86_64-linux-gnu" },
 ]
 
 sgx.enclave_size = "1024M"
-sgx.max_threads = 8
+sgx.max_threads = 32
 sgx.debug = true
 sgx.remote_attestation = "dcap"
 
@@ -29,5 +30,4 @@ sgx.trusted_files = [
   "file:/usr/lib/x86_64-linux-gnu/",
   "file:/lib/",
   "file:/usr/lib/",
-  "file:/dev/attestation/quote",
 ] 

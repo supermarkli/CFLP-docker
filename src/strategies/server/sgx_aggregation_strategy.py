@@ -18,14 +18,13 @@ MAX_RETRIES = 20
 class SgxAggregationStrategy(AggregationStrategy):
     """
     SGX模式的聚合策略。
-    此策略通过Unix套接字与一个独立的、受信任的SGX enclave通信，
-    以执行安全聚合。
+    此策略通过TCP套接字与一个独立的、受信任的SGX enclave通信，
+    以执行安全聚合。使用流式处理协议，逐个发送客户端数据以减少内存峰值。
     """
     def __init__(self, server):
         super().__init__(server)
-        # enclave_socket现在是临时连接，不再是永久状态
         self.public_key, self.quote = self._get_initial_attestation()
-        self.last_aggregated_metrics = None # 用于存储从enclave返回的指标
+        self.last_aggregated_metrics = None
 
     def _connect_to_enclave(self):
         """建立到聚合器enclave的TCP套接字连接。"""
@@ -41,12 +40,22 @@ class SgxAggregationStrategy(AggregationStrategy):
                 time.sleep(RETRY_INTERVAL)
         raise ConnectionError("❌ 多次重试后未能连接到SGX聚合器enclave。")
 
+    def _recv_exact(self, sock, length):
+        """精确接收指定长度的数据"""
+        data = b""
+        while len(data) < length:
+            packet = sock.recv(min(65536, length - len(data)))
+            if not packet:
+                raise ConnectionError("连接意外关闭")
+            data += packet
+        return data
+
     def _get_initial_attestation(self):
         """从enclave获取公钥和证明quote。"""
         self.server.logger.info("正在从enclave请求初始证明数据...")
         enclave_socket = self._connect_to_enclave()
         enclave_socket.sendall(b"GET_ATTESTATION")
-        response_bytes = enclave_socket.recv(4096) # 必要时调整缓冲区大小
+        response_bytes = enclave_socket.recv(4096)
         pubkey_pem, quote = pickle.loads(response_bytes)
         self.server.logger.info("✅ 已从enclave收到公钥和quote。")
         enclave_socket.close()
@@ -59,7 +68,7 @@ class SgxAggregationStrategy(AggregationStrategy):
         return federation_pb2.SetupResponse(
             privacy_mode=self.server.privacy_mode,
             initial_model=federation_pb2.ModelParameters(parameters=serialize_parameters(initial_model_params)),
-            tee_public_key=self.public_key, # 使用正确的字段
+            tee_public_key=self.public_key,
             sgx_quote=self.quote
         )
 
@@ -79,50 +88,65 @@ class SgxAggregationStrategy(AggregationStrategy):
             if round_num != self.server.current_round:
                 return federation_pb2.ServerUpdate(code=400, message=f"轮次不匹配，服务器当前为 {self.server.current_round} 轮")
 
-            # 存储整个TeePayload，因为它包含了enclave解密所需的所有信息
             self.server.client_parameters[round_num][client_id] = payload
             self.server.logger.info(f"已收到并存储来自客户端 {client_id} 的第 {round_num+1} 轮SGX更新。")
 
-            # 检查是否所有客户端都已提交
             if len(self.server.client_parameters[round_num]) >= self.server.expected_clients:
                 threading.Thread(target=self.server.process_round_completion, args=(round_num,)).start()
 
         return federation_pb2.ServerUpdate(code=200, message="Update received", current_round=round_num)
         
     def aggregate_parameters(self, round_num):
-        """将参数的聚合委托给SGX enclave。"""
-        self.server.logger.info(f"[第 {round_num+1} 轮] 正在将聚合任务委托给SGX enclave。")
+        """
+        使用流式协议将参数的聚合委托给SGX enclave。
+        逐个发送客户端数据，避免内存峰值。
+        """
+        self.server.logger.info(f"[第 {round_num+1} 轮] 正在将聚合任务委托给SGX enclave（流式模式）。")
         
-        updates_to_send = []
         client_updates = self.server.client_parameters[round_num]
-        
-        for client_id, update_payload in client_updates.items():
-            if not isinstance(update_payload, federation_pb2.TeePayload):
-                raise TypeError(f"SGX模式下期望TeePayload，但从客户端 {client_id} 收到了 {type(update_payload)}")
-            
-            num_samples = self.server.clients[client_id].data_size
-            
-            encrypted_key = update_payload.encrypted_symmetric_key
-            nonce = update_payload.nonce
-            encrypted_data = update_payload.encrypted_payload
-            
-            updates_to_send.append(((encrypted_key, nonce, encrypted_data), num_samples))
+        num_clients = len(client_updates)
         
         enclave_socket = self._connect_to_enclave()
         try:
-            enclave_socket.sendall(b"AGGREGATE")
+            # 1. 发送流式聚合命令
+            enclave_socket.sendall(b"AGGREGATE_STREAM")
             
             if enclave_socket.recv(1024) != b"READY":
                 raise ConnectionAbortedError("Enclave没有发出数据就绪信号。")
 
-            enclave_socket.sendall(pickle.dumps(updates_to_send))
-            enclave_socket.shutdown(socket.SHUT_WR)
+            # 2. 发送客户端数量 (4字节)
+            enclave_socket.sendall(num_clients.to_bytes(4, byteorder='big'))
+            self.server.logger.info(f"📤 开始流式发送 {num_clients} 个客户端的数据...")
 
-            response_data = b""
-            while True:
-                part = enclave_socket.recv(4096)
-                if not part: break
-                response_data += part
+            # 3. 逐个发送客户端数据
+            for i, (client_id, update_payload) in enumerate(client_updates.items()):
+                if not isinstance(update_payload, federation_pb2.TeePayload):
+                    raise TypeError(f"SGX模式下期望TeePayload，但从客户端 {client_id} 收到了 {type(update_payload)}")
+                
+                num_samples = self.server.clients[client_id].data_size
+                
+                encrypted_key = update_payload.encrypted_symmetric_key
+                nonce = update_payload.nonce
+                encrypted_data = update_payload.encrypted_payload
+                
+                # 序列化单个客户端的数据
+                client_data = pickle.dumps(((encrypted_key, nonce, encrypted_data), num_samples))
+                data_length = len(client_data)
+                
+                # 发送长度 + 数据
+                enclave_socket.sendall(data_length.to_bytes(8, byteorder='big'))
+                enclave_socket.sendall(client_data)
+                
+                self.server.logger.info(f"📤 已发送客户端 {i+1}/{num_clients} 的数据 ({data_length / 1024 / 1024:.2f} MB)")
+
+            self.server.logger.info("📤 所有客户端数据已发送，等待Enclave处理结果...")
+
+            # 4. 接收结果长度 (8字节)
+            length_bytes = self._recv_exact(enclave_socket, 8)
+            result_length = int.from_bytes(length_bytes, byteorder='big')
+
+            # 5. 接收结果数据
+            response_data = self._recv_exact(enclave_socket, result_length)
             
             result = pickle.loads(response_data)
             if "error" in result:
@@ -150,7 +174,6 @@ class SgxAggregationStrategy(AggregationStrategy):
             avg_auc = self.last_aggregated_metrics.get('auc', 0)
             avg_loss = self.last_aggregated_metrics.get('loss', 0)
             
-            # 提取服务器端资源监控指标
             server_cpu = self.last_aggregated_metrics.get('server_cpu_time', 0)
             server_mem = self.last_aggregated_metrics.get('server_memory_usage', 0)
             
