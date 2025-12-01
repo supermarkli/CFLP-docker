@@ -89,6 +89,12 @@ class FederatedLearningClient:
                     ('grpc.max_send_message_length', 500 * 1024 * 1024),
                     ('grpc.max_receive_message_length', 500 * 1024 * 1024),
                     ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
+                    # keepalive 配置，防止长时间传输时连接超时
+                    ('grpc.keepalive_time_ms', 30000),
+                    ('grpc.keepalive_timeout_ms', 60000),
+                    ('grpc.keepalive_permit_without_calls', True),
+                    ('grpc.http2.max_pings_without_data', 0),
+                    ('grpc.http2.min_ping_interval_without_data_ms', 10000),
                 ]
             )
             logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器{self.server_host}:{self.server_port}。")
@@ -100,6 +106,12 @@ class FederatedLearningClient:
                     ('grpc.max_send_message_length', 500 * 1024 * 1024),
                     ('grpc.max_receive_message_length', 500 * 1024 * 1024),
                     ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
+                    # keepalive 配置，防止长时间传输时连接超时
+                    ('grpc.keepalive_time_ms', 30000),
+                    ('grpc.keepalive_timeout_ms', 60000),
+                    ('grpc.keepalive_permit_without_calls', True),
+                    ('grpc.http2.max_pings_without_data', 0),
+                    ('grpc.http2.min_ping_interval_without_data_ms', 10000),
                 ]
             )
         self.channel = channel

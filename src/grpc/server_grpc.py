@@ -372,6 +372,12 @@ def serve():
             ('grpc.max_send_message_length', 500 * 1024 * 1024),
             ('grpc.max_receive_message_length', 500 * 1024 * 1024),
             ('grpc.default_compression_algorithm', grpc.Compression.Gzip),
+            # keepalive 配置，防止长时间传输时连接超时
+            ('grpc.keepalive_time_ms', 30000),                    # 每30秒发送一次keepalive ping
+            ('grpc.keepalive_timeout_ms', 60000),                 # 等待60秒响应
+            ('grpc.keepalive_permit_without_calls', True),        # 即使没有活跃调用也发送keepalive
+            ('grpc.http2.max_pings_without_data', 0),             # 允许无数据时发送ping
+            ('grpc.http2.min_ping_interval_without_data_ms', 10000),  # 最小ping间隔10秒
         ]
     )
     federation_pb2_grpc.add_FederatedLearningServicer_to_server(FederatedLearningServicer(), server)
