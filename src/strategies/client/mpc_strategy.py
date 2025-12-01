@@ -6,11 +6,13 @@ from .base_strategy import ClientStrategy
 from src.grpc.generated import federation_pb2
 from src.utils.config_utils import config
 from src.utils.logging_config import get_logger
+from src.utils.fast_shamir import fast_batch_share, vectorized_secret_to_shares
 import numpy as np
-from pyseltongue import secret_int_to_points
 import gc
+import time
 
 logger = get_logger()
+
 
 class MpcClientStrategy(ClientStrategy):
     def __init__(self, client_instance):
@@ -18,65 +20,121 @@ class MpcClientStrategy(ClientStrategy):
         self.shamir_k = int(config['mpc']['shamir_k'])
         self.shamir_n = int(config['mpc']['shamir_n'])
         self.scaling_factor = int(config['mpc']['scaling_factor'])
-        self.chunk_size = int(config['mpc'].get('chunk_size', 10000)) # 从配置或使用默认值
+        self.chunk_size = int(config['mpc'].get('chunk_size', 50000))
         self.prime_mod = int(config['mpc']['prime_mod'])
-        self.share_separator = ";"
-        logger.info(f"客户端 {self.client.client_id} 的 MPC 策略已初始化 (k={self.shamir_k}, n={self.shamir_n}, chunk_size={self.chunk_size})。")
+        
+        logger.info(
+            f"客户端 {self.client.client_id} 的 MPC 策略已初始化 "
+            f"(k={self.shamir_k}, n={self.shamir_n}, chunk_size={self.chunk_size})，"
+            f"使用高性能向量化 Shamir 实现。"
+        )
 
-    def _float_to_int_shares(self, value):
-        """将浮点数转换为缩放后的整数，再进行秘密共享。"""
+    def _share_scalar_binary(self, value):
+        """为标量值生成二进制编码的秘密共享"""
         integer_value = int(value * self.scaling_factor)
-        # secret_int_to_points 返回一个 (x, y) 元组的列表
-        points = secret_int_to_points(integer_value, self.shamir_k, self.shamir_n, prime=self.prime_mod)
-        # 为了传输，将点转换为 "x:y" 格式的字符串
-        return [f"{p[0]}:{p[1]}" for p in points]
+        
+        # 使用向量化版本（对单个元素）
+        shares = vectorized_secret_to_shares(
+            np.array([integer_value]), 
+            self.shamir_k, 
+            self.shamir_n, 
+            self.prime_mod
+        )
+        
+        # 编码为二进制（每个参与方一个 y 值）
+        byte_parts = []
+        for party_idx in range(self.shamir_n):
+            y_val = int(shares[party_idx][0])
+            y_bytes = y_val.to_bytes(
+                max(1, (y_val.bit_length() + 7) // 8),
+                byteorder='big',
+                signed=False
+            )
+            byte_parts.append(len(y_bytes).to_bytes(2, 'big') + y_bytes)
+        
+        return b''.join(byte_parts)
 
     def prepare_update_request(self, current_round, model_parameters, metrics):
-        """创建参数更新消息（MPC份额）"""
+        """创建参数更新消息（MPC份额）- 高性能版本"""
+        total_start = time.time()
+        logger.info("MPC策略: 开始创建秘密共享（高性能向量化版本）...")
+        
         shared_parameters = {}
-        logger.info("MPC策略: 开始创建秘密共享...")
-
+        
+        # 计算总参数量
+        total_params = sum(
+            np.prod(v.shape) if isinstance(v, np.ndarray) else 1 
+            for v in model_parameters.values()
+        )
+        logger.info(f"MPC策略: 总参数量: {total_params:,}")
+        
+        processed_count = 0
+        
         for key, value in model_parameters.items():
             if isinstance(value, np.ndarray):
-                flat = value.flatten()
-                total = len(flat)
-                shares_by_party_chunks = [[] for _ in range(self.shamir_n)]
-                logger.info(f"MPC策略: 开始处理参数 {key}, 形状: {value.shape}, 总量: {total}, 分块大小: {self.chunk_size}")
-
-                for i in range(0, total, self.chunk_size):
-                    chunk = flat[i:i+self.chunk_size]
-                    
-                    shares_by_pos = [self._float_to_int_shares(v) for v in chunk]
-                    shares_by_party = list(zip(*shares_by_pos))
-
-                    for party_idx, party_shares in enumerate(shares_by_party):
-                        shares_by_party_chunks[party_idx].extend(party_shares)
-
-                    progress = min(i + self.chunk_size, total)
-                    logger.info(f"参数 {key} 秘密共享进度: {progress}/{total} ({(progress/total)*100:.1f}%)")
-
-                    del chunk, shares_by_pos, shares_by_party
-                    gc.collect()
-
-                encoded_shares = [self.share_separator.join(party_shares).encode('utf-8') for party_shares in shares_by_party_chunks]
-
+                layer_start = time.time()
+                num_elements = int(np.prod(value.shape))
+                
+                # 使用高性能批量共享
+                encoded_shares = fast_batch_share(
+                    value,
+                    self.shamir_k,
+                    self.shamir_n,
+                    self.scaling_factor,
+                    self.prime_mod,
+                    self.chunk_size
+                )
+                
                 shared_parameters[key] = {
-                    'data': encoded_shares, 'shape': list(value.shape)
+                    'data': encoded_shares,
+                    'shape': list(value.shape)
                 }
-            else: # scalar
-                shares = self._float_to_int_shares(value)
-                encoded_shares = [self.share_separator.join(shares).encode('utf-8')]
+                
+                processed_count += num_elements
+                layer_time = time.time() - layer_start
+                
+                if num_elements > 10000:
+                    speed = num_elements / layer_time if layer_time > 0 else 0
+                    logger.info(
+                        f"参数 {key} ({num_elements:,} 元素) 完成，"
+                        f"耗时 {layer_time:.2f}s，速度 {speed:.0f} 元素/秒，"
+                        f"进度: {processed_count:,}/{total_params:,} ({100*processed_count/total_params:.1f}%)"
+                    )
+            else:
+                # 标量
+                shares = vectorized_secret_to_shares(
+                    np.array([int(value * self.scaling_factor)]),
+                    self.shamir_k,
+                    self.shamir_n,
+                    self.prime_mod
+                )
+                
+                byte_parts = []
+                for party_idx in range(self.shamir_n):
+                    y_val = int(shares[party_idx][0])
+                    y_bytes = y_val.to_bytes(
+                        max(1, (y_val.bit_length() + 7) // 8),
+                        byteorder='big',
+                        signed=False
+                    )
+                    byte_parts.append(len(y_bytes).to_bytes(2, 'big') + y_bytes)
+                
                 shared_parameters[key] = {
-                    'data': encoded_shares, 'shape': [1]
+                    'data': [b''.join(byte_parts)],  # 单元素
+                    'shape': [1]
                 }
-            logger.info(f"参数 {key} 已完成秘密共享。")
-
-        proto_params = {k: federation_pb2.SharedNumpyArray(data=v['data'], shape=v['shape']) for k, v in shared_parameters.items()}
+                processed_count += 1
+        
+        # 转换为 Protobuf 格式
+        proto_params = {
+            k: federation_pb2.SharedNumpyArray(data=v['data'], shape=v['shape']) 
+            for k, v in shared_parameters.items()
+        }
         shared_model_params = federation_pb2.SharedModelParameters(parameters=proto_params)
 
         # --- 对训练指标进行秘密共享 ---
         metrics_to_share = metrics.copy()
-        # 对auc, acc, loss进行加权，使其在聚合时可以正确平均
+        
         if 'test_num' in metrics_to_share:
             test_num = metrics_to_share.get('test_num', 1)
             if 'auc' in metrics_to_share:
@@ -88,26 +146,34 @@ class MpcClientStrategy(ClientStrategy):
 
         shared_metrics_dict = {}
         for key, value in metrics_to_share.items():
-            # 确保我们只处理标量值，而不是数组或列表
             if isinstance(value, (int, float)):
-                shares = self._float_to_int_shares(value)
-                shared_metrics_dict[key] = self.share_separator.join(shares).encode('utf-8')
+                shared_metrics_dict[key] = self._share_scalar_binary(value)
             else:
                 logger.warning(f"跳过对非标量指标 '{key}' 的秘密共享。")
 
-
         shared_metrics_proto = federation_pb2.SharedTrainingMetrics(**shared_metrics_dict)
         
-        # --- 组装 Payload ---
+        # 组装 Payload
         mpc_payload = federation_pb2.MpcPayload(
             parameters_and_metrics=federation_pb2.SharedParametersAndMetrics(
                 parameters=shared_model_params, 
                 metrics=shared_metrics_proto
             )
         )
+        
+        # 清理内存
+        del shared_parameters
+        gc.collect()
+
+        total_time = time.time() - total_start
+        speed = total_params / total_time if total_time > 0 else 0
+        logger.info(
+            f"MPC策略: 秘密共享完成，总耗时 {total_time:.2f}s，"
+            f"平均速度 {speed:.0f} 元素/秒"
+        )
 
         return federation_pb2.ClientUpdate(
             client_id=self.client.client_id,
             round=current_round,
             mpc=mpc_payload
-        ) 
+        )

@@ -276,9 +276,19 @@ class FederatedLearningClient:
         retry_interval = config['grpc']['retry_interval']
         log_prefix = f"[{self.privacy_mode.upper()}] [轮次 {self.current_round + 1}]"
         
+        # 记录数据大小
+        payload_size = update_request.ByteSize()
+        logger.info(f"{log_prefix} 客户端 {self.client_id} 开始传输更新数据，大小: {payload_size / 1024 / 1024:.2f} MB")
+        
+        import time as _time
+        start_time = _time.time()
+        
         for attempt in range(max_retries):
             try:
                 server_response = self.stub.SubmitUpdate(update_request)
+                elapsed = _time.time() - start_time
+                speed = payload_size / elapsed / 1024 / 1024 if elapsed > 0 else 0
+                logger.info(f"{log_prefix} 客户端 {self.client_id} 传输完成，耗时 {elapsed:.2f}s，速度 {speed:.2f} MB/s")
                 return server_response  # 成功则返回响应
             except grpc._channel._InactiveRpcError as e:
                 if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
