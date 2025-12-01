@@ -274,6 +274,7 @@ class HeAggregationStrategy(AggregationStrategy):
         
         CKKS 的优势: 密文加法直接对应明文加法，可以高效地进行 FedAvg。
         使用多线程并行聚合不同的参数层以提高性能。
+        按 data_size 加权聚合以保证 FedAvg 一致性。
         """
         start_time = time.time()
         logger.info(f"[Round {round_num+1}] 开始CKKS密文聚合...")
@@ -284,6 +285,16 @@ class HeAggregationStrategy(AggregationStrategy):
         if num_clients == 0:
             return self.server.global_model.get_parameters()
         
+        # 计算各客户端的权重 (按 data_size 加权)
+        total_data_size = sum(self.server.clients[cid].data_size for cid in client_ids)
+        if total_data_size == 0:
+            logger.warning(f"[Round {round_num+1}] 总数据量为0，使用简单平均")
+            client_weights = [1.0 / num_clients for _ in client_ids]
+        else:
+            client_weights = [self.server.clients[cid].data_size / total_data_size for cid in client_ids]
+        
+        logger.info(f"[Round {round_num+1}] 客户端权重: {dict(zip(client_ids, [f'{w:.4f}' for w in client_weights]))}")
+        
         # 获取第一个客户端的参数结构
         first_client_params = self.server.client_parameters[round_num][client_ids[0]]
         layer_keys = list(first_client_params.keys())
@@ -292,7 +303,7 @@ class HeAggregationStrategy(AggregationStrategy):
                    f"来自 {num_clients} 个客户端")
         
         def aggregate_single_layer(key):
-            """聚合单个参数层 (可并行执行)"""
+            """聚合单个参数层 (可并行执行), 按 data_size 加权"""
             # 获取该层的所有客户端的 CKKS 向量列表
             all_client_vectors = [
                 self.server.client_parameters[round_num][cid][key]['vectors']
@@ -301,19 +312,18 @@ class HeAggregationStrategy(AggregationStrategy):
             shape = first_client_params[key]['shape']
             num_vectors = len(all_client_vectors[0])
             
-            # 在密文空间聚合 (CKKS 支持密文加法)
+            # 在密文空间加权聚合 (CKKS 支持密文加法和标量乘法)
             aggregated_vectors = []
             for vec_idx in range(num_vectors):
-                # 从第一个客户端开始
-                summed_vector = all_client_vectors[0][vec_idx]
+                # 从第一个客户端开始，乘以其权重
+                weighted_vector = all_client_vectors[0][vec_idx] * client_weights[0]
                 
-                # 加上其他客户端的对应向量
+                # 加上其他客户端的加权向量
                 for client_idx in range(1, num_clients):
-                    summed_vector = summed_vector + all_client_vectors[client_idx][vec_idx]
+                    weighted_vector = weighted_vector + all_client_vectors[client_idx][vec_idx] * client_weights[client_idx]
                 
-                # 密文上除以客户端数量 (FedAvg 简单平均)
-                avg_vector = summed_vector * (1.0 / num_clients)
-                aggregated_vectors.append(avg_vector)
+                # 加权求和后不需要再除，因为权重之和为1
+                aggregated_vectors.append(weighted_vector)
             
             # 解密并重构数组
             decrypted_flat = []

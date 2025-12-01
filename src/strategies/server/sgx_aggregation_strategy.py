@@ -186,3 +186,8 @@ class SgxAggregationStrategy(AggregationStrategy):
             self.server.logger.warning(f"[第 {round_num+1} 轮] 聚合指标中总样本数为0。")
         
         self.last_aggregated_metrics = None
+        
+        # 清理本轮的加密参数缓存，避免内存泄漏
+        if round_num in self.server.client_parameters:
+            del self.server.client_parameters[round_num]
+            self.server.logger.debug(f"[第 {round_num+1} 轮] 已清理 client_parameters 缓存")

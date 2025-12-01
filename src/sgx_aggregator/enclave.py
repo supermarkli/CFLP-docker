@@ -78,8 +78,8 @@ def recv_exact(connection, length):
 def process_single_client(encrypted_key, nonce, encrypted_data, num_samples, 
                           aggregated_params, aggregated_metrics, total_samples):
     """
-    处理单个客户端的加密数据，解密并累加到聚合结果中。
-    输入数据是 float16 格式，聚合结果也用 float16 存储以节省内存。
+    处理单个客户端的加密数据，解密并按 data_size 加权累加到聚合结果中。
+    输入数据是 float16 格式，聚合结果用 float32 存储以提高精度。
     使用原地操作 (in-place) 尽可能减少内存分配。
     """
     # 1. 用RSA私钥解密AES密钥
@@ -102,18 +102,21 @@ def process_single_client(encrypted_key, nonce, encrypted_data, num_samples,
     # 释放中间对象
     del params_and_metrics
 
-    # 4. 累加参数（使用 float16 存储，原地操作减少内存）
+    # 4. 按 data_size (num_samples) 加权累加参数
     total_samples += num_samples
     if aggregated_params is None:
-        # 第一个客户端：直接使用其参数作为初始聚合结果（避免复制）
-        aggregated_params = decrypted_params  # 直接接管引用，不复制
+        # 第一个客户端：转为 float32 并乘以权重
+        aggregated_params = {}
+        for name, param in decrypted_params.items():
+            # 转为 float32 并乘以 data_size 权重
+            aggregated_params[name] = param.astype(np.float32) * num_samples
+        del decrypted_params
     else:
-        # 后续客户端：原地累加
+        # 后续客户端：加权累加
         for name in aggregated_params:
-            # 使用 numpy 的原地操作，避免创建新数组
-            # 先转为 float32 视图进行计算（避免 float16 溢出）
-            np.add(aggregated_params[name], decrypted_params[name], 
-                   out=aggregated_params[name], casting='same_kind')
+            # 乘以 data_size 权重后累加
+            weighted_param = decrypted_params[name].astype(np.float32) * num_samples
+            aggregated_params[name] += weighted_param
         # 释放当前客户端的参数
         del decrypted_params
 
@@ -185,13 +188,12 @@ def handle_streaming_aggregation(connection):
 
         # 3. 计算最终结果
         if aggregated_params and total_samples > 0:
-            # 将 float16 聚合结果转为 float32，并计算平均值
-            # 注意：这里 aggregated_params 存储的是各客户端参数的累加和
-            # 需要除以客户端数量（num_clients）来得到平均值
+            # 计算加权平均值：各客户端参数已经乘以了 data_size，
+            # 现在除以 total_samples 得到加权平均
             final_params = {}
             for name, params in aggregated_params.items():
-                # 转为 float32 并除以客户端数量
-                final_params[name] = params.astype(np.float32) / num_clients
+                # 除以 total_samples 得到加权平均
+                final_params[name] = params / total_samples
             
             # 释放聚合结果
             del aggregated_params

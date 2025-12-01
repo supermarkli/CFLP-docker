@@ -156,14 +156,13 @@ class MpcClientStrategy(ClientStrategy):
         # --- 对训练指标进行秘密共享（始终使用变长编码）---
         metrics_to_share = metrics.copy()
         
+        # 只对 AUC 做样本加权，loss 直接发送总损失
+        # 注意：train_metrics() 返回的 loss 已经是 sum(loss * batch_size)，不需要再乘
         if 'test_num' in metrics_to_share:
             test_num = metrics_to_share.get('test_num', 1)
             if 'auc' in metrics_to_share:
                 metrics_to_share['auc'] *= test_num
-        if 'train_num' in metrics_to_share:
-            train_num = metrics_to_share.get('train_num', 1)
-            if 'loss' in metrics_to_share:
-                metrics_to_share['loss'] *= train_num
+        # loss 不需要乘以 train_num，因为 train_metrics() 返回的已经是累加值
 
         shared_metrics_dict = {}
         for key, value in metrics_to_share.items():

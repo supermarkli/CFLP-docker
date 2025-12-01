@@ -79,10 +79,10 @@ def _recover_chunk_vectorized(args):
     """
     向量化恢复秘密（使用 NumPy，适用于 prime < 2^62）
     """
-    chunk_shares_by_party, k, prime, lagrange_coeffs, prime_half, scaling_factor, num_clients = args
+    chunk_shares_by_party, k, prime, lagrange_coeffs, prime_half, scaling_factor, total_weight = args
     
     num_elements = len(chunk_shares_by_party[0])
-    divisor = float(scaling_factor * num_clients)
+    divisor = float(scaling_factor * total_weight)
     
     # 转换为 numpy 数组
     shares = [np.array(s, dtype=np.uint64) for s in chunk_shares_by_party]
@@ -338,11 +338,19 @@ def fast_batch_recover(
     k: int,
     prime: int,
     scaling_factor: int,
-    num_clients: int,
+    total_weight: float,
     chunk_size: int = 50000
 ) -> np.ndarray:
     """
     高性能批量秘密恢复（使用线程池，兼容 gRPC 环境）
+    
+    Args:
+        encoded_shares_by_party: 每个 party 的份额列表
+        k: Shamir 阈值
+        prime: 素数模
+        scaling_factor: 缩放因子
+        total_weight: 总权重（用于加权平均，可以是 num_clients 或 total_data_size）
+        chunk_size: 分块大小
     """
     num_elements = len(encoded_shares_by_party[0])
     prime_half = prime // 2
@@ -371,7 +379,7 @@ def fast_batch_recover(
     
     # 准备任务参数
     task_args = [
-        (chunk, k, prime, lagrange_coeffs, prime_half, scaling_factor, num_clients)
+        (chunk, k, prime, lagrange_coeffs, prime_half, scaling_factor, total_weight)
         for chunk in chunks
     ]
     

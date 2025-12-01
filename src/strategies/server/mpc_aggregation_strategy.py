@@ -70,39 +70,53 @@ class MpcAggregationStrategy(AggregationStrategy):
         else:
             return decode_variable_shares(data_bytes)
 
-    def _fast_aggregate_and_recover_v2(self, client_updates, key, num_elements, num_clients):
+    def _fast_aggregate_and_recover_v2(self, client_updates, key, num_elements, client_ids):
         """
-        高性能聚合和恢复 v2
+        高性能聚合和恢复 v2（按 data_size 加权）
         
         优化：
         1. 固定 8 字节解码（NumPy 直接读取）
-        2. 向量化份额聚合
+        2. 向量化份额加权聚合
         3. 批量恢复
         """
         prime = self.prime_mod
         
-        # 步骤 1: 解码并向量化聚合
+        # 计算各客户端的 data_size
+        client_data_sizes = [self.server.clients[cid].data_size for cid in client_ids]
+        total_data_size = sum(client_data_sizes)
+        
+        if total_data_size == 0:
+            total_data_size = len(client_ids)  # 回退到简单平均
+            client_data_sizes = [1] * len(client_ids)
+        
+        # 步骤 1: 解码并加权聚合份额
         summed_shares = []
         
         for party_idx in range(self.shamir_k):
-            # 收集所有客户端的份额
-            client_shares = []
-            for client_param_set in client_updates:
+            # 收集所有客户端的份额并加权
+            weighted_sum = None
+            for client_idx, client_param_set in enumerate(client_updates):
                 shared_array = client_param_set[key]
                 shares = self._decode_shares(shared_array.data[party_idx])
-                client_shares.append(shares)
+                
+                # 在有限域里乘以 data_size 权重
+                weight = client_data_sizes[client_idx]
+                weighted_shares = (shares.astype(np.uint64) * weight) % prime
+                
+                if weighted_sum is None:
+                    weighted_sum = weighted_shares
+                else:
+                    weighted_sum = (weighted_sum + weighted_shares) % prime
             
-            # 向量化聚合
-            summed = aggregate_shares_vectorized(client_shares, prime)
-            summed_shares.append(summed.tolist())
+            summed_shares.append(weighted_sum.tolist())
         
-        # 步骤 2: 批量恢复秘密
+        # 步骤 2: 批量恢复秘密（除以 total_data_size 而不是 num_clients）
         result = fast_batch_recover(
             summed_shares,
             self.shamir_k,
             self.prime_mod,
             self.scaling_factor,
-            num_clients,
+            total_data_size,  # 使用 total_data_size 进行加权平均
             chunk_size=50000
         )
         
@@ -158,17 +172,23 @@ class MpcAggregationStrategy(AggregationStrategy):
             return federation_pb2.ServerUpdate(code=500, message=f"服务器错误: {str(e)}")
 
     def aggregate_parameters(self, round_num):
-        """聚合指定轮次的客户端模型参数份额"""
-        logger.info(f"[Round {round_num+1}] 开始MPC参数聚合（向量化 v2）...")
+        """聚合指定轮次的客户端模型参数份额（按 data_size 加权）"""
+        logger.info(f"[Round {round_num+1}] 开始MPC参数聚合（向量化 v2，加权）...")
         total_start = time.time()
         
+        client_ids = list(self.server.client_parameters[round_num].keys())
         client_updates = list(self.server.client_parameters[round_num].values())
         if not client_updates:
             return self.server.global_model.get_parameters()
 
+        # 记录权重信息
+        total_data_size = sum(self.server.clients[cid].data_size for cid in client_ids)
+        client_weights = {cid: self.server.clients[cid].data_size / total_data_size 
+                         for cid in client_ids} if total_data_size > 0 else {cid: 1.0/len(client_ids) for cid in client_ids}
+        logger.info(f"[Round {round_num+1}] 客户端权重: {dict((k, f'{v:.4f}') for k, v in client_weights.items())}")
+
         aggregated_params = {}
         param_structure = client_updates[0]
-        num_clients = len(client_updates)
 
         total_elements = sum(int(np.prod(param_structure[key].shape)) for key in param_structure.keys())
         processed_elements = 0
@@ -178,9 +198,9 @@ class MpcAggregationStrategy(AggregationStrategy):
             shape = list(param_structure[key].shape)
             num_elements = int(np.prod(shape))
             
-            # 使用优化的 v2 聚合
+            # 使用优化的 v2 聚合（传递 client_ids 用于加权）
             result = self._fast_aggregate_and_recover_v2(
-                client_updates, key, num_elements, num_clients
+                client_updates, key, num_elements, client_ids
             )
             
             # 验证结果有效性

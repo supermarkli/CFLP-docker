@@ -183,7 +183,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             response = federation_pb2.TrainingStatusResponse(
                 code=code,
                 message=message,
-                registered_clients=self.count,
+                registered_clients=len(self.clients),  # 返回真实注册数
                 total_clients=expected,
                 submitted_clients=submitted
             )

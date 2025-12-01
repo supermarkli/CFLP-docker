@@ -38,8 +38,6 @@ training:
 
 # 仅在 privacy_mode = "he" 时生效
 encryption:
-  key_size: 2048 # Paillier 密钥长度 (bits)
-  scaling_factor: 1000000 # HE加密时，浮点数转定点数的缩放因子
   # CKKS 同态加密参数 (TenSEAL)
   poly_modulus_degree: 8192 # 多项式模次数，必须是 2 的幂 (4096, 8192, 16384, 32768)
   coeff_mod_bit_sizes: [60, 40, 40, 60] # 系数模的位大小，影响安全性和精度
