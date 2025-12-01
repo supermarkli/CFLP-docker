@@ -15,7 +15,7 @@ federation:
   # "tee"  - 使用TDX（可信执行环境）在服务器端保护明文聚合。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
   # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
-  privacy_mode: "mpc" # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "he" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 10000
   convergence:
@@ -39,8 +39,15 @@ training:
 # 仅在 privacy_mode = "he" 时生效
 encryption:
   key_size: 2048 # Paillier 密钥长度 (bits)
-  chunk_size: 50000 # HE加密时，每批处理的元素数量
   scaling_factor: 1000000 # HE加密时，浮点数转定点数的缩放因子
+  # CKKS 同态加密参数 (TenSEAL)
+  poly_modulus_degree: 8192 # 多项式模次数，必须是 2 的幂 (4096, 8192, 16384, 32768)
+  coeff_mod_bit_sizes: [60, 40, 40, 60] # 系数模的位大小，影响安全性和精度
+  global_scale: 1099511627776.0 # 全局缩放因子 (2^40)，用于浮点数精度
+  # chunk_size: CKKS 每个密文打包的最大元素数
+  # 限制: chunk_size <= poly_modulus_degree / 2
+  # 例如: poly_modulus_degree=8192 时，chunk_size 最大为 4096
+  chunk_size: 4096 # CKKS slots 数量，设置为 poly_modulus_degree / 2 以最大化 SIMD 效率
 
 mpc:
   shamir_k: 3 # 恢复秘密需要的最小份额数

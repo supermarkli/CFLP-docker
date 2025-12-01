@@ -1,7 +1,10 @@
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import numpy as np
 from collections import defaultdict
 import grpc
+import zlib
+import time
 from .base_aggregation_strategy import AggregationStrategy
 from src.grpc.generated import federation_pb2
 from src.utils.config_utils import config
@@ -9,6 +12,12 @@ from src.utils.parameter_utils import serialize_parameters
 from src.utils.logging_config import get_logger
 
 logger = get_logger()
+
+# 聚合时的并行线程数
+AGGREGATION_WORKERS = 4
+
+# 压缩配置 (需要与客户端保持一致)
+ENABLE_COMPRESSION = True
 
 
 class HeAggregationStrategy(AggregationStrategy):
@@ -32,7 +41,21 @@ class HeAggregationStrategy(AggregationStrategy):
         poly_mod_degree = config['encryption']['poly_modulus_degree']
         coeff_mod_bit_sizes = config['encryption']['coeff_mod_bit_sizes']
         global_scale = config['encryption']['global_scale']
-        self.n_slots = config['encryption']['chunk_size']
+        
+        # 计算 CKKS 最大 slots 并校正 chunk_size
+        max_slots = poly_mod_degree // 2
+        configured_chunk_size = config['encryption']['chunk_size']
+        
+        if configured_chunk_size > max_slots:
+            logger.warning(
+                f"⚠️  配置错误: chunk_size ({configured_chunk_size}) 超过 CKKS 最大容量!\n"
+                f"   CKKS slots 限制: poly_modulus_degree / 2 = {poly_mod_degree} / 2 = {max_slots}\n"
+                f"   自动校正 chunk_size: {configured_chunk_size} → {max_slots}\n"
+                f"   请修改 default.yaml 中的 chunk_size 配置以消除此警告。"
+            )
+            self.n_slots = max_slots
+        else:
+            self.n_slots = configured_chunk_size
         
         # 创建 CKKS 上下文 (包含公钥和私钥)
         self.context = ts.context(
@@ -47,8 +70,24 @@ class HeAggregationStrategy(AggregationStrategy):
         self.public_context = self.context.copy()
         self.public_context.make_context_public()  # 移除私钥
         
-        logger.info(f"CKKS上下文生成完毕 (poly_modulus_degree={poly_mod_degree}, "
-                   f"slots={self.n_slots})。")
+        logger.info(f"CKKS上下文生成完毕: poly_mod={poly_mod_degree}, "
+                   f"slots={self.n_slots}/{max_slots}, 压缩={'启用' if ENABLE_COMPRESSION else '禁用'}")
+
+    def _decompress(self, data: bytes) -> bytes:
+        """解压数据 (自动检测是否压缩)"""
+        if not ENABLE_COMPRESSION:
+            return data
+        try:
+            # zlib 压缩的数据以特定的魔数开头
+            return zlib.decompress(data)
+        except zlib.error:
+            # 如果解压失败，假设数据未压缩
+            return data
+    
+    def _decompress_and_deserialize(self, compressed_bytes: bytes):
+        """解压并反序列化 CKKS 向量"""
+        decompressed = self._decompress(compressed_bytes)
+        return self.ts.ckks_vector_from(self.context, decompressed)
 
     def prepare_setup_response(self, request):
         """向客户端发送公钥上下文。"""
@@ -107,6 +146,9 @@ class HeAggregationStrategy(AggregationStrategy):
     def aggregate_stream(self, request_iterator, context):
         """处理来自客户端的加密参数流。"""
         client_id, round_num = None, None
+        start_time = time.time()
+        total_bytes_received = 0
+        layers_received = 0
         
         # 用于缓存每一层的所有 CKKS 密文块
         layer_cache = defaultdict(list)
@@ -128,12 +170,11 @@ class HeAggregationStrategy(AggregationStrategy):
                     
                     logger.info(f"[Round {round_num+1}] 开始接收来自客户端 {client_id} 的CKKS流式更新...")
                     
-                    # 处理第一个块中的指标 (所有指标打包在一个 CKKS 向量中)
-                    metrics_bytes = chunk.metrics.test_acc  # 整个向量存储在 test_acc 字段
+                    # 处理第一个块中的指标 (解压并反序列化)
+                    metrics_bytes = chunk.metrics.test_acc
                     if metrics_bytes:
-                        encrypted_metrics_vector = self.ts.ckks_vector_from(
-                            self.context, metrics_bytes
-                        )
+                        total_bytes_received += len(metrics_bytes)
+                        encrypted_metrics_vector = self._decompress_and_deserialize(metrics_bytes)
                         with self.server.lock:
                             self.server.clients[client_id].encrypted_metrics = encrypted_metrics_vector
                     continue
@@ -141,9 +182,10 @@ class HeAggregationStrategy(AggregationStrategy):
                 # --- 累积参数块数据 ---
                 layer_name = chunk.layer_name
                 for key, enc_array in chunk.parameters_chunk.items():
-                    # 每个 data 元素是一个序列化的 CKKS 向量
-                    for serialized_vec in enc_array.data:
-                        ckks_vector = self.ts.ckks_vector_from(self.context, serialized_vec)
+                    for compressed_vec in enc_array.data:
+                        total_bytes_received += len(compressed_vec)
+                        # 解压并反序列化
+                        ckks_vector = self._decompress_and_deserialize(compressed_vec)
                         layer_cache[layer_name].append(ckks_vector)
                     
                     if enc_array.shape:
@@ -151,14 +193,17 @@ class HeAggregationStrategy(AggregationStrategy):
                 
                 # --- 如果当前层的所有块都已接收完毕 ---
                 if chunk.is_last_chunk_for_layer:
-                    logger.info(f"[Round {round_num+1}] 客户端 {client_id} 的层 {layer_name} "
-                               f"数据接收完毕 ({len(layer_cache[layer_name])} 个CKKS密文)。")
+                    layers_received += 1
+                    num_vectors = len(layer_cache[layer_name])
+                    logger.debug(f"[Round {round_num+1}] 客户端 {client_id}: 层 {layer_name} "
+                                f"接收完毕 ({num_vectors} 个密文)")
                     
                     # 存储该层的所有 CKKS 向量和形状
+                    shape = layer_shapes.get(layer_name, [1])
                     reconstructed_layer = {
                         layer_name: {
                             'vectors': layer_cache[layer_name],
-                            'shape': layer_shapes[layer_name]
+                            'shape': shape
                         }
                     }
 
@@ -172,9 +217,11 @@ class HeAggregationStrategy(AggregationStrategy):
                     if layer_name in layer_shapes:
                         del layer_shapes[layer_name]
 
-            # --- 流处理结束，检查是否所有客户端都已提交 ---
+            # --- 流处理结束 ---
+            elapsed = time.time() - start_time
             with self.server.lock:
-                logger.info(f"[Round {round_num+1}] 已成功处理客户端 {client_id} 的所有CKKS流式数据。")
+                logger.info(f"[Round {round_num+1}] 客户端 {client_id} 数据接收完成: "
+                           f"{layers_received} 层, {total_bytes_received/1024:.1f}KB, {elapsed:.2f}s")
                 self.server.completed_clients[round_num].add(client_id)
                 
                 completed_clients_count = len(self.server.completed_clients[round_num])
@@ -198,23 +245,24 @@ class HeAggregationStrategy(AggregationStrategy):
             return federation_pb2.ServerUpdate(code=500, message=f"服务器错误: {str(e)}")
 
     def _process_encrypted_update(self, payload):
-        """反序列化非流式的 CKKS 加密更新。"""
+        """反序列化非流式的 CKKS 加密更新 (支持压缩数据)。"""
         params = {}
         
         for key, enc_array in payload.parameters_and_metrics.parameters.parameters.items():
             vectors = [
-                self.ts.ckks_vector_from(self.context, b) 
+                self._decompress_and_deserialize(b) 
                 for b in enc_array.data
             ]
+            shape = list(enc_array.shape) if enc_array.shape else [1]
             params[key] = {
                 'vectors': vectors,
-                'shape': list(enc_array.shape)
+                'shape': shape
             }
         
-        # 反序列化指标 (所有指标打包在 test_acc 字段中)
+        # 反序列化指标 (解压并反序列化)
         metrics_bytes = payload.parameters_and_metrics.metrics.test_acc
         if metrics_bytes:
-            metrics_vector = self.ts.ckks_vector_from(self.context, metrics_bytes)
+            metrics_vector = self._decompress_and_deserialize(metrics_bytes)
         else:
             metrics_vector = None
             
@@ -225,7 +273,9 @@ class HeAggregationStrategy(AggregationStrategy):
         在 CKKS 密文上聚合客户端参数，然后解密。
         
         CKKS 的优势: 密文加法直接对应明文加法，可以高效地进行 FedAvg。
+        使用多线程并行聚合不同的参数层以提高性能。
         """
+        start_time = time.time()
         logger.info(f"[Round {round_num+1}] 开始CKKS密文聚合...")
         
         client_ids = list(self.server.client_parameters[round_num].keys())
@@ -236,19 +286,20 @@ class HeAggregationStrategy(AggregationStrategy):
         
         # 获取第一个客户端的参数结构
         first_client_params = self.server.client_parameters[round_num][client_ids[0]]
+        layer_keys = list(first_client_params.keys())
         
-        aggregated_params = {}
+        logger.info(f"[Round {round_num+1}] 聚合 {len(layer_keys)} 个参数层, "
+                   f"来自 {num_clients} 个客户端")
         
-        for key in first_client_params.keys():
-            logger.info(f"聚合参数层: {key}")
-            
+        def aggregate_single_layer(key):
+            """聚合单个参数层 (可并行执行)"""
             # 获取该层的所有客户端的 CKKS 向量列表
             all_client_vectors = [
                 self.server.client_parameters[round_num][cid][key]['vectors']
                 for cid in client_ids
             ]
             shape = first_client_params[key]['shape']
-            num_vectors = len(all_client_vectors[0])  # 每个客户端的向量块数
+            num_vectors = len(all_client_vectors[0])
             
             # 在密文空间聚合 (CKKS 支持密文加法)
             aggregated_vectors = []
@@ -270,13 +321,30 @@ class HeAggregationStrategy(AggregationStrategy):
                 decrypted_flat.extend(vec.decrypt())
             
             # 截断到原始大小并重塑形状
-            total_elements = np.prod(shape)
+            total_elements = int(np.prod(shape))
             decrypted_array = np.array(decrypted_flat[:total_elements]).reshape(shape)
-            aggregated_params[key] = decrypted_array
             
-            logger.debug(f"层 {key} 聚合完成, 形状: {shape}")
+            return key, decrypted_array
+        
+        aggregated_params = {}
+        
+        # 使用线程池并行聚合不同层
+        # 注意：TenSEAL 的某些操作可能有 GIL 限制，但解密操作通常是 CPU 密集型的
+        with ThreadPoolExecutor(max_workers=AGGREGATION_WORKERS) as executor:
+            futures = {executor.submit(aggregate_single_layer, key): key for key in layer_keys}
+            
+            completed = 0
+            for future in as_completed(futures):
+                key, decrypted_array = future.result()
+                aggregated_params[key] = decrypted_array
+                completed += 1
+                
+                # 每完成 10 层或全部完成时输出进度
+                if completed % 10 == 0 or completed == len(layer_keys):
+                    logger.debug(f"[Round {round_num+1}] 聚合进度: {completed}/{len(layer_keys)} 层")
 
-        logger.info(f"[Round {round_num+1}] CKKS密文参数聚合与解密完成。")
+        elapsed = time.time() - start_time
+        logger.info(f"[Round {round_num+1}] CKKS密文聚合完成: {len(layer_keys)} 层, 耗时: {elapsed:.2f}s")
         return aggregated_params
         
     def evaluate_metrics(self, round_num):
