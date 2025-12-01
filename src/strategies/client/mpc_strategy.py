@@ -6,7 +6,11 @@ from .base_strategy import ClientStrategy
 from src.grpc.generated import federation_pb2
 from src.utils.config_utils import config
 from src.utils.logging_config import get_logger
-from src.utils.fast_shamir import fast_batch_share, vectorized_secret_to_shares
+from src.utils.fast_shamir import (
+    fast_batch_share, 
+    fast_batch_share_variable,
+    vectorized_secret_to_shares
+)
 import numpy as np
 import gc
 import time
@@ -23,17 +27,19 @@ class MpcClientStrategy(ClientStrategy):
         self.chunk_size = int(config['mpc'].get('chunk_size', 50000))
         self.prime_mod = int(config['mpc']['prime_mod'])
         
+        # 使用固定 8 字节编码（适用于 prime < 2^64）
+        self.use_fixed_encoding = self.prime_mod < (1 << 64)
+        
         logger.info(
             f"客户端 {self.client.client_id} 的 MPC 策略已初始化 "
-            f"(k={self.shamir_k}, n={self.shamir_n}, chunk_size={self.chunk_size})，"
-            f"使用高性能向量化 Shamir 实现。"
+            f"(k={self.shamir_k}, n={self.shamir_n}, chunk_size={self.chunk_size}, "
+            f"encoding={'fixed-8byte' if self.use_fixed_encoding else 'variable'})。"
         )
 
     def _share_scalar_binary(self, value):
-        """为标量值生成二进制编码的秘密共享"""
+        """为标量值生成二进制编码的秘密共享（变长格式，用于 metrics）"""
         integer_value = int(value * self.scaling_factor)
         
-        # 使用向量化版本（对单个元素）
         shares = vectorized_secret_to_shares(
             np.array([integer_value]), 
             self.shamir_k, 
@@ -41,7 +47,7 @@ class MpcClientStrategy(ClientStrategy):
             self.prime_mod
         )
         
-        # 编码为二进制（每个参与方一个 y 值）
+        # 变长编码（metrics 数据量小，保持兼容性）
         byte_parts = []
         for party_idx in range(self.shamir_n):
             y_val = int(shares[party_idx][0])
@@ -55,9 +61,9 @@ class MpcClientStrategy(ClientStrategy):
         return b''.join(byte_parts)
 
     def prepare_update_request(self, current_round, model_parameters, metrics):
-        """创建参数更新消息（MPC份额）- 高性能版本"""
+        """创建参数更新消息（MPC份额）- 高性能版本 v2"""
         total_start = time.time()
-        logger.info("MPC策略: 开始创建秘密共享（高性能向量化版本）...")
+        logger.info(f"MPC策略: 开始创建秘密共享（v2, {'固定8字节' if self.use_fixed_encoding else '变长'}编码）...")
         
         shared_parameters = {}
         
@@ -70,13 +76,16 @@ class MpcClientStrategy(ClientStrategy):
         
         processed_count = 0
         
+        # 选择编码函数
+        share_func = fast_batch_share if self.use_fixed_encoding else fast_batch_share_variable
+        
         for key, value in model_parameters.items():
             if isinstance(value, np.ndarray):
                 layer_start = time.time()
                 num_elements = int(np.prod(value.shape))
                 
                 # 使用高性能批量共享
-                encoded_shares = fast_batch_share(
+                encoded_shares = share_func(
                     value,
                     self.shamir_k,
                     self.shamir_n,
@@ -95,9 +104,11 @@ class MpcClientStrategy(ClientStrategy):
                 
                 if num_elements > 10000:
                     speed = num_elements / layer_time if layer_time > 0 else 0
+                    data_size = sum(len(d) for d in encoded_shares) / 1024 / 1024
                     logger.info(
                         f"参数 {key} ({num_elements:,} 元素) 完成，"
                         f"耗时 {layer_time:.2f}s，速度 {speed:.0f} 元素/秒，"
+                        f"数据量 {data_size:.2f} MB，"
                         f"进度: {processed_count:,}/{total_params:,} ({100*processed_count/total_params:.1f}%)"
                     )
             else:
@@ -109,20 +120,30 @@ class MpcClientStrategy(ClientStrategy):
                     self.prime_mod
                 )
                 
-                byte_parts = []
-                for party_idx in range(self.shamir_n):
-                    y_val = int(shares[party_idx][0])
-                    y_bytes = y_val.to_bytes(
-                        max(1, (y_val.bit_length() + 7) // 8),
-                        byteorder='big',
-                        signed=False
-                    )
-                    byte_parts.append(len(y_bytes).to_bytes(2, 'big') + y_bytes)
-                
-                shared_parameters[key] = {
-                    'data': [b''.join(byte_parts)],  # 单元素
-                    'shape': [1]
-                }
+                if self.use_fixed_encoding:
+                    # 固定 8 字节编码
+                    byte_data = np.array([int(shares[party_idx][0]) for party_idx in range(self.shamir_n)], 
+                                        dtype='>u8').tobytes()
+                    shared_parameters[key] = {
+                        'data': [byte_data],
+                        'shape': [1]
+                    }
+                else:
+                    # 变长编码
+                    byte_parts = []
+                    for party_idx in range(self.shamir_n):
+                        y_val = int(shares[party_idx][0])
+                        y_bytes = y_val.to_bytes(
+                            max(1, (y_val.bit_length() + 7) // 8),
+                            byteorder='big',
+                            signed=False
+                        )
+                        byte_parts.append(len(y_bytes).to_bytes(2, 'big') + y_bytes)
+                    
+                    shared_parameters[key] = {
+                        'data': [b''.join(byte_parts)],
+                        'shape': [1]
+                    }
                 processed_count += 1
         
         # 转换为 Protobuf 格式
@@ -132,7 +153,7 @@ class MpcClientStrategy(ClientStrategy):
         }
         shared_model_params = federation_pb2.SharedModelParameters(parameters=proto_params)
 
-        # --- 对训练指标进行秘密共享 ---
+        # --- 对训练指标进行秘密共享（始终使用变长编码）---
         metrics_to_share = metrics.copy()
         
         if 'test_num' in metrics_to_share:
@@ -161,6 +182,12 @@ class MpcClientStrategy(ClientStrategy):
             )
         )
         
+        # 计算总数据量
+        total_data_size = sum(
+            sum(len(d) for d in v['data']) 
+            for v in shared_parameters.values()
+        )
+        
         # 清理内存
         del shared_parameters
         gc.collect()
@@ -169,7 +196,8 @@ class MpcClientStrategy(ClientStrategy):
         speed = total_params / total_time if total_time > 0 else 0
         logger.info(
             f"MPC策略: 秘密共享完成，总耗时 {total_time:.2f}s，"
-            f"平均速度 {speed:.0f} 元素/秒"
+            f"平均速度 {speed:.0f} 元素/秒，"
+            f"总数据量 {total_data_size / 1024 / 1024:.2f} MB"
         )
 
         return federation_pb2.ClientUpdate(

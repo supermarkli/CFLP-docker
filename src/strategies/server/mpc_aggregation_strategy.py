@@ -6,7 +6,14 @@ from src.grpc.generated import federation_pb2
 from src.utils.config_utils import config
 from src.utils.logging_config import get_logger
 from src.utils.parameter_utils import serialize_parameters
-from src.utils.fast_shamir import fast_batch_recover, vectorized_shares_to_secret, _mod_inverse
+from src.utils.fast_shamir import (
+    fast_batch_recover, 
+    vectorized_shares_to_secret, 
+    _mod_inverse,
+    decode_fixed_shares,
+    decode_variable_shares,
+    aggregate_shares_vectorized
+)
 import time
 
 logger = get_logger()
@@ -15,12 +22,15 @@ logger = get_logger()
 class MpcAggregationStrategy(AggregationStrategy):
     def __init__(self, server_instance):
         super().__init__(server_instance)
-        logger.info("MPC 聚合策略已初始化（高性能多进程版本）。")
+        logger.info("MPC 聚合策略已初始化（高性能向量化版本 v2）。")
         self.shamir_k = int(config['mpc']['shamir_k'])
         self.shamir_n = int(config['mpc']['shamir_n'])
         self.scaling_factor = int(config['mpc']['scaling_factor'])
         self.prime_mod = int(config['mpc']['prime_mod'])
         self.prime_mod_half = self.prime_mod // 2
+        
+        # 检测编码格式（固定 8 字节 vs 变长）
+        self.use_fixed_encoding = self.prime_mod < (1 << 64)
         
         # 预计算拉格朗日系数
         self._precompute_lagrange_coeffs()
@@ -53,67 +63,48 @@ class MpcAggregationStrategy(AggregationStrategy):
             return n - self.prime_mod
         return n
 
-    def _decode_binary_shares(self, data_bytes):
-        """解码二进制格式的份额数据"""
-        y_values = []
-        offset = 0
-        data_len = len(data_bytes)
-        while offset < data_len:
-            length = int.from_bytes(data_bytes[offset:offset + 2], 'big')
-            offset += 2
-            y_bytes = data_bytes[offset:offset + length]
-            y_val = int.from_bytes(y_bytes, byteorder='big', signed=False)
-            y_values.append(y_val)
-            offset += length
-        return y_values
+    def _decode_shares(self, data_bytes):
+        """根据格式解码份额"""
+        if self.use_fixed_encoding:
+            return decode_fixed_shares(data_bytes)
+        else:
+            return decode_variable_shares(data_bytes)
 
-    def _fast_aggregate_and_recover(self, client_updates, key, num_elements, num_clients):
+    def _fast_aggregate_and_recover_v2(self, client_updates, key, num_elements, num_clients):
         """
-        快速聚合和恢复参数
+        高性能聚合和恢复 v2
         
         优化：
-        1. 边解码边聚合，减少内存占用
-        2. 使用预计算的拉格朗日系数
-        3. 批量处理恢复
+        1. 固定 8 字节解码（NumPy 直接读取）
+        2. 向量化份额聚合
+        3. 批量恢复
         """
         prime = self.prime_mod
         
-        # 步骤 1: 解码并聚合份额
-        # summed_y[party_idx] = list of summed y values
-        summed_y_by_party = [None] * self.shamir_k  # 只需要 k 个份额
+        # 步骤 1: 解码并向量化聚合
+        summed_shares = []
         
         for party_idx in range(self.shamir_k):
-            # 初始化为零
-            summed_y = [0] * num_elements
-            
-            # 累加所有客户端的份额
+            # 收集所有客户端的份额
+            client_shares = []
             for client_param_set in client_updates:
                 shared_array = client_param_set[key]
-                y_values = self._decode_binary_shares(shared_array.data[party_idx])
-                
-                for elem_idx in range(num_elements):
-                    summed_y[elem_idx] = (summed_y[elem_idx] + y_values[elem_idx]) % prime
+                shares = self._decode_shares(shared_array.data[party_idx])
+                client_shares.append(shares)
             
-            summed_y_by_party[party_idx] = summed_y
+            # 向量化聚合
+            summed = aggregate_shares_vectorized(client_shares, prime)
+            summed_shares.append(summed.tolist())
         
         # 步骤 2: 批量恢复秘密
         result = fast_batch_recover(
-            summed_y_by_party,
+            summed_shares,
             self.shamir_k,
             self.prime_mod,
             self.scaling_factor,
             num_clients,
             chunk_size=50000
         )
-        
-        # 调试：检查恢复结果的统计信息
-        if num_elements > 10000:
-            result_arr = np.array(result)
-            logger.debug(
-                f"参数 {key} 恢复统计: min={result_arr.min():.6f}, max={result_arr.max():.6f}, "
-                f"mean={result_arr.mean():.6f}, std={result_arr.std():.6f}, "
-                f"nan_count={np.isnan(result_arr).sum()}, inf_count={np.isinf(result_arr).sum()}"
-            )
         
         return result
 
@@ -168,7 +159,7 @@ class MpcAggregationStrategy(AggregationStrategy):
 
     def aggregate_parameters(self, round_num):
         """聚合指定轮次的客户端模型参数份额"""
-        logger.info(f"[Round {round_num+1}] 开始MPC参数聚合（多进程并行版本）...")
+        logger.info(f"[Round {round_num+1}] 开始MPC参数聚合（向量化 v2）...")
         total_start = time.time()
         
         client_updates = list(self.server.client_parameters[round_num].values())
@@ -187,8 +178,8 @@ class MpcAggregationStrategy(AggregationStrategy):
             shape = list(param_structure[key].shape)
             num_elements = int(np.prod(shape))
             
-            # 使用优化的聚合和恢复
-            result = self._fast_aggregate_and_recover(
+            # 使用优化的 v2 聚合
+            result = self._fast_aggregate_and_recover_v2(
                 client_updates, key, num_elements, num_clients
             )
             
@@ -197,7 +188,6 @@ class MpcAggregationStrategy(AggregationStrategy):
                 nan_count = np.isnan(result).sum()
                 inf_count = np.isinf(result).sum()
                 logger.error(f"参数 {key} 恢复后包含无效值: NaN={nan_count}, Inf={inf_count}")
-                # 用零替换无效值（临时修复）
                 result = np.nan_to_num(result, nan=0.0, posinf=0.0, neginf=0.0)
             
             aggregated_params[key] = result.reshape(shape)
@@ -237,7 +227,7 @@ class MpcAggregationStrategy(AggregationStrategy):
                 for key in sm.DESCRIPTOR.fields_by_name:
                     shares_bytes = getattr(sm, key)
                     if shares_bytes:
-                        y_values = self._decode_binary_shares(shares_bytes)
+                        y_values = decode_variable_shares(shares_bytes)
                         metrics_shares[key].append(y_values)
         
         decrypted_metrics = {}

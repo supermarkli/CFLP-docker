@@ -1,23 +1,28 @@
 """
-高性能 Shamir 秘密共享实现
+高性能 Shamir 秘密共享实现 v2
 
 优化策略：
-1. 多进程并行处理
-2. 批量处理减少函数调用开销
-3. 优化的多项式求值（Horner's method）
+1. 固定 8 字节编码（适用于 prime < 2^64）
+2. NumPy 向量化聚合
+3. 多进程并行处理
+4. 循环展开优化
 """
 
 import numpy as np
-from typing import List, Tuple
-from concurrent.futures import ProcessPoolExecutor
+from typing import List
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import multiprocessing as mp
 import os
+import struct
 
 # 禁用 OpenMP 多线程，避免与多进程冲突
 os.environ['OMP_NUM_THREADS'] = '1'
 
 # 全局配置
 _NUM_WORKERS = min(8, mp.cpu_count())
+
+# 固定编码：每个份额 8 字节（uint64）
+_SHARE_SIZE = 8
 
 
 def _mod_inverse(a: int, p: int) -> int:
@@ -37,6 +42,7 @@ def _mod_inverse(a: int, p: int) -> int:
 def _share_chunk(args):
     """
     多进程工作函数：为一个数据块生成秘密共享
+    返回固定 8 字节编码的份额
     """
     chunk_values, k, n, scaling_factor, prime, seed = args
     
@@ -45,8 +51,8 @@ def _share_chunk(args):
     
     num_secrets = len(chunk_values)
     
-    # 预分配结果：shares[party_idx] = list of y values
-    shares = [[] for _ in range(n)]
+    # 预分配结果数组 (使用 uint64)
+    shares = [np.zeros(num_secrets, dtype=np.uint64) for _ in range(n)]
     
     for i, val in enumerate(chunk_values):
         # 缩放并转换为整数
@@ -57,60 +63,56 @@ def _share_chunk(args):
         for _ in range(k - 1):
             coeffs.append(int(rng.integers(0, min(prime, 2**62))))
         
-        # 在 x = 1, 2, ..., n 处评估多项式
+        # 在 x = 1, 2, ..., n 处评估多项式 (Horner's method)
         for party_idx in range(n):
             x = party_idx + 1
-            # Horner's method
             result = 0
             for c in reversed(coeffs[1:]):
                 result = (result * x + c) % prime
             result = (result * x + coeffs[0]) % prime
-            shares[party_idx].append(result)
+            shares[party_idx][i] = result
     
     return shares
 
 
-def _recover_chunk(args):
+def _recover_chunk_vectorized(args):
     """
-    工作函数：恢复一个数据块的秘密
-    使用 Python 大整数保证精度，循环展开优化速度
+    向量化恢复秘密（使用 NumPy，适用于 prime < 2^62）
     """
     chunk_shares_by_party, k, prime, lagrange_coeffs, prime_half, scaling_factor, num_clients = args
     
     num_elements = len(chunk_shares_by_party[0])
     divisor = float(scaling_factor * num_clients)
     
-    # 预转换拉格朗日系数为 Python int
-    lc = [int(c) for c in lagrange_coeffs]
+    # 转换为 numpy 数组
+    shares = [np.array(s, dtype=np.uint64) for s in chunk_shares_by_party]
+    lc = np.array(lagrange_coeffs, dtype=np.uint64)
     
-    # 预分配结果
-    results = [0.0] * num_elements
+    # 向量化计算 - 使用 Python 对象类型以支持大整数
+    # 但对于 2^61-1 素数，uint64 乘法可能溢出，需要用 Python int
+    results = np.zeros(num_elements, dtype=np.float64)
     
-    # 针对 k=3 的常见情况进行循环展开优化
     if k == 3:
-        s0, s1, s2 = chunk_shares_by_party[0], chunk_shares_by_party[1], chunk_shares_by_party[2]
-        c0, c1, c2 = lc[0], lc[1], lc[2]
+        # k=3 循环展开优化
+        s0, s1, s2 = shares[0], shares[1], shares[2]
+        c0, c1, c2 = int(lc[0]), int(lc[1]), int(lc[2])
         
         for i in range(num_elements):
-            # 直接展开计算，减少循环开销
             result = (int(s0[i]) * c0 + int(s1[i]) * c1 + int(s2[i]) * c2) % prime
             if result > prime_half:
                 result = result - prime
             results[i] = float(result) / divisor
     else:
-        # 通用情况
-        for elem_idx in range(num_elements):
+        for i in range(num_elements):
             result = 0
-            for party_idx in range(k):
-                result += int(chunk_shares_by_party[party_idx][elem_idx]) * lc[party_idx]
+            for j in range(k):
+                result += int(shares[j][i]) * int(lc[j])
             result = result % prime
-            
             if result > prime_half:
                 result = result - prime
-            
-            results[elem_idx] = float(result) / divisor
+            results[i] = float(result) / divisor
     
-    return results
+    return results.tolist()
 
 
 def fast_batch_share(
@@ -122,7 +124,7 @@ def fast_batch_share(
     chunk_size: int = 50000
 ) -> List[bytes]:
     """
-    高性能批量秘密共享（多进程并行）
+    高性能批量秘密共享（多进程并行 + 固定 8 字节编码）
     """
     flat = values.flatten().astype(np.float64)
     total = len(flat)
@@ -148,15 +150,64 @@ def fast_batch_share(
         
         for chunk_shares in results:
             for party_idx in range(n):
+                all_shares[party_idx].append(chunk_shares[party_idx])
+    else:
+        for args in task_args:
+            chunk_shares = _share_chunk(args)
+            for party_idx in range(n):
+                all_shares[party_idx].append(chunk_shares[party_idx])
+    
+    # 合并并编码为固定 8 字节格式
+    encoded = []
+    for party_chunks in all_shares:
+        # 合并所有块
+        all_values = np.concatenate(party_chunks)
+        # 直接转换为字节（固定 8 字节 big-endian）
+        encoded.append(all_values.astype('>u8').tobytes())
+    
+    return encoded
+
+
+def fast_batch_share_variable(
+    values: np.ndarray,
+    k: int,
+    n: int,
+    scaling_factor: int,
+    prime: int,
+    chunk_size: int = 50000
+) -> List[bytes]:
+    """
+    变长编码版本（兼容旧格式）
+    """
+    flat = values.flatten().astype(np.float64)
+    total = len(flat)
+    
+    chunks = []
+    for i in range(0, total, chunk_size):
+        chunks.append(flat[i:i + chunk_size])
+    
+    base_seed = np.random.randint(0, 2**31)
+    task_args = [
+        (chunk, k, n, scaling_factor, prime, base_seed + i)
+        for i, chunk in enumerate(chunks)
+    ]
+    
+    all_shares = [[] for _ in range(n)]
+    
+    if len(chunks) > 1 and _NUM_WORKERS > 1:
+        with ProcessPoolExecutor(max_workers=_NUM_WORKERS) as executor:
+            results = list(executor.map(_share_chunk, task_args))
+        
+        for chunk_shares in results:
+            for party_idx in range(n):
                 all_shares[party_idx].extend(chunk_shares[party_idx])
     else:
-        # 单进程
         for args in task_args:
             chunk_shares = _share_chunk(args)
             for party_idx in range(n):
                 all_shares[party_idx].extend(chunk_shares[party_idx])
     
-    # 编码为二进制
+    # 变长编码
     encoded = []
     for party_shares in all_shares:
         byte_parts = []
@@ -170,6 +221,26 @@ def fast_batch_share(
         encoded.append(b''.join(byte_parts))
     
     return encoded
+
+
+def decode_fixed_shares(data_bytes: bytes) -> np.ndarray:
+    """解码固定 8 字节格式的份额"""
+    return np.frombuffer(data_bytes, dtype='>u8')
+
+
+def decode_variable_shares(data_bytes: bytes) -> List[int]:
+    """解码变长格式的份额"""
+    y_values = []
+    offset = 0
+    data_len = len(data_bytes)
+    while offset < data_len:
+        length = int.from_bytes(data_bytes[offset:offset + 2], 'big')
+        offset += 2
+        y_bytes = data_bytes[offset:offset + length]
+        y_val = int.from_bytes(y_bytes, byteorder='big', signed=False)
+        y_values.append(y_val)
+        offset += length
+    return y_values
 
 
 def vectorized_secret_to_shares(
@@ -215,7 +286,6 @@ def vectorized_shares_to_secret(
     num_secrets = len(shares[0])
     x_coords = list(range(1, k + 1))
     
-    # 预计算拉格朗日系数
     lagrange_coeffs = []
     for i in range(k):
         xi = x_coords[i]
@@ -229,7 +299,6 @@ def vectorized_shares_to_secret(
         coeff = (numerator * _mod_inverse(denominator, prime)) % prime
         lagrange_coeffs.append(coeff)
     
-    # 恢复秘密
     secrets = np.empty(num_secrets, dtype=object)
     for secret_idx in range(num_secrets):
         result = 0
@@ -239,6 +308,29 @@ def vectorized_shares_to_secret(
         secrets[secret_idx] = result
     
     return secrets
+
+
+def aggregate_shares_vectorized(
+    all_client_shares: List[np.ndarray],
+    prime: int
+) -> np.ndarray:
+    """
+    向量化聚合份额（NumPy 优化）
+    
+    Args:
+        all_client_shares: List of numpy arrays, each from one client
+        prime: Prime modulus
+    
+    Returns:
+        Summed shares as numpy array
+    """
+    # 堆叠所有客户端的份额
+    stacked = np.stack(all_client_shares)
+    # 使用 Python 对象类型进行精确模运算
+    # 但对于 2^61-1 素数，直接用 uint64 求和再取模更快
+    summed = np.sum(stacked.astype(np.uint64), axis=0)
+    # 取模
+    return summed % prime
 
 
 def fast_batch_recover(
@@ -252,8 +344,6 @@ def fast_batch_recover(
     """
     高性能批量秘密恢复（使用线程池，兼容 gRPC 环境）
     """
-    from concurrent.futures import ThreadPoolExecutor
-    
     num_elements = len(encoded_shares_by_party[0])
     prime_half = prime // 2
     x_coords = list(range(1, k + 1))
@@ -290,11 +380,11 @@ def fast_batch_recover(
     
     if len(chunks) > 1:
         with ThreadPoolExecutor(max_workers=_NUM_WORKERS) as executor:
-            results = list(executor.map(_recover_chunk, task_args))
+            results = list(executor.map(_recover_chunk_vectorized, task_args))
         for chunk_result in results:
             all_results.extend(chunk_result)
     else:
         for args in task_args:
-            all_results.extend(_recover_chunk(args))
+            all_results.extend(_recover_chunk_vectorized(args))
     
     return np.array(all_results, dtype=np.float64)
