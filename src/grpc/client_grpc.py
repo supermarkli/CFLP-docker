@@ -9,7 +9,8 @@ import pickle
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, Dataset
+from torchvision import transforms
 from sklearn.preprocessing import label_binarize
 from sklearn import metrics
 from tqdm import tqdm
@@ -43,6 +44,43 @@ np.random.seed(config['base']['random_seed'])
 torch.manual_seed(config['base']['random_seed'])
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(config['base']['random_seed'])
+
+
+class AugmentedDataset(Dataset):
+    """支持数据增强的自定义数据集"""
+    def __init__(self, X, y, transform=None):
+        self.X = torch.tensor(X, dtype=torch.float32)
+        self.y = torch.tensor(y, dtype=torch.long)
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, idx):
+        x = self.X[idx]
+        y = self.y[idx]
+        if self.transform:
+            x = self.transform(x)
+        return x, y
+
+
+def get_train_transform(dataset_name):
+    """根据数据集类型返回训练时的数据增强 transform"""
+    dataset_name = dataset_name.lower()
+    if dataset_name == 'cifar10':
+        # CIFAR10: 32x32 彩色图像，使用随机裁剪和水平翻转
+        return transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+        ])
+    elif dataset_name == 'mnist':
+        # MNIST: 28x28 灰度图像，使用轻度随机裁剪（手写数字不适合水平翻转）
+        return transforms.Compose([
+            transforms.RandomCrop(28, padding=2),
+        ])
+    else:
+        return None
+
 
 class FederatedLearningClient:
     def __init__(self, data=None):
@@ -181,17 +219,18 @@ class FederatedLearningClient:
             X_test = data.get('X_test')
             y_test = data.get('y_test')
             if X_train is not None and y_train is not None:
-                X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
-                y_train_tensor = torch.tensor(y_train, dtype=torch.long)
-                train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+                # 获取训练时的数据增强 transform
+                train_transform = get_train_transform(self.dataset_name)
+                train_dataset = AugmentedDataset(X_train, y_train, transform=train_transform)
                 self.train_data = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=True)
-                self.data_size = len(X_train_tensor)
-                logger.debug(f"数据集划分完成 - 训练集: {X_train_tensor.shape}")
+                self.data_size = len(train_dataset)
+                logger.debug(f"数据集划分完成 - 训练集: {X_train.shape}，数据增强: {train_transform is not None}")
             else:
                 self.train_data = None
                 self.data_size = 0
                 logger.warning("未提供训练集数据")
             if X_test is not None and y_test is not None:
+                # 测试集不使用数据增强
                 X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
                 y_test_tensor = torch.tensor(y_test, dtype=torch.long)
                 test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
