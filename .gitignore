@@ -4,7 +4,7 @@
 # *.csr
 # 可以选择是否忽略证书文件
 # *.crt
-logs/
+# logs/
 out/
 *.npz
 __pycache__/

@@ -1,0 +1,206 @@
+2025-12-01 11:25:33 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_none.log
+2025-12-01 11:25:33 - INFO - [server_grpc.py:69] - 服务器配置: Dataset=cifar10, Model=resnet18
+2025-12-01 11:25:33 - INFO - [server_grpc.py:97] - 服务器初始化完成 (模式: none)，等待 3 个客户端注册...
+2025-12-01 11:25:33 - INFO - [server_grpc.py:388] - 联邦学习安全服务器正在启动，监听端口: 50051
+2025-12-01 11:26:05 - INFO - [server_grpc.py:116] - 接收到客户端 1 的注册请求 (模型: resnet18, 数据量: 16000)
+2025-12-01 11:26:05 - INFO - [server_grpc.py:125] - 客户端 1 注册成功。当前 1/3 个客户端。
+2025-12-01 11:26:05 - INFO - [server_grpc.py:116] - 接收到客户端 2 的注册请求 (模型: resnet18, 数据量: 16000)
+2025-12-01 11:26:05 - INFO - [server_grpc.py:125] - 客户端 2 注册成功。当前 2/3 个客户端。
+2025-12-01 11:26:05 - INFO - [server_grpc.py:116] - 接收到客户端 3 的注册请求 (模型: resnet18, 数据量: 16000)
+2025-12-01 11:26:05 - INFO - [server_grpc.py:125] - 客户端 3 注册成功。当前 3/3 个客户端。
+2025-12-01 11:26:06 - INFO - [server_grpc.py:131] - 所有客户端已注册，设置 next_step=True，准备开始训练。
+2025-12-01 11:26:06 - INFO - [server_grpc.py:134] - 联邦学习流程计时开始
+2025-12-01 11:26:18 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:26:18 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:26:18 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:26:19 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:26:19 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:26:19 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:26:19 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:26:19 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:26:19 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:26:48 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:26:48 - INFO - [none_aggregation_strategy.py:40] - [Round 1] 收到客户端 1 的明文更新。
+2025-12-01 11:26:48 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:26:52 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:26:52 - INFO - [none_aggregation_strategy.py:40] - [Round 1] 收到客户端 3 的明文更新。
+2025-12-01 11:26:52 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:26:56 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:26:56 - INFO - [none_aggregation_strategy.py:40] - [Round 1] 收到客户端 2 的明文更新。
+2025-12-01 11:26:56 - INFO - [server_grpc.py:280] - [Round 1] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:26:56 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:26:56 - INFO - [none_aggregation_strategy.py:82] - [Round 1] 明文参数聚合完成。
+2025-12-01 11:26:56 - INFO - [server_grpc.py:299] - [Round 1] Server Aggregation Resources - CPU Time: 0.0900s, Memory Usage: 875.18 MB
+2025-12-01 11:26:56 - INFO - [server_grpc.py:306] - [Round 1] 全局模型参数更新完成。
+2025-12-01 11:26:56 - INFO - [none_aggregation_strategy.py:111] - [Round 1] 全局评估: Acc=0.6288, AUC=0.9212, Loss=0.4453
+2025-12-01 11:26:56 - INFO - [server_grpc.py:352] - 第 1 轮聚合完成，进入第 2 轮。
+2025-12-01 11:26:56 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:26:56 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:26:56 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:26:56 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:26:56 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:26:56 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:26:56 - INFO - [server_grpc.py:268] - 向客户端 3 提供第1轮全局模型
+2025-12-01 11:26:56 - INFO - [server_grpc.py:268] - 向客户端 2 提供第1轮全局模型
+2025-12-01 11:26:56 - INFO - [server_grpc.py:268] - 向客户端 1 提供第1轮全局模型
+2025-12-01 11:27:40 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:27:40 - INFO - [none_aggregation_strategy.py:40] - [Round 2] 收到客户端 3 的明文更新。
+2025-12-01 11:27:40 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:27:46 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:27:46 - INFO - [none_aggregation_strategy.py:40] - [Round 2] 收到客户端 2 的明文更新。
+2025-12-01 11:27:47 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:27:47 - INFO - [none_aggregation_strategy.py:40] - [Round 2] 收到客户端 1 的明文更新。
+2025-12-01 11:27:47 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:27:47 - INFO - [server_grpc.py:280] - [Round 2] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:27:47 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:27:47 - INFO - [none_aggregation_strategy.py:82] - [Round 2] 明文参数聚合完成。
+2025-12-01 11:27:47 - INFO - [server_grpc.py:299] - [Round 2] Server Aggregation Resources - CPU Time: 0.0600s, Memory Usage: 951.95 MB
+2025-12-01 11:27:47 - INFO - [server_grpc.py:306] - [Round 2] 全局模型参数更新完成。
+2025-12-01 11:27:47 - INFO - [none_aggregation_strategy.py:111] - [Round 2] 全局评估: Acc=0.6613, AUC=0.9361, Loss=0.2240
+2025-12-01 11:27:47 - INFO - [server_grpc.py:352] - 第 2 轮聚合完成，进入第 3 轮。
+2025-12-01 11:27:47 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:27:47 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:27:47 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:27:47 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:27:47 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:27:47 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:27:47 - INFO - [server_grpc.py:268] - 向客户端 1 提供第2轮全局模型
+2025-12-01 11:27:47 - INFO - [server_grpc.py:268] - 向客户端 3 提供第2轮全局模型
+2025-12-01 11:27:47 - INFO - [server_grpc.py:268] - 向客户端 2 提供第2轮全局模型
+2025-12-01 11:28:34 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:28:34 - INFO - [none_aggregation_strategy.py:40] - [Round 3] 收到客户端 3 的明文更新。
+2025-12-01 11:28:34 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:28:38 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:28:38 - INFO - [none_aggregation_strategy.py:40] - [Round 3] 收到客户端 1 的明文更新。
+2025-12-01 11:28:39 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:28:39 - INFO - [none_aggregation_strategy.py:40] - [Round 3] 收到客户端 2 的明文更新。
+2025-12-01 11:28:39 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:28:39 - INFO - [server_grpc.py:280] - [Round 3] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:28:39 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:28:39 - INFO - [none_aggregation_strategy.py:82] - [Round 3] 明文参数聚合完成。
+2025-12-01 11:28:39 - INFO - [server_grpc.py:299] - [Round 3] Server Aggregation Resources - CPU Time: 0.0300s, Memory Usage: 1008.63 MB
+2025-12-01 11:28:39 - INFO - [server_grpc.py:306] - [Round 3] 全局模型参数更新完成。
+2025-12-01 11:28:39 - INFO - [none_aggregation_strategy.py:111] - [Round 3] 全局评估: Acc=0.6833, AUC=0.9441, Loss=0.1600
+2025-12-01 11:28:39 - INFO - [server_grpc.py:352] - 第 3 轮聚合完成，进入第 4 轮。
+2025-12-01 11:28:39 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:28:39 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:28:39 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:28:39 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:28:39 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:28:39 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:28:39 - INFO - [server_grpc.py:268] - 向客户端 3 提供第3轮全局模型
+2025-12-01 11:28:39 - INFO - [server_grpc.py:268] - 向客户端 1 提供第3轮全局模型
+2025-12-01 11:28:39 - INFO - [server_grpc.py:268] - 向客户端 2 提供第3轮全局模型
+2025-12-01 11:29:25 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:29:25 - INFO - [none_aggregation_strategy.py:40] - [Round 4] 收到客户端 3 的明文更新。
+2025-12-01 11:29:25 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:29:29 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:29:29 - INFO - [none_aggregation_strategy.py:40] - [Round 4] 收到客户端 1 的明文更新。
+2025-12-01 11:29:29 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:29:30 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:29:30 - INFO - [none_aggregation_strategy.py:40] - [Round 4] 收到客户端 2 的明文更新。
+2025-12-01 11:29:30 - INFO - [server_grpc.py:280] - [Round 4] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:29:30 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:29:30 - INFO - [none_aggregation_strategy.py:82] - [Round 4] 明文参数聚合完成。
+2025-12-01 11:29:30 - INFO - [server_grpc.py:299] - [Round 4] Server Aggregation Resources - CPU Time: 0.0600s, Memory Usage: 957.63 MB
+2025-12-01 11:29:30 - INFO - [server_grpc.py:306] - [Round 4] 全局模型参数更新完成。
+2025-12-01 11:29:30 - INFO - [none_aggregation_strategy.py:111] - [Round 4] 全局评估: Acc=0.6877, AUC=0.9410, Loss=0.2138
+2025-12-01 11:29:30 - INFO - [server_grpc.py:352] - 第 4 轮聚合完成，进入第 5 轮。
+2025-12-01 11:29:30 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:29:30 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:29:30 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:29:30 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:29:30 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:29:30 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:29:30 - INFO - [server_grpc.py:268] - 向客户端 2 提供第4轮全局模型
+2025-12-01 11:29:30 - INFO - [server_grpc.py:268] - 向客户端 3 提供第4轮全局模型
+2025-12-01 11:29:30 - INFO - [server_grpc.py:268] - 向客户端 1 提供第4轮全局模型
+2025-12-01 11:30:18 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:30:18 - INFO - [none_aggregation_strategy.py:40] - [Round 5] 收到客户端 2 的明文更新。
+2025-12-01 11:30:18 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:30:19 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:30:19 - INFO - [none_aggregation_strategy.py:40] - [Round 5] 收到客户端 1 的明文更新。
+2025-12-01 11:30:19 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:30:20 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:30:20 - INFO - [none_aggregation_strategy.py:40] - [Round 5] 收到客户端 3 的明文更新。
+2025-12-01 11:30:20 - INFO - [server_grpc.py:280] - [Round 5] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:30:20 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:30:20 - INFO - [none_aggregation_strategy.py:82] - [Round 5] 明文参数聚合完成。
+2025-12-01 11:30:20 - INFO - [server_grpc.py:299] - [Round 5] Server Aggregation Resources - CPU Time: 0.0400s, Memory Usage: 1034.46 MB
+2025-12-01 11:30:20 - INFO - [server_grpc.py:306] - [Round 5] 全局模型参数更新完成。
+2025-12-01 11:30:20 - INFO - [none_aggregation_strategy.py:111] - [Round 5] 全局评估: Acc=0.7225, AUC=0.9536, Loss=0.0985
+2025-12-01 11:30:20 - INFO - [server_grpc.py:352] - 第 5 轮聚合完成，进入第 6 轮。
+2025-12-01 11:30:20 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:30:20 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:30:20 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:30:20 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:30:20 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:30:20 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:30:20 - INFO - [server_grpc.py:268] - 向客户端 3 提供第5轮全局模型
+2025-12-01 11:30:21 - INFO - [server_grpc.py:268] - 向客户端 1 提供第5轮全局模型
+2025-12-01 11:30:21 - INFO - [server_grpc.py:268] - 向客户端 2 提供第5轮全局模型
+2025-12-01 11:31:09 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:31:10 - INFO - [none_aggregation_strategy.py:40] - [Round 6] 收到客户端 3 的明文更新。
+2025-12-01 11:31:10 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:31:10 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:31:10 - INFO - [none_aggregation_strategy.py:40] - [Round 6] 收到客户端 1 的明文更新。
+2025-12-01 11:31:11 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:31:11 - INFO - [none_aggregation_strategy.py:40] - [Round 6] 收到客户端 2 的明文更新。
+2025-12-01 11:31:11 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:31:11 - INFO - [server_grpc.py:280] - [Round 6] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:31:11 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:31:11 - INFO - [none_aggregation_strategy.py:82] - [Round 6] 明文参数聚合完成。
+2025-12-01 11:31:11 - INFO - [server_grpc.py:299] - [Round 6] Server Aggregation Resources - CPU Time: 0.0600s, Memory Usage: 1092.80 MB
+2025-12-01 11:31:11 - INFO - [server_grpc.py:306] - [Round 6] 全局模型参数更新完成。
+2025-12-01 11:31:11 - INFO - [none_aggregation_strategy.py:111] - [Round 6] 全局评估: Acc=0.7163, AUC=0.9545, Loss=0.1096
+2025-12-01 11:31:11 - INFO - [server_grpc.py:352] - 第 6 轮聚合完成，进入第 7 轮。
+2025-12-01 11:31:11 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
+2025-12-01 11:31:11 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
+2025-12-01 11:31:11 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:31:11 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
+2025-12-01 11:31:11 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:31:11 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:31:11 - INFO - [server_grpc.py:268] - 向客户端 1 提供第6轮全局模型
+2025-12-01 11:31:11 - INFO - [server_grpc.py:268] - 向客户端 3 提供第6轮全局模型
+2025-12-01 11:31:11 - INFO - [server_grpc.py:268] - 向客户端 2 提供第6轮全局模型
+2025-12-01 11:31:55 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 2 的更新，数据大小: 43694.20 KB
+2025-12-01 11:31:55 - INFO - [none_aggregation_strategy.py:40] - [Round 7] 收到客户端 2 的明文更新。
+2025-12-01 11:31:55 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-01 11:31:58 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 1 的更新，数据大小: 43694.20 KB
+2025-12-01 11:31:59 - INFO - [none_aggregation_strategy.py:40] - [Round 7] 收到客户端 1 的明文更新。
+2025-12-01 11:31:59 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-01 11:31:59 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 3 的更新，数据大小: 43694.20 KB
+2025-12-01 11:32:00 - INFO - [none_aggregation_strategy.py:40] - [Round 7] 收到客户端 3 的明文更新。
+2025-12-01 11:32:00 - INFO - [server_grpc.py:280] - [Round 7] 所有客户端参数已收集完毕，开始聚合。
+2025-12-01 11:32:00 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-01 11:32:00 - INFO - [none_aggregation_strategy.py:82] - [Round 7] 明文参数聚合完成。
+2025-12-01 11:32:00 - INFO - [server_grpc.py:299] - [Round 7] Server Aggregation Resources - CPU Time: 0.0600s, Memory Usage: 1092.66 MB
+2025-12-01 11:32:00 - INFO - [server_grpc.py:306] - [Round 7] 全局模型参数更新完成。
+2025-12-01 11:32:00 - INFO - [none_aggregation_strategy.py:111] - [Round 7] 全局评估: Acc=0.7225, AUC=0.9549, Loss=0.0921
+2025-12-01 11:32:00 - INFO - [server_grpc.py:365] - [Round 7] 训练已收敛，准确率变化 (0.006167) 小于阈值 (0.01)。
+2025-12-01 11:32:00 - INFO - [server_grpc.py:316] - 训练结束。总耗时: 353.84 秒
+2025-12-01 11:32:00 - INFO - [server_grpc.py:330] - 通信开销 (KB) 汇总:
+            Total_KB
+1      305859.426758
+2      305859.426758
+3      305859.426758
+Total  917578.280273
+2025-12-01 11:32:00 - INFO - [server_grpc.py:343] - 全局模型评估指标汇总:
+      Accuracy     AUC    Loss
+Round                         
+1       0.6288  0.9212  0.4453
+2       0.6613  0.9361  0.2240
+3       0.6833  0.9441  0.1600
+4       0.6877  0.9410  0.2138
+5       0.7225  0.9536  0.0985
+6       0.7163  0.9545  0.1096
+7       0.7225  0.9549  0.0921
+2025-12-01 11:32:01 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=300)
+2025-12-01 11:32:01 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
+2025-12-01 11:32:01 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=300)
+2025-12-01 11:32:01 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
+2025-12-01 11:32:01 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=300)
+2025-12-01 11:32:01 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
+2025-12-01 11:32:01 - INFO - [server_grpc.py:268] - 向客户端 1 提供第7轮全局模型
+2025-12-01 11:32:01 - INFO - [server_grpc.py:268] - 向客户端 2 提供第7轮全局模型
+2025-12-01 11:32:01 - INFO - [server_grpc.py:268] - 向客户端 3 提供第7轮全局模型
