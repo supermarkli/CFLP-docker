@@ -17,7 +17,7 @@ def setup_logging(create_file=False):
     """
     # 创建logger
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     
     # 过滤掉 matplotlib 的 DEBUG 日志
     logging.getLogger('matplotlib').setLevel(logging.INFO)
