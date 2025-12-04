@@ -131,9 +131,10 @@ class FederatedLearningClient:
         logger.info(f"[Client {self.client_id}] {self._gpu_info}")
         logger.info(f"[Client {self.client_id}] 优化器: SGD (lr={lr}, momentum={momentum}, weight_decay={weight_decay})")
         
-        max_rounds = config['federation'].get('max_rounds', 100)
+        # 使用 estimated_rounds 计算 T_max（与 CFLP_Revision 一致）
+        estimated_rounds = config['training'].get('estimated_rounds', 200)
         local_epochs = config['training'].get('epochs', 3)
-        T_max = max_rounds * local_epochs
+        T_max = estimated_rounds * local_epochs
         self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
             self.optimizer, 
             T_max=T_max,
@@ -251,8 +252,9 @@ class FederatedLearningClient:
             X_test = data.get('X_test')
             y_test = data.get('y_test')
             if X_train is not None and y_train is not None:
-                # 获取训练时的数据增强 transform
-                train_transform = get_train_transform(self.dataset_name)
+                # 根据配置决定是否启用数据增强（与 CFLP_Revision 一致）
+                use_augmentation = config['training'].get('use_augmentation', False)
+                train_transform = get_train_transform(self.dataset_name) if use_augmentation else None
                 train_dataset = AugmentedDataset(X_train, y_train, transform=train_transform)
                 # 使用配置中的 num_workers 和 prefetch_factor
                 num_workers = config['training'].get('num_workers', 0)  # 默认 0（单进程）
@@ -267,8 +269,10 @@ class FederatedLearningClient:
                 )
                 self.data_size = len(train_dataset)
                 # 数据增强日志
-                if train_transform is not None:
+                if use_augmentation and train_transform is not None:
                     logger.info(f"[Client {self.client_id}] 数据增强: 已启用")
+                else:
+                    logger.info(f"[Client {self.client_id}] 数据增强: 已禁用")
                 logger.debug(f"[Client {self.client_id}] 数据划分完成 - 训练集: {X_train.shape}")
             else:
                 self.train_data = None

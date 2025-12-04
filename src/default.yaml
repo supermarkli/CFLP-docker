@@ -7,7 +7,7 @@ model:
   name: "resnet18" # "cnn", "resnet18", "vgg16"
 
 base:
-  random_seed: 42  # 与实验配置一致
+  random_seed: 0  # 与 CFLP_Revision 一致
 
 federation:
   # 隐私保护模式:
@@ -31,15 +31,24 @@ grpc:
   max_workers: 10
 
 training:
-  batch_size: 128        # 训练批次大小（与实验配置一致）
-  eval_batch_size: 512   # 评估批次大小（与实验配置一致）
-  learning_rate: 0.01     # SGD 初始学习率（与实验配置一致）
-  momentum: 0.9          # SGD 动量系数（与实验配置一致）
-  weight_decay: 0.0005   # L2 正则化系数（与实验配置一致）
-  epochs: 5              # 每轮本地训练轮数（local_epochs，与实验配置一致）
-  num_workers: 4         # DataLoader 多进程数（GPU 模式，与实验配置一致）
-  prefetch_factor: 2     # 数据预取批次数（与实验配置一致）
-  use_amp: true          # 混合精度训练（GPU 模式，与实验配置一致）
+  batch_size: 128        # 训练批次大小
+  eval_batch_size: 128   # 评估批次大小
+  learning_rate: 0.01    # SGD 初始学习率
+  momentum: 0.9          # SGD 动量系数
+  weight_decay: 0.0005   # L2 正则化系数
+  epochs: 5              # 每轮本地训练轮数（local_epochs）
+  num_workers: 4         # DataLoader 多进程数
+  prefetch_factor: 2     # 数据预取批次数
+  use_amp: true          # 混合精度训练
+  optimizer: sgd         # 优化器类型
+  scheduler: cosine      # 学习率调度器
+  estimated_rounds: 200  # 预估收敛轮数，用于学习率调度器
+  gamma: 0.2             # MultiStepLR 衰减因子
+  milestones:            # MultiStepLR 衰减节点
+    - 60
+    - 120
+    - 160
+  use_augmentation: true # 数据增强
 
 # 仅在 privacy_mode = "he" 时生效
 encryption:
