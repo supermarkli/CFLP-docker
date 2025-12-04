@@ -16,14 +16,8 @@
 2025-12-02 03:00:53 - INFO - [server_grpc.py:131] - 所有客户端已注册，设置 next_step=True，准备开始训练。
 2025-12-02 03:00:53 - INFO - [server_grpc.py:134] - 联邦学习流程计时开始
 2025-12-02 03:01:01 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-02 03:01:01 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:01:01 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
 2025-12-02 03:01:03 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-02 03:01:03 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:01:03 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
 2025-12-02 03:01:06 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-02 03:01:06 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:01:06 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
 2025-12-02 03:01:27 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 3 的更新，数据大小: 43694.48 KB
 2025-12-02 03:01:27 - INFO - [tee_aggregation_strategy.py:70] - [Round 1] 收到并解密了客户端 3 的TEE模式更新。
 2025-12-02 03:01:27 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
@@ -39,12 +33,6 @@
 2025-12-02 03:01:36 - INFO - [server_grpc.py:306] - [Round 1] 全局模型参数更新完成。
 2025-12-02 03:01:36 - INFO - [tee_aggregation_strategy.py:140] - [Round 1] 全局评估 (TEE): Acc=0.6362, AUC=0.9184, Loss=1.0753
 2025-12-02 03:01:36 - INFO - [server_grpc.py:352] - 第 1 轮聚合完成，进入第 2 轮。
-2025-12-02 03:01:36 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:01:36 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:01:36 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:01:36 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:01:36 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:01:36 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
 2025-12-02 03:01:36 - INFO - [server_grpc.py:268] - 向客户端 2 提供第1轮全局模型
 2025-12-02 03:01:36 - INFO - [server_grpc.py:268] - 向客户端 3 提供第1轮全局模型
 2025-12-02 03:01:36 - INFO - [server_grpc.py:268] - 向客户端 1 提供第1轮全局模型
@@ -63,12 +51,6 @@
 2025-12-02 03:02:27 - INFO - [server_grpc.py:306] - [Round 2] 全局模型参数更新完成。
 2025-12-02 03:02:27 - INFO - [tee_aggregation_strategy.py:140] - [Round 2] 全局评估 (TEE): Acc=0.7241, AUC=0.9451, Loss=0.7141
 2025-12-02 03:02:27 - INFO - [server_grpc.py:352] - 第 2 轮聚合完成，进入第 3 轮。
-2025-12-02 03:02:27 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:02:27 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:02:27 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:02:27 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:02:27 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:02:27 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
 2025-12-02 03:02:27 - INFO - [server_grpc.py:268] - 向客户端 2 提供第2轮全局模型
 2025-12-02 03:02:27 - INFO - [server_grpc.py:268] - 向客户端 1 提供第2轮全局模型
 2025-12-02 03:02:27 - INFO - [server_grpc.py:268] - 向客户端 3 提供第2轮全局模型
@@ -87,12 +69,6 @@
 2025-12-02 03:03:15 - INFO - [server_grpc.py:306] - [Round 3] 全局模型参数更新完成。
 2025-12-02 03:03:15 - INFO - [tee_aggregation_strategy.py:140] - [Round 3] 全局评估 (TEE): Acc=0.7678, AUC=0.9580, Loss=0.5718
 2025-12-02 03:03:15 - INFO - [server_grpc.py:352] - 第 3 轮聚合完成，进入第 4 轮。
-2025-12-02 03:03:15 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:03:15 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:03:15 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:03:15 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:03:15 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:03:15 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
 2025-12-02 03:03:15 - INFO - [server_grpc.py:268] - 向客户端 3 提供第3轮全局模型
 2025-12-02 03:03:15 - INFO - [server_grpc.py:268] - 向客户端 2 提供第3轮全局模型
 2025-12-02 03:03:15 - INFO - [server_grpc.py:268] - 向客户端 1 提供第3轮全局模型
@@ -111,12 +87,6 @@
 2025-12-02 03:04:06 - INFO - [server_grpc.py:306] - [Round 4] 全局模型参数更新完成。
 2025-12-02 03:04:06 - INFO - [tee_aggregation_strategy.py:140] - [Round 4] 全局评估 (TEE): Acc=0.7793, AUC=0.9641, Loss=0.5367
 2025-12-02 03:04:06 - INFO - [server_grpc.py:352] - 第 4 轮聚合完成，进入第 5 轮。
-2025-12-02 03:04:06 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:04:06 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:04:06 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:04:06 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:04:06 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:04:06 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
 2025-12-02 03:04:06 - INFO - [server_grpc.py:268] - 向客户端 3 提供第4轮全局模型
 2025-12-02 03:04:06 - INFO - [server_grpc.py:268] - 向客户端 1 提供第4轮全局模型
 2025-12-02 03:04:07 - INFO - [server_grpc.py:268] - 向客户端 2 提供第4轮全局模型
@@ -135,12 +105,6 @@
 2025-12-02 03:04:57 - INFO - [server_grpc.py:306] - [Round 5] 全局模型参数更新完成。
 2025-12-02 03:04:57 - INFO - [tee_aggregation_strategy.py:140] - [Round 5] 全局评估 (TEE): Acc=0.8090, AUC=0.9717, Loss=0.4058
 2025-12-02 03:04:57 - INFO - [server_grpc.py:352] - 第 5 轮聚合完成，进入第 6 轮。
-2025-12-02 03:04:57 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:04:57 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:04:57 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:04:57 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:04:57 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:04:57 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
 2025-12-02 03:04:57 - INFO - [server_grpc.py:268] - 向客户端 2 提供第5轮全局模型
 2025-12-02 03:04:57 - INFO - [server_grpc.py:268] - 向客户端 3 提供第5轮全局模型
 2025-12-02 03:04:57 - INFO - [server_grpc.py:268] - 向客户端 1 提供第5轮全局模型
@@ -159,12 +123,6 @@
 2025-12-02 03:05:46 - INFO - [server_grpc.py:306] - [Round 6] 全局模型参数更新完成。
 2025-12-02 03:05:46 - INFO - [tee_aggregation_strategy.py:140] - [Round 6] 全局评估 (TEE): Acc=0.8174, AUC=0.9748, Loss=0.3640
 2025-12-02 03:05:46 - INFO - [server_grpc.py:352] - 第 6 轮聚合完成，进入第 7 轮。
-2025-12-02 03:05:46 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:05:46 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:05:46 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:05:46 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:05:46 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:05:46 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
 2025-12-02 03:05:46 - INFO - [server_grpc.py:268] - 向客户端 2 提供第6轮全局模型
 2025-12-02 03:05:46 - INFO - [server_grpc.py:268] - 向客户端 3 提供第6轮全局模型
 2025-12-02 03:05:46 - INFO - [server_grpc.py:268] - 向客户端 1 提供第6轮全局模型
@@ -183,12 +141,6 @@
 2025-12-02 03:06:37 - INFO - [server_grpc.py:306] - [Round 7] 全局模型参数更新完成。
 2025-12-02 03:06:37 - INFO - [tee_aggregation_strategy.py:140] - [Round 7] 全局评估 (TEE): Acc=0.8360, AUC=0.9784, Loss=0.3141
 2025-12-02 03:06:37 - INFO - [server_grpc.py:352] - 第 7 轮聚合完成，进入第 8 轮。
-2025-12-02 03:06:37 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:06:37 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:06:37 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:06:37 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:06:37 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:06:37 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
 2025-12-02 03:06:37 - INFO - [server_grpc.py:268] - 向客户端 3 提供第7轮全局模型
 2025-12-02 03:06:37 - INFO - [server_grpc.py:268] - 向客户端 2 提供第7轮全局模型
 2025-12-02 03:06:38 - INFO - [server_grpc.py:268] - 向客户端 1 提供第7轮全局模型
@@ -207,12 +159,6 @@
 2025-12-02 03:07:28 - INFO - [server_grpc.py:306] - [Round 8] 全局模型参数更新完成。
 2025-12-02 03:07:28 - INFO - [tee_aggregation_strategy.py:140] - [Round 8] 全局评估 (TEE): Acc=0.8303, AUC=0.9776, Loss=0.3220
 2025-12-02 03:07:28 - INFO - [server_grpc.py:352] - 第 8 轮聚合完成，进入第 9 轮。
-2025-12-02 03:07:29 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:07:29 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:07:29 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:07:29 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:07:29 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:07:29 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
 2025-12-02 03:07:29 - INFO - [server_grpc.py:268] - 向客户端 2 提供第8轮全局模型
 2025-12-02 03:07:29 - INFO - [server_grpc.py:268] - 向客户端 1 提供第8轮全局模型
 2025-12-02 03:07:29 - INFO - [server_grpc.py:268] - 向客户端 3 提供第8轮全局模型
@@ -231,12 +177,6 @@
 2025-12-02 03:08:19 - INFO - [server_grpc.py:306] - [Round 9] 全局模型参数更新完成。
 2025-12-02 03:08:19 - INFO - [tee_aggregation_strategy.py:140] - [Round 9] 全局评估 (TEE): Acc=0.8504, AUC=0.9821, Loss=0.2520
 2025-12-02 03:08:19 - INFO - [server_grpc.py:352] - 第 9 轮聚合完成，进入第 10 轮。
-2025-12-02 03:08:19 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:08:19 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:08:19 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:08:19 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:08:19 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:08:19 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
 2025-12-02 03:08:19 - INFO - [server_grpc.py:268] - 向客户端 1 提供第9轮全局模型
 2025-12-02 03:08:19 - INFO - [server_grpc.py:268] - 向客户端 3 提供第9轮全局模型
 2025-12-02 03:08:19 - INFO - [server_grpc.py:268] - 向客户端 2 提供第9轮全局模型
@@ -255,12 +195,6 @@
 2025-12-02 03:09:09 - INFO - [server_grpc.py:306] - [Round 10] 全局模型参数更新完成。
 2025-12-02 03:09:09 - INFO - [tee_aggregation_strategy.py:140] - [Round 10] 全局评估 (TEE): Acc=0.8495, AUC=0.9824, Loss=0.2562
 2025-12-02 03:09:09 - INFO - [server_grpc.py:352] - 第 10 轮聚合完成，进入第 11 轮。
-2025-12-02 03:09:09 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-02 03:09:09 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-02 03:09:09 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-02 03:09:09 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-02 03:09:09 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:09:09 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
 2025-12-02 03:09:09 - INFO - [server_grpc.py:268] - 向客户端 2 提供第10轮全局模型
 2025-12-02 03:09:09 - INFO - [server_grpc.py:268] - 向客户端 1 提供第10轮全局模型
 2025-12-02 03:09:10 - INFO - [server_grpc.py:268] - 向客户端 3 提供第10轮全局模型
@@ -300,12 +234,6 @@ Round
 9       0.8504  0.9821  0.2520
 10      0.8495  0.9824  0.2562
 11      0.8586  0.9844  0.2024
-2025-12-02 03:10:00 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=300)
-2025-12-02 03:10:00 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=300)
-2025-12-02 03:10:00 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=300)
-2025-12-02 03:10:00 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-02 03:10:00 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-02 03:10:00 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
 2025-12-02 03:10:00 - INFO - [server_grpc.py:268] - 向客户端 2 提供第11轮全局模型
 2025-12-02 03:10:00 - INFO - [server_grpc.py:268] - 向客户端 1 提供第11轮全局模型
 2025-12-02 03:10:00 - INFO - [server_grpc.py:268] - 向客户端 3 提供第11轮全局模型

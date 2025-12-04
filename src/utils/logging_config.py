@@ -14,6 +14,8 @@ def setup_logging(create_file=False):
     配置两个处理器：
     1. 控制台处理器：只显示 INFO 级别以上的简要信息
     2. 文件处理器：记录 DEBUG 级别以上的详细信息
+    
+    日志文件命名格式: {privacy_mode}_{YYYYMMDD_HHMMSS}.log
     """
     # 创建logger
     logger = logging.getLogger()
@@ -57,9 +59,9 @@ def setup_logging(create_file=False):
         # 从配置中获取隐私模式
         privacy_mode = config.get('federation', {}).get('privacy_mode', 'unknown')
         
-        # 生成日志文件名
+        # 生成带时间戳的日志文件名: {模式}_{日期时间}.log
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_filename = f"server_{privacy_mode}.log"
+        log_filename = f"{privacy_mode}_{timestamp}.log"
         log_file = log_dir / log_filename
 
         file_handler = logging.FileHandler(log_file, mode='w', encoding='utf-8')
@@ -78,5 +80,3 @@ def get_logger(create_file=False):
     if not logger.handlers or (create_file and not any(isinstance(h, logging.FileHandler) for h in logger.handlers)):
         logger = setup_logging(create_file)
     return logger
-
-

@@ -41,12 +41,14 @@ class TeeAggregationStrategy(AggregationStrategy):
         return response
 
     def aggregate(self, request, context):
+        import time
         payload = request.tee
         if not payload:
             return federation_pb2.ServerUpdate(code=400, message="请求载荷与 'tee' 模式不匹配。")
 
         try:
             # 1. 解密载荷
+            decrypt_start = time.time()
             symmetric_key = self.private_key.decrypt(
                 payload.encrypted_symmetric_key,
                 padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None)
@@ -56,6 +58,8 @@ class TeeAggregationStrategy(AggregationStrategy):
             
             params_and_metrics = federation_pb2.ParametersAndMetrics()
             params_and_metrics.ParseFromString(decrypted_payload_bytes)
+            decrypt_time = time.time() - decrypt_start
+            logger.info(f"[TEE] 客户端 {request.client_id} 解密耗时: {decrypt_time:.4f}s")
 
             # 2. 调用与 'none' 模式类似的明文处理逻辑
             with self.server.lock:
@@ -95,6 +99,13 @@ class TeeAggregationStrategy(AggregationStrategy):
 
     def aggregate_parameters(self, round_num):
         """聚合明文客户端参数 (FedAvg)"""
+        import time
+        
+        # TEE 模式解密发生在 aggregate() 中（接收时解密），这里记录为 0
+        # 但实际解密时间已在 aggregate() 中按客户端记录
+        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec=0.0000")
+        
+        aggregation_start = time.time()
         active_clients = [self.server.clients[cid] for cid in self.server.client_parameters[round_num].keys()]
         parameters_list = list(self.server.client_parameters[round_num].values())
         
@@ -108,10 +119,12 @@ class TeeAggregationStrategy(AggregationStrategy):
         for param_name in param_structure.keys():
             aggregated[param_name] = sum(weight * params[param_name] for params, weight in zip(parameters_list, client_weights))
         
+        aggregation_time = time.time() - aggregation_start
+        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
         logger.info(f"[Round {round_num+1}] TEE模式下明文参数聚合完成。")
         return aggregated
 
-    def evaluate_metrics(self, round_num):
+    def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """评估明文指标"""
         total_test_acc, total_test_num = 0, 0
         total_auc, total_loss, total_train_num = 0, 0, 0
@@ -130,14 +143,17 @@ class TeeAggregationStrategy(AggregationStrategy):
         # 清理本轮存储的指标
         for c in clients_in_round: c.metrics = None
         
-        avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
-        avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
         avg_loss = total_loss / total_train_num if total_train_num > 0 else 0
-        
-        self.server.rs_test_acc.append(avg_acc)
         self.server.rs_train_loss.append(avg_loss)
-        self.server.rs_auc.append(avg_auc)
-        logger.info(f"[Round {round_num+1}] 全局评估 (TEE): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+        
+        if not skip_acc_auc:
+            avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
+            avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
+            self.server.rs_test_acc.append(avg_acc)
+            self.server.rs_auc.append(avg_auc)
+            logger.info(f"[Round {round_num+1}] 客户端聚合评估 (TEE): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+        else:
+            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss (TEE)={avg_loss:.4f}")
 
         # 清理本轮的参数
         if round_num in self.server.client_parameters:

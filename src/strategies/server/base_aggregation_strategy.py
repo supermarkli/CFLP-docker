@@ -46,11 +46,12 @@ class AggregationStrategy(ABC):
         pass
 
     @abstractmethod
-    def evaluate_metrics(self, round_num):
+    def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """
         评估指定轮次的所有客户端指标。
 
         Args:
             round_num: 当前轮次。
+            skip_acc_auc: 如果为 True，则只评估 loss（acc 和 auc 由服务端全局测试集评估）。
         """
         pass 

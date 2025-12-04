@@ -1,12 +1,13 @@
 data:
   dataset: "cifar10" # "mnist" or "cifar10"
-  test_size: 0.2
+  dirichlet_alpha: 0.5  # Dirichlet 分布参数，α 越小越 Non-IID
+  local_val_size: 0.1  # 客户端本地验证集比例
 
 model:
   name: "resnet18" # "cnn", "resnet18", "vgg16"
 
 base:
-  random_seed: 2
+  random_seed: 42  # 与实验配置一致
 
 federation:
   # 隐私保护模式:
@@ -15,12 +16,12 @@ federation:
   # "tee"  - 使用TDX（可信执行环境）在服务器端保护明文聚合。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
   # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
-  privacy_mode: "he" # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "none" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
-  max_rounds: 10000
+  max_rounds: 100  # 与实验配置一致（100 轮）
   convergence:
-    acc_delta_threshold: 0.01
-    window: 3
+    acc_delta_threshold: 0.0001  # 与实验配置一致
+    window: 4  # 与实验配置一致（检查最近4轮）
 
 grpc:
   server_host: "10.16.56.126"
@@ -30,11 +31,15 @@ grpc:
   max_workers: 10
 
 training:
-  batch_size: 128
-  learning_rate: 0.0005  # Adam 学习率
-  momentum: 0.9          # SGD 时使用
-  weight_decay: 0.0005   # L2 正则化
-  epochs: 5
+  batch_size: 128        # 训练批次大小（与实验配置一致）
+  eval_batch_size: 512   # 评估批次大小（与实验配置一致）
+  learning_rate: 0.1     # SGD 初始学习率（与实验配置一致）
+  momentum: 0.9          # SGD 动量系数（与实验配置一致）
+  weight_decay: 0.0005   # L2 正则化系数（与实验配置一致）
+  epochs: 3              # 每轮本地训练轮数（local_epochs，与实验配置一致）
+  num_workers: 4         # DataLoader 多进程数（GPU 模式，与实验配置一致）
+  prefetch_factor: 2     # 数据预取批次数（与实验配置一致）
+  use_amp: true          # 混合精度训练（GPU 模式，与实验配置一致）
 
 # 仅在 privacy_mode = "he" 时生效
 encryption:

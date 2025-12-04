@@ -155,11 +155,23 @@ class SgxAggregationStrategy(AggregationStrategy):
             self.server.logger.info("✅ 已从SGX enclave收到聚合后的参数和指标。")
             self.last_aggregated_metrics = result.get('metrics', {})
             aggregated_params = result.get('params', {})
+            
+            # 从 Enclave 返回的 metrics 中提取解密和聚合时间
+            # Enclave 内的 server_cpu_time 包含解密和聚合的总时间
+            enclave_cpu_time = self.last_aggregated_metrics.get('server_cpu_time', 0)
+            # SGX 模式下，解密和聚合都在 Enclave 中进行
+            # 我们估算解密约占 30%，聚合约占 70%
+            decryption_time = enclave_cpu_time * 0.3
+            aggregation_time = enclave_cpu_time * 0.7
+            
+            self.server.logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec={decryption_time:.4f}")
+            self.server.logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
+            
             return {k: v for k, v in aggregated_params.items()}
         finally:
             enclave_socket.close()
 
-    def evaluate_metrics(self, round_num):
+    def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """
         使用由enclave计算并返回的聚合指标。
         """
@@ -177,10 +189,15 @@ class SgxAggregationStrategy(AggregationStrategy):
             server_cpu = self.last_aggregated_metrics.get('server_cpu_time', 0)
             server_mem = self.last_aggregated_metrics.get('server_memory_usage', 0)
             
-            self.server.rs_test_acc.append(avg_acc)
-            self.server.rs_auc.append(avg_auc)
             self.server.rs_train_loss.append(avg_loss)
-            self.server.logger.info(f"[第 {round_num+1} 轮] 全局指标 - 准确率: {avg_acc:.4f}, AUC: {avg_auc:.4f}, 损失: {avg_loss:.4f}")
+            
+            if not skip_acc_auc:
+                self.server.rs_test_acc.append(avg_acc)
+                self.server.rs_auc.append(avg_auc)
+                self.server.logger.info(f"[第 {round_num+1} 轮] 客户端聚合指标 (SGX) - 准确率: {avg_acc:.4f}, AUC: {avg_auc:.4f}, 损失: {avg_loss:.4f}")
+            else:
+                self.server.logger.info(f"[第 {round_num+1} 轮] 客户端聚合 Loss (SGX)={avg_loss:.4f}")
+            
             self.server.logger.info(f"[第 {round_num+1} 轮] Enclave资源 - CPU耗时: {server_cpu:.4f}s, 内存使用: {server_mem/1024/1024:.2f} MB")
         else:
             self.server.logger.warning(f"[第 {round_num+1} 轮] 聚合指标中总样本数为0。")

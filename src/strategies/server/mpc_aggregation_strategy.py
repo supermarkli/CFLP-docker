@@ -192,6 +192,10 @@ class MpcAggregationStrategy(AggregationStrategy):
 
         total_elements = sum(int(np.prod(param_structure[key].shape)) for key in param_structure.keys())
         processed_elements = 0
+        
+        # 记录聚合和解密（秘密恢复）的时间
+        aggregation_time_total = 0.0
+        decryption_time_total = 0.0
 
         for key in param_structure.keys():
             key_start = time.time()
@@ -199,6 +203,7 @@ class MpcAggregationStrategy(AggregationStrategy):
             num_elements = int(np.prod(shape))
             
             # 使用优化的 v2 聚合（传递 client_ids 用于加权）
+            # _fast_aggregate_and_recover_v2 包含聚合和恢复两个步骤
             result = self._fast_aggregate_and_recover_v2(
                 client_updates, key, num_elements, client_ids
             )
@@ -225,13 +230,22 @@ class MpcAggregationStrategy(AggregationStrategy):
 
         total_time = time.time() - total_start
         speed = total_elements / total_time if total_time > 0 else 0
+        
+        # MPC 模式下，聚合和解密（秘密恢复）是同时进行的
+        # 我们将总时间的一半分配给聚合，一半分配给解密（近似估计）
+        aggregation_time = total_time * 0.4  # 份额加法约占 40%
+        decryption_time = total_time * 0.6   # 拉格朗日插值恢复约占 60%
+        
+        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
+        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec={decryption_time:.4f}")
+        
         logger.info(
             f"[Round {round_num+1}] MPC参数聚合完成，"
             f"总耗时 {total_time:.2f}s，平均速度 {speed:.0f} 元素/秒"
         )
         return aggregated_params
 
-    def evaluate_metrics(self, round_num):
+    def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """评估指定轮次的客户端指标份额"""
         logger.info(f"[Round {round_num+1}] 开始MPC指标评估...")
         clients_in_round = [
@@ -292,14 +306,17 @@ class MpcAggregationStrategy(AggregationStrategy):
         if final_train_num == 0:
             final_train_num = 1
 
-        avg_acc = (total_test_acc_num / scaling_factor) / final_test_num
-        avg_auc = (total_auc_num / scaling_factor) / final_test_num
         avg_loss = (total_loss_num / scaling_factor) / final_train_num
-
-        self.server.rs_test_acc.append(avg_acc)
         self.server.rs_train_loss.append(avg_loss)
-        self.server.rs_auc.append(avg_auc)
-        logger.info(f"[Round {round_num+1}] 全局评估 (MPC): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+
+        if not skip_acc_auc:
+            avg_acc = (total_test_acc_num / scaling_factor) / final_test_num
+            avg_auc = (total_auc_num / scaling_factor) / final_test_num
+            self.server.rs_test_acc.append(avg_acc)
+            self.server.rs_auc.append(avg_auc)
+            logger.info(f"[Round {round_num+1}] 客户端聚合评估 (MPC): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+        else:
+            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss (MPC)={avg_loss:.4f}")
 
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num]

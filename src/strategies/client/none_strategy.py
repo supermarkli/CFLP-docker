@@ -1,14 +1,20 @@
 import os
 import sys
+import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from .base_strategy import ClientStrategy
 from src.grpc.generated import federation_pb2
 from src.utils.parameter_utils import serialize_parameters
+from src.utils.logging_config import get_logger
+
+logger = get_logger()
 
 
 class NoneClientStrategy(ClientStrategy):
     def prepare_update_request(self, current_round, model_parameters, metrics):
         """创建参数更新消息（明文）"""
+        # 注意：BASE模式无加密，此处仅记录序列化时间作为"加密"阶段
+        # 实际加密时间在 client_grpc.py 中统一测量
         serialized_params = serialize_parameters(model_parameters)
         
         training_metrics = federation_pb2.TrainingMetrics(

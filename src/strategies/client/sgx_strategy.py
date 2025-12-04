@@ -70,6 +70,9 @@ class SgxStrategy(ClientStrategy):
         准备经SGX保护的更新请求。
         使用 float16 压缩模型参数以减少数据量。
         """
+        import time
+        encrypt_start = time.time()
+        
         if not self.public_key:
             raise ValueError("公钥未设置，请确认setup()方法已被调用。")
 
@@ -102,6 +105,9 @@ class SgxStrategy(ClientStrategy):
         aesgcm = AESGCM(symmetric_key)
         nonce = os.urandom(12)  # 推荐96位
         encrypted_payload = aesgcm.encrypt(nonce, serialized_payload, None)
+
+        encrypt_time = time.time() - encrypt_start
+        self.logger.info(f"[SGX] 参数加密完成 (RSA+AES)，耗时: {encrypt_time:.4f}s，密文大小: {len(encrypted_payload)/1024/1024:.2f} MB")
 
         # 5. 创建TeePayload
         tee_payload = federation_pb2.TeePayload(

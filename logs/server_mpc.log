@@ -1,600 +1,809 @@
-2025-12-01 12:02:46 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_mpc.log
-2025-12-01 12:02:46 - INFO - [server_grpc.py:69] - 服务器配置: Dataset=cifar10, Model=resnet18
-2025-12-01 12:02:47 - INFO - [mpc_aggregation_strategy.py:25] - MPC 聚合策略已初始化（高性能向量化版本 v2）。
-2025-12-01 12:02:47 - INFO - [mpc_aggregation_strategy.py:57] - 已预计算拉格朗日系数: [3, 2305843009213693948, 1]
-2025-12-01 12:02:47 - INFO - [server_grpc.py:97] - 服务器初始化完成 (模式: mpc)，等待 3 个客户端注册...
-2025-12-01 12:02:47 - INFO - [server_grpc.py:388] - 联邦学习安全服务器正在启动，监听端口: 50051
-2025-12-01 12:03:32 - INFO - [server_grpc.py:116] - 接收到客户端 2 的注册请求 (模型: resnet18, 数据量: 16000)
-2025-12-01 12:03:32 - INFO - [server_grpc.py:125] - 客户端 2 注册成功。当前 1/3 个客户端。
-2025-12-01 12:03:32 - INFO - [mpc_aggregation_strategy.py:126] - 为客户端 2 准备MPC模式的设置响应。
-2025-12-01 12:03:34 - INFO - [server_grpc.py:116] - 接收到客户端 3 的注册请求 (模型: resnet18, 数据量: 16000)
-2025-12-01 12:03:34 - INFO - [server_grpc.py:125] - 客户端 3 注册成功。当前 2/3 个客户端。
-2025-12-01 12:03:34 - INFO - [mpc_aggregation_strategy.py:126] - 为客户端 3 准备MPC模式的设置响应。
-2025-12-01 12:03:34 - INFO - [server_grpc.py:116] - 接收到客户端 1 的注册请求 (模型: resnet18, 数据量: 16000)
-2025-12-01 12:03:34 - INFO - [server_grpc.py:125] - 客户端 1 注册成功。当前 3/3 个客户端。
-2025-12-01 12:03:34 - INFO - [mpc_aggregation_strategy.py:126] - 为客户端 1 准备MPC模式的设置响应。
-2025-12-01 12:03:34 - INFO - [server_grpc.py:131] - 所有客户端已注册，设置 next_step=True，准备开始训练。
-2025-12-01 12:03:34 - INFO - [server_grpc.py:134] - 联邦学习流程计时开始
-2025-12-01 12:03:39 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:03:39 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:03:39 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:03:43 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:03:43 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:03:43 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:03:46 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:03:46 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:03:46 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:05:18 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:05:18 - INFO - [mpc_aggregation_strategy.py:155] - [Round 1] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:05:18 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:05:34 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:05:34 - INFO - [mpc_aggregation_strategy.py:155] - [Round 1] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:05:34 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:05:39 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:05:39 - INFO - [mpc_aggregation_strategy.py:155] - [Round 1] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:05:39 - INFO - [server_grpc.py:280] - [Round 1] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:05:39 - INFO - [mpc_aggregation_strategy.py:176] - [Round 1] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:05:39 - INFO - [mpc_aggregation_strategy.py:188] - [Round 1] 客户端权重: {'2': '0.3333', '3': '0.3333', '1': '0.3333'}
-2025-12-01 12:05:39 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:05:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.27s，速度 520201 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:05:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 528534 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:05:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 557438 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:05:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.24s，速度 556813 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:05:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.03s，速度 1073901 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:05:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.11s，速度 691043 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:05:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 587787 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:05:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.22s，速度 604172 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:05:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 607373 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:05:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.04s，速度 567509 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:05:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.09s，速度 539642 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:05:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.05s，速度 562844 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:05:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.54s，速度 547360 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:05:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 644165 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:05:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 635662 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:05:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 615520 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:05:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.25s，速度 555027 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:05:59 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.15s，速度 567988 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:05:59 - INFO - [mpc_aggregation_strategy.py:228] - [Round 1] MPC参数聚合完成，总耗时 20.04s，平均速度 558140 元素/秒
-2025-12-01 12:05:59 - INFO - [server_grpc.py:299] - [Round 1] Server Aggregation Resources - CPU Time: 20.5100s, Memory Usage: 2083.63 MB
-2025-12-01 12:05:59 - INFO - [server_grpc.py:306] - [Round 1] 全局模型参数更新完成。
-2025-12-01 12:05:59 - INFO - [mpc_aggregation_strategy.py:236] - [Round 1] 开始MPC指标评估...
-2025-12-01 12:05:59 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 7567000000, 'test_num': 12000000000, 'auc': 11042330832, 'loss': 23597601622, 'train_num': 48000000000}
-2025-12-01 12:05:59 - INFO - [mpc_aggregation_strategy.py:302] - [Round 1] 全局评估 (MPC): Acc=0.6306, AUC=0.9202, Loss=0.4916
-2025-12-01 12:05:59 - INFO - [server_grpc.py:352] - 第 1 轮聚合完成，进入第 2 轮。
-2025-12-01 12:05:59 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:05:59 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:05:59 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:05:59 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:05:59 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:05:59 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:05:59 - INFO - [server_grpc.py:268] - 向客户端 2 提供第1轮全局模型
-2025-12-01 12:05:59 - INFO - [server_grpc.py:268] - 向客户端 1 提供第1轮全局模型
-2025-12-01 12:06:00 - INFO - [server_grpc.py:268] - 向客户端 3 提供第1轮全局模型
-2025-12-01 12:08:02 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:08:02 - INFO - [mpc_aggregation_strategy.py:155] - [Round 2] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:08:02 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:08:12 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:08:12 - INFO - [mpc_aggregation_strategy.py:155] - [Round 2] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:08:12 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:08:41 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:08:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 2] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:08:41 - INFO - [server_grpc.py:280] - [Round 2] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:08:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 2] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:08:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 2] 客户端权重: {'1': '0.3333', '2': '0.3333', '3': '0.3333'}
-2025-12-01 12:08:41 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:08:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.11s，速度 559442 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:08:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 538074 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:08:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 527670 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:08:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.33s，速度 544899 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:08:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.06s，速度 522113 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:08:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.12s，速度 591737 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:08:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 618393 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:08:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.22s，速度 587332 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:08:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 631110 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:08:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.05s，速度 559861 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:08:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.10s，速度 535477 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:08:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.08s，速度 546438 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:08:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.52s，速度 565226 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:08:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.04s，速度 874897 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:08:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 592753 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:08:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 582596 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:08:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.36s，速度 541301 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:09:01 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.39s，速度 537991 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:09:01 - INFO - [mpc_aggregation_strategy.py:228] - [Round 2] MPC参数聚合完成，总耗时 20.42s，平均速度 547768 元素/秒
-2025-12-01 12:09:01 - INFO - [server_grpc.py:299] - [Round 2] Server Aggregation Resources - CPU Time: 20.9100s, Memory Usage: 2244.98 MB
-2025-12-01 12:09:01 - INFO - [server_grpc.py:306] - [Round 2] 全局模型参数更新完成。
-2025-12-01 12:09:01 - INFO - [mpc_aggregation_strategy.py:236] - [Round 2] 开始MPC指标评估...
-2025-12-01 12:09:01 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8144000000, 'test_num': 12000000000, 'auc': 11222196318, 'loss': 10629865501, 'train_num': 48000000000}
-2025-12-01 12:09:01 - INFO - [mpc_aggregation_strategy.py:302] - [Round 2] 全局评估 (MPC): Acc=0.6787, AUC=0.9352, Loss=0.2215
-2025-12-01 12:09:01 - INFO - [server_grpc.py:352] - 第 2 轮聚合完成，进入第 3 轮。
-2025-12-01 12:09:01 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:09:01 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:09:01 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:09:01 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:09:01 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:09:01 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:09:01 - INFO - [server_grpc.py:268] - 向客户端 3 提供第2轮全局模型
-2025-12-01 12:09:01 - INFO - [server_grpc.py:268] - 向客户端 2 提供第2轮全局模型
-2025-12-01 12:09:01 - INFO - [server_grpc.py:268] - 向客户端 1 提供第2轮全局模型
-2025-12-01 12:11:10 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:11:10 - INFO - [mpc_aggregation_strategy.py:155] - [Round 3] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:11:11 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:11:15 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:11:15 - INFO - [mpc_aggregation_strategy.py:155] - [Round 3] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:11:15 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:11:19 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:11:19 - INFO - [mpc_aggregation_strategy.py:155] - [Round 3] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:11:19 - INFO - [server_grpc.py:280] - [Round 3] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:11:19 - INFO - [mpc_aggregation_strategy.py:176] - [Round 3] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:11:19 - INFO - [mpc_aggregation_strategy.py:188] - [Round 3] 客户端权重: {'1': '0.3333', '2': '0.3333', '3': '0.3333'}
-2025-12-01 12:11:19 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:11:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.13s，速度 553550 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:11:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 670873 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:11:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 610546 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:11:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.40s，速度 536395 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:11:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 671243 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:11:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.12s，速度 599634 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:11:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 582583 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:11:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.25s，速度 529291 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:11:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 580828 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:11:27 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.05s，速度 563475 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:11:28 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.09s，速度 540431 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:11:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.03s，速度 572926 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:11:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.48s，速度 617381 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:11:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 623031 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:11:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.27s，速度 548146 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:11:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.26s，速度 557751 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:11:35 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.28s，速度 551106 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:11:39 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.28s，速度 551477 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:11:39 - INFO - [mpc_aggregation_strategy.py:228] - [Round 3] MPC参数聚合完成，总耗时 20.27s，平均速度 551836 元素/秒
-2025-12-01 12:11:39 - INFO - [server_grpc.py:299] - [Round 3] Server Aggregation Resources - CPU Time: 20.7500s, Memory Usage: 2510.88 MB
-2025-12-01 12:11:39 - INFO - [server_grpc.py:306] - [Round 3] 全局模型参数更新完成。
-2025-12-01 12:11:39 - INFO - [mpc_aggregation_strategy.py:236] - [Round 3] 开始MPC指标评估...
-2025-12-01 12:11:39 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 7832000000, 'test_num': 12000000000, 'auc': 11242898221, 'loss': 11891008314, 'train_num': 48000000000}
-2025-12-01 12:11:39 - INFO - [mpc_aggregation_strategy.py:302] - [Round 3] 全局评估 (MPC): Acc=0.6527, AUC=0.9369, Loss=0.2477
-2025-12-01 12:11:39 - INFO - [server_grpc.py:352] - 第 3 轮聚合完成，进入第 4 轮。
-2025-12-01 12:11:39 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:11:39 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:11:39 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:11:39 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:11:39 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:11:39 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:11:39 - INFO - [server_grpc.py:268] - 向客户端 1 提供第3轮全局模型
-2025-12-01 12:11:39 - INFO - [server_grpc.py:268] - 向客户端 3 提供第3轮全局模型
-2025-12-01 12:11:39 - INFO - [server_grpc.py:268] - 向客户端 2 提供第3轮全局模型
-2025-12-01 12:13:50 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:13:50 - INFO - [mpc_aggregation_strategy.py:155] - [Round 4] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:13:50 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:13:55 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:13:55 - INFO - [mpc_aggregation_strategy.py:155] - [Round 4] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:13:55 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:14:20 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:14:20 - INFO - [mpc_aggregation_strategy.py:155] - [Round 4] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:14:20 - INFO - [server_grpc.py:280] - [Round 4] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:14:20 - INFO - [mpc_aggregation_strategy.py:176] - [Round 4] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:14:20 - INFO - [mpc_aggregation_strategy.py:188] - [Round 4] 客户端权重: {'3': '0.3333', '2': '0.3333', '1': '0.3333'}
-2025-12-01 12:14:20 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:14:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.12s，速度 555530 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:14:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 673145 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:14:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 628213 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:14:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.13s，速度 571240 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:14:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 656099 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:14:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.11s，速度 663594 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:14:27 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 637084 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:14:27 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.21s，速度 616309 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:14:27 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 574317 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:14:28 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.02s，速度 578365 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:14:29 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.03s，速度 573690 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:14:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 0.98s，速度 602468 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:14:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.50s，速度 586987 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:14:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 640657 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:14:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.27s，速度 541764 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:14:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 606955 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:14:35 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.16s，速度 567728 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:14:39 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.22s，速度 558956 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:14:39 - INFO - [mpc_aggregation_strategy.py:228] - [Round 4] MPC参数聚合完成，总耗时 19.61s，平均速度 570394 元素/秒
-2025-12-01 12:14:39 - INFO - [server_grpc.py:299] - [Round 4] Server Aggregation Resources - CPU Time: 20.0700s, Memory Usage: 2281.35 MB
-2025-12-01 12:14:39 - INFO - [server_grpc.py:306] - [Round 4] 全局模型参数更新完成。
-2025-12-01 12:14:39 - INFO - [mpc_aggregation_strategy.py:236] - [Round 4] 开始MPC指标评估...
-2025-12-01 12:14:39 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8082000000, 'test_num': 12000000000, 'auc': 11254230055, 'loss': 11908206473, 'train_num': 48000000000}
-2025-12-01 12:14:39 - INFO - [mpc_aggregation_strategy.py:302] - [Round 4] 全局评估 (MPC): Acc=0.6735, AUC=0.9379, Loss=0.2481
-2025-12-01 12:14:39 - INFO - [server_grpc.py:352] - 第 4 轮聚合完成，进入第 5 轮。
-2025-12-01 12:14:39 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:14:39 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:14:39 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:14:39 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:14:39 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:14:39 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:14:39 - INFO - [server_grpc.py:268] - 向客户端 2 提供第4轮全局模型
-2025-12-01 12:14:39 - INFO - [server_grpc.py:268] - 向客户端 3 提供第4轮全局模型
-2025-12-01 12:14:40 - INFO - [server_grpc.py:268] - 向客户端 1 提供第4轮全局模型
-2025-12-01 12:16:48 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:16:48 - INFO - [mpc_aggregation_strategy.py:155] - [Round 5] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:16:51 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:16:51 - INFO - [mpc_aggregation_strategy.py:155] - [Round 5] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:16:51 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:16:51 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:17:00 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:17:00 - INFO - [mpc_aggregation_strategy.py:155] - [Round 5] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:17:00 - INFO - [server_grpc.py:280] - [Round 5] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:17:00 - INFO - [mpc_aggregation_strategy.py:176] - [Round 5] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:17:00 - INFO - [mpc_aggregation_strategy.py:188] - [Round 5] 客户端权重: {'2': '0.3333', '1': '0.3333', '3': '0.3333'}
-2025-12-01 12:17:00 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:17:02 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.02s，速度 582807 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:17:02 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 649116 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:17:02 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 658081 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:17:06 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.08s，速度 578204 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:17:06 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 666141 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:17:06 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.11s，速度 664276 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:17:06 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.28s，速度 534643 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:17:06 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.22s，速度 593133 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:17:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 591697 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:17:08 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.16s，速度 507090 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:17:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.05s，速度 561260 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:17:10 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.12s，速度 528585 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:17:10 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.62s，速度 475251 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:17:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 699145 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:17:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 645066 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:17:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 604310 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:17:15 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.21s，速度 559759 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:17:19 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.17s，速度 565124 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:17:19 - INFO - [mpc_aggregation_strategy.py:228] - [Round 5] MPC参数聚合完成，总耗时 19.89s，平均速度 562253 元素/秒
-2025-12-01 12:17:19 - INFO - [server_grpc.py:299] - [Round 5] Server Aggregation Resources - CPU Time: 20.3600s, Memory Usage: 2477.14 MB
-2025-12-01 12:17:19 - INFO - [server_grpc.py:306] - [Round 5] 全局模型参数更新完成。
-2025-12-01 12:17:19 - INFO - [mpc_aggregation_strategy.py:236] - [Round 5] 开始MPC指标评估...
-2025-12-01 12:17:19 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8320000000, 'test_num': 12000000000, 'auc': 11357598624, 'loss': 7101490663, 'train_num': 48000000000}
-2025-12-01 12:17:19 - INFO - [mpc_aggregation_strategy.py:302] - [Round 5] 全局评估 (MPC): Acc=0.6933, AUC=0.9465, Loss=0.1479
-2025-12-01 12:17:19 - INFO - [server_grpc.py:352] - 第 5 轮聚合完成，进入第 6 轮。
-2025-12-01 12:17:19 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:17:19 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:17:19 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:17:19 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:17:19 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:17:19 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:17:19 - INFO - [server_grpc.py:268] - 向客户端 1 提供第5轮全局模型
-2025-12-01 12:17:19 - INFO - [server_grpc.py:268] - 向客户端 2 提供第5轮全局模型
-2025-12-01 12:17:19 - INFO - [server_grpc.py:268] - 向客户端 3 提供第5轮全局模型
-2025-12-01 12:19:33 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:19:33 - INFO - [mpc_aggregation_strategy.py:155] - [Round 6] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:19:33 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:19:36 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:19:36 - INFO - [mpc_aggregation_strategy.py:155] - [Round 6] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:19:38 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:19:38 - INFO - [mpc_aggregation_strategy.py:155] - [Round 6] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:19:38 - INFO - [server_grpc.py:280] - [Round 6] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:19:38 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:19:38 - INFO - [mpc_aggregation_strategy.py:176] - [Round 6] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:19:38 - INFO - [mpc_aggregation_strategy.py:188] - [Round 6] 客户端权重: {'3': '0.3333', '2': '0.3333', '1': '0.3333'}
-2025-12-01 12:19:38 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:19:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.13s，速度 552653 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:19:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 551723 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:19:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 554714 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.11s，速度 573795 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.06s，速度 547454 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.14s，速度 545805 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 605194 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.19s，速度 694600 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 625498 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:19:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.01s，速度 582832 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:19:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.03s，速度 572736 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:19:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 0.97s，速度 605836 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:19:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.46s，速度 641595 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:19:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 597727 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:19:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.27s，速度 550957 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:19:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 640525 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:19:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.11s，速度 573349 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:19:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.10s，速度 575258 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:19:58 - INFO - [mpc_aggregation_strategy.py:228] - [Round 6] MPC参数聚合完成，总耗时 19.40s，平均速度 576469 元素/秒
-2025-12-01 12:19:58 - INFO - [server_grpc.py:299] - [Round 6] Server Aggregation Resources - CPU Time: 19.8700s, Memory Usage: 2525.51 MB
-2025-12-01 12:19:58 - INFO - [server_grpc.py:306] - [Round 6] 全局模型参数更新完成。
-2025-12-01 12:19:58 - INFO - [mpc_aggregation_strategy.py:236] - [Round 6] 开始MPC指标评估...
-2025-12-01 12:19:58 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8460000000, 'test_num': 12000000000, 'auc': 11413814346, 'loss': 5590643826, 'train_num': 48000000000}
-2025-12-01 12:19:58 - INFO - [mpc_aggregation_strategy.py:302] - [Round 6] 全局评估 (MPC): Acc=0.7050, AUC=0.9512, Loss=0.1165
-2025-12-01 12:19:58 - INFO - [server_grpc.py:352] - 第 6 轮聚合完成，进入第 7 轮。
-2025-12-01 12:19:58 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:19:58 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:19:58 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:19:58 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:19:58 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:19:58 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:19:58 - INFO - [server_grpc.py:268] - 向客户端 3 提供第6轮全局模型
-2025-12-01 12:19:58 - INFO - [server_grpc.py:268] - 向客户端 2 提供第6轮全局模型
-2025-12-01 12:19:58 - INFO - [server_grpc.py:268] - 向客户端 1 提供第6轮全局模型
-2025-12-01 12:22:07 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:22:07 - INFO - [mpc_aggregation_strategy.py:155] - [Round 7] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:22:07 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:22:09 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:22:09 - INFO - [mpc_aggregation_strategy.py:155] - [Round 7] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:22:09 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:22:16 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:22:16 - INFO - [mpc_aggregation_strategy.py:155] - [Round 7] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:22:16 - INFO - [server_grpc.py:280] - [Round 7] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:22:16 - INFO - [mpc_aggregation_strategy.py:176] - [Round 7] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:22:16 - INFO - [mpc_aggregation_strategy.py:188] - [Round 7] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
-2025-12-01 12:22:16 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:22:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.04s，速度 577691 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:22:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 622118 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:22:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 618418 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:22:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.12s，速度 572153 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:22:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.06s，速度 537539 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:22:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.13s，速度 576960 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:22:23 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 641953 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:22:23 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.19s，速度 673331 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:22:23 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 655495 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:22:24 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.01s，速度 585748 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:22:25 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.03s，速度 571573 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:22:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 0.98s，速度 601318 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:22:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.52s，速度 564397 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:22:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 617450 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:22:27 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.22s，速度 655802 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:22:27 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 633326 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:22:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.12s，速度 572307 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:22:35 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.04s，速度 584509 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:22:35 - INFO - [mpc_aggregation_strategy.py:228] - [Round 7] MPC参数聚合完成，总耗时 19.26s，平均速度 580715 元素/秒
-2025-12-01 12:22:35 - INFO - [server_grpc.py:299] - [Round 7] Server Aggregation Resources - CPU Time: 19.6900s, Memory Usage: 2575.02 MB
-2025-12-01 12:22:35 - INFO - [server_grpc.py:306] - [Round 7] 全局模型参数更新完成。
-2025-12-01 12:22:35 - INFO - [mpc_aggregation_strategy.py:236] - [Round 7] 开始MPC指标评估...
-2025-12-01 12:22:35 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8688000000, 'test_num': 12000000000, 'auc': 11481175485, 'loss': 4661973293, 'train_num': 48000000000}
-2025-12-01 12:22:35 - INFO - [mpc_aggregation_strategy.py:302] - [Round 7] 全局评估 (MPC): Acc=0.7240, AUC=0.9568, Loss=0.0971
-2025-12-01 12:22:35 - INFO - [server_grpc.py:352] - 第 7 轮聚合完成，进入第 8 轮。
-2025-12-01 12:22:35 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:22:35 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:22:35 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:22:35 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:22:35 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:22:35 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:22:35 - INFO - [server_grpc.py:268] - 向客户端 3 提供第7轮全局模型
-2025-12-01 12:22:35 - INFO - [server_grpc.py:268] - 向客户端 2 提供第7轮全局模型
-2025-12-01 12:22:35 - INFO - [server_grpc.py:268] - 向客户端 1 提供第7轮全局模型
-2025-12-01 12:24:37 - INFO - [server_grpc.py:217] - [Round 8] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:24:37 - INFO - [mpc_aggregation_strategy.py:155] - [Round 8] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:24:37 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:24:46 - INFO - [server_grpc.py:217] - [Round 8] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:24:46 - INFO - [mpc_aggregation_strategy.py:155] - [Round 8] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:24:47 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:24:53 - INFO - [server_grpc.py:217] - [Round 8] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:24:53 - INFO - [mpc_aggregation_strategy.py:155] - [Round 8] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:24:53 - INFO - [server_grpc.py:280] - [Round 8] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:24:53 - INFO - [mpc_aggregation_strategy.py:176] - [Round 8] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:24:53 - INFO - [mpc_aggregation_strategy.py:188] - [Round 8] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
-2025-12-01 12:24:53 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:24:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.04s，速度 577318 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:24:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 616434 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:24:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 633764 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:25:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.12s，速度 573330 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:25:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 621030 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:25:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.12s，速度 638261 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:25:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.22s，速度 669282 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:25:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.21s，速度 639024 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:25:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 630089 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:25:01 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 0.99s，速度 597183 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:25:02 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.02s，速度 577139 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:25:03 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.02s，速度 575600 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:25:04 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.51s，速度 575754 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:25:04 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.04s，速度 890708 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:25:04 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 604826 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:25:04 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.22s，速度 677971 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:25:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.17s，速度 566357 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:25:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.17s，速度 566141 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:25:13 - INFO - [mpc_aggregation_strategy.py:228] - [Round 8] MPC参数聚合完成，总耗时 19.39s，平均速度 576715 元素/秒
-2025-12-01 12:25:13 - INFO - [server_grpc.py:299] - [Round 8] Server Aggregation Resources - CPU Time: 19.8500s, Memory Usage: 2499.01 MB
-2025-12-01 12:25:13 - INFO - [server_grpc.py:306] - [Round 8] 全局模型参数更新完成。
-2025-12-01 12:25:13 - INFO - [mpc_aggregation_strategy.py:236] - [Round 8] 开始MPC指标评估...
-2025-12-01 12:25:13 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8913000000, 'test_num': 12000000000, 'auc': 11527372248, 'loss': 2733092875, 'train_num': 48000000000}
-2025-12-01 12:25:13 - INFO - [mpc_aggregation_strategy.py:302] - [Round 8] 全局评估 (MPC): Acc=0.7428, AUC=0.9606, Loss=0.0569
-2025-12-01 12:25:13 - INFO - [server_grpc.py:352] - 第 8 轮聚合完成，进入第 9 轮。
-2025-12-01 12:25:13 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:25:13 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:25:13 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:25:13 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:25:13 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:25:13 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:25:13 - INFO - [server_grpc.py:268] - 向客户端 1 提供第8轮全局模型
-2025-12-01 12:25:13 - INFO - [server_grpc.py:268] - 向客户端 3 提供第8轮全局模型
-2025-12-01 12:25:13 - INFO - [server_grpc.py:268] - 向客户端 2 提供第8轮全局模型
-2025-12-01 12:27:20 - INFO - [server_grpc.py:217] - [Round 9] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:27:20 - INFO - [mpc_aggregation_strategy.py:155] - [Round 9] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:27:20 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:27:26 - INFO - [server_grpc.py:217] - [Round 9] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:27:26 - INFO - [mpc_aggregation_strategy.py:155] - [Round 9] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:27:29 - INFO - [server_grpc.py:217] - [Round 9] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:27:29 - INFO - [mpc_aggregation_strategy.py:155] - [Round 9] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:27:29 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:27:29 - INFO - [server_grpc.py:280] - [Round 9] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:27:29 - INFO - [mpc_aggregation_strategy.py:176] - [Round 9] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:27:29 - INFO - [mpc_aggregation_strategy.py:188] - [Round 9] 客户端权重: {'1': '0.3333', '2': '0.3333', '3': '0.3333'}
-2025-12-01 12:27:29 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:27:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.04s，速度 577329 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:27:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 583963 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:27:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 629966 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:27:35 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.10s，速度 575002 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:27:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.06s，速度 566925 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:27:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.12s，速度 631818 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:27:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.26s，速度 569730 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:27:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.21s，速度 636074 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:27:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 653876 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:27:37 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 0.98s，速度 599789 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:27:38 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.07s，速度 552439 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:27:39 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 0.99s，速度 595985 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:27:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.46s，速度 641300 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:27:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 661836 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:27:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 604511 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:27:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.26s，速度 562047 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:27:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.17s，速度 565766 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:27:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.20s，速度 561846 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:27:49 - INFO - [mpc_aggregation_strategy.py:228] - [Round 9] MPC参数聚合完成，总耗时 19.48s，平均速度 574097 元素/秒
-2025-12-01 12:27:49 - INFO - [server_grpc.py:299] - [Round 9] Server Aggregation Resources - CPU Time: 19.9400s, Memory Usage: 2522.76 MB
-2025-12-01 12:27:49 - INFO - [server_grpc.py:306] - [Round 9] 全局模型参数更新完成。
-2025-12-01 12:27:49 - INFO - [mpc_aggregation_strategy.py:236] - [Round 9] 开始MPC指标评估...
-2025-12-01 12:27:49 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8797000000, 'test_num': 12000000000, 'auc': 11512462832, 'loss': 3142281450, 'train_num': 48000000000}
-2025-12-01 12:27:49 - INFO - [mpc_aggregation_strategy.py:302] - [Round 9] 全局评估 (MPC): Acc=0.7331, AUC=0.9594, Loss=0.0655
-2025-12-01 12:27:49 - INFO - [server_grpc.py:352] - 第 9 轮聚合完成，进入第 10 轮。
-2025-12-01 12:27:49 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:27:49 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:27:49 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:27:49 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:27:49 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:27:49 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:27:49 - INFO - [server_grpc.py:268] - 向客户端 1 提供第9轮全局模型
-2025-12-01 12:27:49 - INFO - [server_grpc.py:268] - 向客户端 3 提供第9轮全局模型
-2025-12-01 12:27:49 - INFO - [server_grpc.py:268] - 向客户端 2 提供第9轮全局模型
-2025-12-01 12:29:49 - INFO - [server_grpc.py:217] - [Round 10] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:29:49 - INFO - [mpc_aggregation_strategy.py:155] - [Round 10] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:29:49 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:29:58 - INFO - [server_grpc.py:217] - [Round 10] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:29:58 - INFO - [mpc_aggregation_strategy.py:155] - [Round 10] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:29:58 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:30:05 - INFO - [server_grpc.py:217] - [Round 10] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:30:05 - INFO - [mpc_aggregation_strategy.py:155] - [Round 10] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:30:05 - INFO - [server_grpc.py:280] - [Round 10] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:30:05 - INFO - [mpc_aggregation_strategy.py:176] - [Round 10] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:30:05 - INFO - [mpc_aggregation_strategy.py:188] - [Round 10] 客户端权重: {'3': '0.3333', '2': '0.3333', '1': '0.3333'}
-2025-12-01 12:30:05 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:30:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 1.97s，速度 597712 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:30:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 563502 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:30:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 549422 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:30:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.16s，速度 567081 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:30:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 657027 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:30:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.11s，速度 665901 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:30:12 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 616891 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:30:12 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.22s，速度 593303 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:30:12 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 702573 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:30:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 1.01s，速度 583322 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:30:14 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.03s，速度 570696 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:30:15 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.02s，速度 578532 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:30:15 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.58s，速度 505338 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:30:16 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 690917 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:30:16 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 641876 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:30:16 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 581466 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:30:20 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.17s，速度 566084 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:30:24 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.19s，速度 562723 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:30:24 - INFO - [mpc_aggregation_strategy.py:228] - [Round 10] MPC参数聚合完成，总耗时 19.56s，平均速度 571698 元素/秒
-2025-12-01 12:30:24 - INFO - [server_grpc.py:299] - [Round 10] Server Aggregation Resources - CPU Time: 20.0500s, Memory Usage: 2478.24 MB
-2025-12-01 12:30:24 - INFO - [server_grpc.py:306] - [Round 10] 全局模型参数更新完成。
-2025-12-01 12:30:24 - INFO - [mpc_aggregation_strategy.py:236] - [Round 10] 开始MPC指标评估...
-2025-12-01 12:30:24 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9136000000, 'test_num': 12000000000, 'auc': 11581430137, 'loss': 1482860988, 'train_num': 48000000000}
-2025-12-01 12:30:24 - INFO - [mpc_aggregation_strategy.py:302] - [Round 10] 全局评估 (MPC): Acc=0.7613, AUC=0.9651, Loss=0.0309
-2025-12-01 12:30:24 - INFO - [server_grpc.py:352] - 第 10 轮聚合完成，进入第 11 轮。
-2025-12-01 12:30:24 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:30:24 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:30:24 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:30:24 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:30:24 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:30:24 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:30:24 - INFO - [server_grpc.py:268] - 向客户端 1 提供第10轮全局模型
-2025-12-01 12:30:24 - INFO - [server_grpc.py:268] - 向客户端 2 提供第10轮全局模型
-2025-12-01 12:30:24 - INFO - [server_grpc.py:268] - 向客户端 3 提供第10轮全局模型
-2025-12-01 12:32:33 - INFO - [server_grpc.py:217] - [Round 11] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:32:33 - INFO - [mpc_aggregation_strategy.py:155] - [Round 11] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:32:33 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:32:39 - INFO - [server_grpc.py:217] - [Round 11] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:32:39 - INFO - [mpc_aggregation_strategy.py:155] - [Round 11] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:32:41 - INFO - [server_grpc.py:217] - [Round 11] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:32:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 11] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:32:41 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:32:41 - INFO - [server_grpc.py:280] - [Round 11] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:32:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 11] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:32:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 11] 客户端权重: {'3': '0.3333', '2': '0.3333', '1': '0.3333'}
-2025-12-01 12:32:41 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:32:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.05s，速度 574977 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:32:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 688992 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:32:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 714049 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:32:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 3.96s，速度 595441 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:32:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 648181 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:32:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.12s，速度 615447 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:32:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 592198 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:32:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.21s，速度 625887 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:32:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 700701 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:32:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 0.94s，速度 625023 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:32:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.05s，速度 564195 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:32:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 1.03s，速度 570561 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:32:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.46s，速度 636274 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:32:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 660815 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:32:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.25s，速度 580548 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:32:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 648394 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:32:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.12s，速度 572455 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:33:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.12s，速度 572290 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:33:00 - INFO - [mpc_aggregation_strategy.py:228] - [Round 11] MPC参数聚合完成，总耗时 19.15s，平均速度 584114 元素/秒
-2025-12-01 12:33:00 - INFO - [server_grpc.py:299] - [Round 11] Server Aggregation Resources - CPU Time: 19.6200s, Memory Usage: 2609.17 MB
-2025-12-01 12:33:00 - INFO - [server_grpc.py:306] - [Round 11] 全局模型参数更新完成。
-2025-12-01 12:33:00 - INFO - [mpc_aggregation_strategy.py:236] - [Round 11] 开始MPC指标评估...
-2025-12-01 12:33:00 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9081000000, 'test_num': 12000000000, 'auc': 11577957998, 'loss': 1927112079, 'train_num': 48000000000}
-2025-12-01 12:33:00 - INFO - [mpc_aggregation_strategy.py:302] - [Round 11] 全局评估 (MPC): Acc=0.7568, AUC=0.9648, Loss=0.0401
-2025-12-01 12:33:00 - INFO - [server_grpc.py:352] - 第 11 轮聚合完成，进入第 12 轮。
-2025-12-01 12:33:00 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=200)
-2025-12-01 12:33:00 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:33:00 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=200)
-2025-12-01 12:33:00 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:33:00 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=200)
-2025-12-01 12:33:00 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:33:00 - INFO - [server_grpc.py:268] - 向客户端 2 提供第11轮全局模型
-2025-12-01 12:33:00 - INFO - [server_grpc.py:268] - 向客户端 3 提供第11轮全局模型
-2025-12-01 12:33:00 - INFO - [server_grpc.py:268] - 向客户端 1 提供第11轮全局模型
-2025-12-01 12:35:01 - INFO - [server_grpc.py:217] - [Round 12] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
-2025-12-01 12:35:01 - INFO - [mpc_aggregation_strategy.py:155] - [Round 12] 收到客户端 2 的MPC份额更新。
-2025-12-01 12:35:01 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
-2025-12-01 12:35:10 - INFO - [server_grpc.py:217] - [Round 12] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
-2025-12-01 12:35:10 - INFO - [mpc_aggregation_strategy.py:155] - [Round 12] 收到客户端 1 的MPC份额更新。
-2025-12-01 12:35:10 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
-2025-12-01 12:35:15 - INFO - [server_grpc.py:217] - [Round 12] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
-2025-12-01 12:35:15 - INFO - [mpc_aggregation_strategy.py:155] - [Round 12] 收到客户端 3 的MPC份额更新。
-2025-12-01 12:35:15 - INFO - [server_grpc.py:280] - [Round 12] 所有客户端参数已收集完毕，开始聚合。
-2025-12-01 12:35:15 - INFO - [mpc_aggregation_strategy.py:176] - [Round 12] 开始MPC参数聚合（向量化 v2，加权）...
-2025-12-01 12:35:15 - INFO - [mpc_aggregation_strategy.py:188] - [Round 12] 客户端权重: {'2': '0.3333', '1': '0.3333', '3': '0.3333'}
-2025-12-01 12:35:15 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
-2025-12-01 12:35:17 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 2.03s，速度 581873 元素/秒，进度: 1,179,650/11,183,582 (10.5%)
-2025-12-01 12:35:17 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 579779 元素/秒，进度: 1,216,770/11,183,582 (10.9%)
-2025-12-01 12:35:17 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 583342 元素/秒，进度: 1,253,634/11,183,582 (11.2%)
-2025-12-01 12:35:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.09s，速度 577500 元素/秒，进度: 3,614,211/11,183,582 (32.3%)
-2025-12-01 12:35:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.05s，速度 621246 元素/秒，进度: 3,646,980/11,183,582 (32.6%)
-2025-12-01 12:35:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.11s，速度 645133 元素/秒，进度: 3,720,964/11,183,582 (33.3%)
-2025-12-01 12:35:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.22s，速度 671136 元素/秒，进度: 3,869,060/11,183,582 (34.6%)
-2025-12-01 12:35:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.21s，速度 622965 元素/秒，进度: 4,004,294/11,183,582 (35.8%)
-2025-12-01 12:35:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 598704 元素/秒，进度: 4,051,977/11,183,582 (36.2%)
-2025-12-01 12:35:23 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 0.98s，速度 602371 元素/秒，进度: 4,642,378/11,183,582 (41.5%)
-2025-12-01 12:35:24 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 1.00s，速度 589554 元素/秒，进度: 5,235,278/11,183,582 (46.8%)
-2025-12-01 12:35:25 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 0.98s，速度 601397 元素/秒，进度: 5,833,358/11,183,582 (52.2%)
-2025-12-01 12:35:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 0.53s，速度 552684 元素/秒，进度: 6,128,526/11,183,582 (54.8%)
-2025-12-01 12:35:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 570587 元素/秒，进度: 6,165,455/11,183,582 (55.1%)
-2025-12-01 12:35:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.23s，速度 651531 元素/秒，进度: 6,313,551/11,183,582 (56.5%)
-2025-12-01 12:35:26 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.24s，速度 625053 元素/秒，进度: 6,462,287/11,183,582 (57.8%)
-2025-12-01 12:35:30 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 4.09s，速度 577102 元素/秒，进度: 8,821,841/11,183,582 (78.9%)
-2025-12-01 12:35:34 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 4.08s，速度 578130 元素/秒，进度: 11,182,748/11,183,582 (100.0%)
-2025-12-01 12:35:34 - INFO - [mpc_aggregation_strategy.py:228] - [Round 12] MPC参数聚合完成，总耗时 19.17s，平均速度 583296 元素/秒
-2025-12-01 12:35:34 - INFO - [server_grpc.py:299] - [Round 12] Server Aggregation Resources - CPU Time: 19.6400s, Memory Usage: 2589.74 MB
-2025-12-01 12:35:34 - INFO - [server_grpc.py:306] - [Round 12] 全局模型参数更新完成。
-2025-12-01 12:35:34 - INFO - [mpc_aggregation_strategy.py:236] - [Round 12] 开始MPC指标评估...
-2025-12-01 12:35:34 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9145000000, 'test_num': 12000000000, 'auc': 11590878429, 'loss': 2054735968, 'train_num': 48000000000}
-2025-12-01 12:35:34 - INFO - [mpc_aggregation_strategy.py:302] - [Round 12] 全局评估 (MPC): Acc=0.7621, AUC=0.9659, Loss=0.0428
-2025-12-01 12:35:34 - INFO - [server_grpc.py:365] - [Round 12] 训练已收敛，准确率变化 (0.005333) 小于阈值 (0.01)。
-2025-12-01 12:35:34 - INFO - [server_grpc.py:316] - 训练结束。总耗时: 1920.26 秒
-2025-12-01 12:35:34 - INFO - [server_grpc.py:330] - 通信开销 (KB) 汇总:
+2025-12-02 05:06:40 - INFO - [logging_config.py:70] - 日志文件已创建: logs/server_mpc.log
+2025-12-02 05:06:40 - INFO - [server_grpc.py:69] - 服务器配置: Dataset=cifar10, Model=resnet18
+2025-12-02 05:06:40 - INFO - [mpc_aggregation_strategy.py:25] - MPC 聚合策略已初始化（高性能向量化版本 v2）。
+2025-12-02 05:06:40 - INFO - [mpc_aggregation_strategy.py:57] - 已预计算拉格朗日系数: [3, 2305843009213693948, 1]
+2025-12-02 05:06:40 - INFO - [server_grpc.py:97] - 服务器初始化完成 (模式: mpc)，等待 3 个客户端注册...
+2025-12-02 05:06:40 - INFO - [server_grpc.py:394] - 联邦学习安全服务器正在启动，监听端口: 50051
+2025-12-02 05:07:17 - INFO - [server_grpc.py:116] - 接收到客户端 3 的注册请求 (模型: resnet18, 数据量: 16000)
+2025-12-02 05:07:17 - INFO - [server_grpc.py:125] - 客户端 3 注册成功。当前 1/3 个客户端。
+2025-12-02 05:07:17 - INFO - [mpc_aggregation_strategy.py:126] - 为客户端 3 准备MPC模式的设置响应。
+2025-12-02 05:07:18 - INFO - [server_grpc.py:116] - 接收到客户端 2 的注册请求 (模型: resnet18, 数据量: 16000)
+2025-12-02 05:07:18 - INFO - [server_grpc.py:125] - 客户端 2 注册成功。当前 2/3 个客户端。
+2025-12-02 05:07:18 - INFO - [mpc_aggregation_strategy.py:126] - 为客户端 2 准备MPC模式的设置响应。
+2025-12-02 05:07:18 - INFO - [server_grpc.py:116] - 接收到客户端 1 的注册请求 (模型: resnet18, 数据量: 16000)
+2025-12-02 05:07:18 - INFO - [server_grpc.py:125] - 客户端 1 注册成功。当前 3/3 个客户端。
+2025-12-02 05:07:18 - INFO - [mpc_aggregation_strategy.py:126] - 为客户端 1 准备MPC模式的设置响应。
+2025-12-02 05:07:18 - INFO - [server_grpc.py:131] - 所有客户端已注册，设置 next_step=True，准备开始训练。
+2025-12-02 05:07:18 - INFO - [server_grpc.py:134] - 联邦学习流程计时开始
+2025-12-02 05:07:29 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:07:31 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:07:31 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:09:15 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:09:15 - INFO - [mpc_aggregation_strategy.py:155] - [Round 1] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:09:15 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:09:26 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:09:26 - INFO - [mpc_aggregation_strategy.py:155] - [Round 1] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:09:26 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:09:35 - INFO - [server_grpc.py:217] - [Round 1] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:09:35 - INFO - [mpc_aggregation_strategy.py:155] - [Round 1] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:09:35 - INFO - [server_grpc.py:280] - [Round 1] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:09:35 - INFO - [mpc_aggregation_strategy.py:176] - [Round 1] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:09:35 - INFO - [mpc_aggregation_strategy.py:188] - [Round 1] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
+2025-12-02 05:09:35 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:09:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.16s，速度 254986 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:09:38 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.32s，速度 254705 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:09:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 9.04s，速度 260882 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:09:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 277124 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:09:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 578934 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:09:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 761718 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:09:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 764255 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:09:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.48s，速度 274967 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:09:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.31s，速度 255550 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:09:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 759919 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:09:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 306946 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:09:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.61s，速度 240167 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:09:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 604409 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:09:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.58s，速度 254368 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:09:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.21s，速度 266495 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:10:04 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 9.10s，速度 259333 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:10:08 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.34s，速度 271720 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:10:17 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.69s，速度 271385 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:10:17 - INFO - [mpc_aggregation_strategy.py:228] - [Round 1] MPC参数聚合完成，总耗时 41.98s，平均速度 266405 元素/秒
+2025-12-02 05:10:17 - INFO - [server_grpc.py:299] - [Round 1] Server Aggregation Resources - CPU Time: 45.3800s, Memory Usage: 2153.67 MB
+2025-12-02 05:10:17 - INFO - [server_grpc.py:306] - [Round 1] 全局模型参数更新完成。
+2025-12-02 05:10:17 - INFO - [mpc_aggregation_strategy.py:236] - [Round 1] 开始MPC指标评估...
+2025-12-02 05:10:17 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 7866000000, 'test_num': 12000000000, 'auc': 11110794693, 'loss': 47009542510, 'train_num': 48000000000}
+2025-12-02 05:10:17 - INFO - [mpc_aggregation_strategy.py:302] - [Round 1] 全局评估 (MPC): Acc=0.6555, AUC=0.9259, Loss=0.9794
+2025-12-02 05:10:17 - INFO - [server_grpc.py:352] - 第 1 轮聚合完成，进入第 2 轮。
+2025-12-02 05:10:17 - INFO - [server_grpc.py:268] - 向客户端 1 提供第1轮全局模型
+2025-12-02 05:10:17 - INFO - [server_grpc.py:268] - 向客户端 3 提供第1轮全局模型
+2025-12-02 05:10:17 - INFO - [server_grpc.py:268] - 向客户端 2 提供第1轮全局模型
+2025-12-02 05:12:12 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:12:12 - INFO - [mpc_aggregation_strategy.py:155] - [Round 2] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:12:12 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:12:34 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:12:34 - INFO - [mpc_aggregation_strategy.py:155] - [Round 2] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:12:34 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:13:05 - INFO - [server_grpc.py:217] - [Round 2] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:13:05 - INFO - [mpc_aggregation_strategy.py:155] - [Round 2] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:13:05 - INFO - [server_grpc.py:280] - [Round 2] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:13:05 - INFO - [mpc_aggregation_strategy.py:176] - [Round 2] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:13:05 - INFO - [mpc_aggregation_strategy.py:188] - [Round 2] 客户端权重: {'1': '0.3333', '3': '0.3333', '2': '0.3333'}
+2025-12-02 05:13:05 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:13:06 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.19s，速度 247132 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:13:08 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.30s，速度 256704 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:13:17 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 9.13s，速度 258325 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:13:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 263507 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:13:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 554517 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:13:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 754131 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:13:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 672967 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:13:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.50s，速度 259860 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:13:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.28s，速度 258241 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:13:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 744644 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:13:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 302503 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:13:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.58s，速度 253584 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:13:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 644377 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:13:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.57s，速度 257857 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:13:25 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.41s，速度 245131 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:13:34 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 9.09s，速度 259476 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:13:38 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.51s，速度 261459 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:13:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 9.20s，速度 256358 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:13:47 - INFO - [mpc_aggregation_strategy.py:228] - [Round 2] MPC参数聚合完成，总耗时 42.96s，平均速度 260337 元素/秒
+2025-12-02 05:13:47 - INFO - [server_grpc.py:299] - [Round 2] Server Aggregation Resources - CPU Time: 46.5100s, Memory Usage: 2245.44 MB
+2025-12-02 05:13:48 - INFO - [server_grpc.py:306] - [Round 2] 全局模型参数更新完成。
+2025-12-02 05:13:48 - INFO - [mpc_aggregation_strategy.py:236] - [Round 2] 开始MPC指标评估...
+2025-12-02 05:13:48 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 8542000000, 'test_num': 12000000000, 'auc': 11274297860, 'loss': 36851776556, 'train_num': 48000000000}
+2025-12-02 05:13:48 - INFO - [mpc_aggregation_strategy.py:302] - [Round 2] 全局评估 (MPC): Acc=0.7118, AUC=0.9395, Loss=0.7677
+2025-12-02 05:13:48 - INFO - [server_grpc.py:352] - 第 2 轮聚合完成，进入第 3 轮。
+2025-12-02 05:13:48 - INFO - [server_grpc.py:268] - 向客户端 2 提供第2轮全局模型
+2025-12-02 05:13:48 - INFO - [server_grpc.py:268] - 向客户端 3 提供第2轮全局模型
+2025-12-02 05:13:48 - INFO - [server_grpc.py:268] - 向客户端 1 提供第2轮全局模型
+2025-12-02 05:15:58 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:15:58 - INFO - [mpc_aggregation_strategy.py:155] - [Round 3] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:15:58 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:16:02 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:16:02 - INFO - [mpc_aggregation_strategy.py:155] - [Round 3] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:16:02 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:16:28 - INFO - [server_grpc.py:217] - [Round 3] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:16:28 - INFO - [mpc_aggregation_strategy.py:155] - [Round 3] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:16:28 - INFO - [server_grpc.py:280] - [Round 3] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:16:28 - INFO - [mpc_aggregation_strategy.py:176] - [Round 3] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:16:28 - INFO - [mpc_aggregation_strategy.py:188] - [Round 3] 客户端权重: {'3': '0.3333', '2': '0.3333', '1': '0.3333'}
+2025-12-02 05:16:28 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:16:29 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.16s，速度 254814 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:16:31 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.29s，速度 257884 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:16:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 9.27s，速度 254603 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:16:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.57s，速度 258979 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:16:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 575474 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:16:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 768579 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:16:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 758750 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:16:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.50s，速度 262013 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:16:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.30s，速度 256370 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:16:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 752056 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:16:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.25s，速度 290722 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:16:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.58s，速度 254852 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:16:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 675994 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:16:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.57s，速度 260126 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:16:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.41s，速度 244665 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:16:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 9.08s，速度 259890 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:17:02 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.54s，速度 259762 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:17:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 9.23s，速度 255513 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:17:11 - INFO - [mpc_aggregation_strategy.py:228] - [Round 3] MPC参数聚合完成，总耗时 43.11s，平均速度 259440 元素/秒
+2025-12-02 05:17:11 - INFO - [server_grpc.py:299] - [Round 3] Server Aggregation Resources - CPU Time: 46.7100s, Memory Usage: 2265.29 MB
+2025-12-02 05:17:11 - INFO - [server_grpc.py:306] - [Round 3] 全局模型参数更新完成。
+2025-12-02 05:17:11 - INFO - [mpc_aggregation_strategy.py:236] - [Round 3] 开始MPC指标评估...
+2025-12-02 05:17:11 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9022000000, 'test_num': 12000000000, 'auc': 11438246832, 'loss': 29985992201, 'train_num': 48000000000}
+2025-12-02 05:17:11 - INFO - [mpc_aggregation_strategy.py:302] - [Round 3] 全局评估 (MPC): Acc=0.7518, AUC=0.9532, Loss=0.6247
+2025-12-02 05:17:11 - INFO - [server_grpc.py:352] - 第 3 轮聚合完成，进入第 4 轮。
+2025-12-02 05:17:11 - INFO - [server_grpc.py:268] - 向客户端 1 提供第3轮全局模型
+2025-12-02 05:17:11 - INFO - [server_grpc.py:268] - 向客户端 3 提供第3轮全局模型
+2025-12-02 05:17:11 - INFO - [server_grpc.py:268] - 向客户端 2 提供第3轮全局模型
+2025-12-02 05:19:12 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:19:12 - INFO - [mpc_aggregation_strategy.py:155] - [Round 4] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:19:13 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:19:25 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:19:25 - INFO - [mpc_aggregation_strategy.py:155] - [Round 4] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:19:25 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:19:32 - INFO - [server_grpc.py:217] - [Round 4] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:19:32 - INFO - [mpc_aggregation_strategy.py:155] - [Round 4] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:19:32 - INFO - [server_grpc.py:280] - [Round 4] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:19:32 - INFO - [mpc_aggregation_strategy.py:176] - [Round 4] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:19:32 - INFO - [mpc_aggregation_strategy.py:188] - [Round 4] 客户端权重: {'1': '0.3333', '3': '0.3333', '2': '0.3333'}
+2025-12-02 05:19:32 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:19:33 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.17s，速度 251852 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:19:35 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 271120 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:19:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.83s，速度 267190 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:19:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.49s，速度 300559 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:19:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 551619 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:19:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 793870 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:19:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 791286 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:19:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.48s，速度 271240 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:19:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.19s，速度 269167 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:19:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 783039 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:19:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 314209 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:19:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 263875 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:19:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 619000 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:19:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 269529 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:19:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.27s，速度 260090 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:20:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.67s，速度 272197 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:20:04 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.23s，速度 278791 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:20:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.75s，速度 269527 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:20:13 - INFO - [mpc_aggregation_strategy.py:228] - [Round 4] MPC参数聚合完成，总耗时 40.96s，平均速度 273008 元素/秒
+2025-12-02 05:20:13 - INFO - [server_grpc.py:299] - [Round 4] Server Aggregation Resources - CPU Time: 44.3900s, Memory Usage: 2410.12 MB
+2025-12-02 05:20:13 - INFO - [server_grpc.py:306] - [Round 4] 全局模型参数更新完成。
+2025-12-02 05:20:13 - INFO - [mpc_aggregation_strategy.py:236] - [Round 4] 开始MPC指标评估...
+2025-12-02 05:20:13 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9198000000, 'test_num': 12000000000, 'auc': 11530929845, 'loss': 27269882875, 'train_num': 48000000000}
+2025-12-02 05:20:13 - INFO - [mpc_aggregation_strategy.py:302] - [Round 4] 全局评估 (MPC): Acc=0.7665, AUC=0.9609, Loss=0.5681
+2025-12-02 05:20:13 - INFO - [server_grpc.py:352] - 第 4 轮聚合完成，进入第 5 轮。
+2025-12-02 05:20:13 - INFO - [server_grpc.py:268] - 向客户端 1 提供第4轮全局模型
+2025-12-02 05:20:13 - INFO - [server_grpc.py:268] - 向客户端 2 提供第4轮全局模型
+2025-12-02 05:20:13 - INFO - [server_grpc.py:268] - 向客户端 3 提供第4轮全局模型
+2025-12-02 05:22:21 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:22:21 - INFO - [mpc_aggregation_strategy.py:155] - [Round 5] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:22:21 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:22:28 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:22:28 - INFO - [mpc_aggregation_strategy.py:155] - [Round 5] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:22:28 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:22:35 - INFO - [server_grpc.py:217] - [Round 5] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:22:35 - INFO - [mpc_aggregation_strategy.py:155] - [Round 5] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:22:35 - INFO - [server_grpc.py:280] - [Round 5] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:22:35 - INFO - [mpc_aggregation_strategy.py:176] - [Round 5] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:22:35 - INFO - [mpc_aggregation_strategy.py:188] - [Round 5] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
+2025-12-02 05:22:35 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:22:36 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.12s，速度 262165 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:22:38 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 270071 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:22:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.72s，速度 270542 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:22:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 273711 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:22:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 592262 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:22:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 791168 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:22:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 804017 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:22:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 281279 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:22:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.19s，速度 269707 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:22:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 793949 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:22:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 313350 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:22:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 265847 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:22:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 611458 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:22:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 276163 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:22:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.26s，速度 261305 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:23:03 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.57s，速度 275159 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:23:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.29s，速度 274718 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:23:15 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.55s，速度 275872 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:23:15 - INFO - [mpc_aggregation_strategy.py:228] - [Round 5] MPC参数聚合完成，总耗时 40.58s，平均速度 275585 元素/秒
+2025-12-02 05:23:15 - INFO - [server_grpc.py:299] - [Round 5] Server Aggregation Resources - CPU Time: 43.9400s, Memory Usage: 2493.12 MB
+2025-12-02 05:23:15 - INFO - [server_grpc.py:306] - [Round 5] 全局模型参数更新完成。
+2025-12-02 05:23:15 - INFO - [mpc_aggregation_strategy.py:236] - [Round 5] 开始MPC指标评估...
+2025-12-02 05:23:15 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9778000000, 'test_num': 12000000000, 'auc': 11666220179, 'loss': 18948978596, 'train_num': 48000000000}
+2025-12-02 05:23:15 - INFO - [mpc_aggregation_strategy.py:302] - [Round 5] 全局评估 (MPC): Acc=0.8148, AUC=0.9722, Loss=0.3948
+2025-12-02 05:23:15 - INFO - [server_grpc.py:352] - 第 5 轮聚合完成，进入第 6 轮。
+2025-12-02 05:23:15 - INFO - [server_grpc.py:268] - 向客户端 3 提供第5轮全局模型
+2025-12-02 05:23:15 - INFO - [server_grpc.py:268] - 向客户端 1 提供第5轮全局模型
+2025-12-02 05:23:15 - INFO - [server_grpc.py:268] - 向客户端 2 提供第5轮全局模型
+2025-12-02 05:25:20 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:25:20 - INFO - [mpc_aggregation_strategy.py:155] - [Round 6] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:25:20 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:25:32 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:25:32 - INFO - [mpc_aggregation_strategy.py:155] - [Round 6] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:25:32 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:25:37 - INFO - [server_grpc.py:217] - [Round 6] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:25:37 - INFO - [mpc_aggregation_strategy.py:155] - [Round 6] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:25:37 - INFO - [server_grpc.py:280] - [Round 6] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:25:37 - INFO - [mpc_aggregation_strategy.py:176] - [Round 6] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:25:37 - INFO - [mpc_aggregation_strategy.py:188] - [Round 6] 客户端权重: {'2': '0.3333', '1': '0.3333', '3': '0.3333'}
+2025-12-02 05:25:37 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:25:38 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.11s，速度 265781 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:25:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.17s，速度 271419 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:25:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.79s，速度 268357 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:25:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.46s，速度 319462 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:25:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 524541 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:25:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 804004 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:25:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 797938 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:25:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 278707 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:25:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.17s，速度 271285 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:25:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 794955 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:25:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.25s，速度 298606 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:25:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 272470 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:25:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 680547 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:25:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 276868 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:25:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.29s，速度 257364 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:26:05 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.64s，速度 273166 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:26:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.27s，速度 276254 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:26:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.56s，速度 275692 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:26:18 - INFO - [mpc_aggregation_strategy.py:228] - [Round 6] MPC参数聚合完成，总耗时 40.61s，平均速度 275385 元素/秒
+2025-12-02 05:26:18 - INFO - [server_grpc.py:299] - [Round 6] Server Aggregation Resources - CPU Time: 43.9700s, Memory Usage: 2404.02 MB
+2025-12-02 05:26:18 - INFO - [server_grpc.py:306] - [Round 6] 全局模型参数更新完成。
+2025-12-02 05:26:18 - INFO - [mpc_aggregation_strategy.py:236] - [Round 6] 开始MPC指标评估...
+2025-12-02 05:26:18 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9591000000, 'test_num': 12000000000, 'auc': 11658045193, 'loss': 19898166609, 'train_num': 48000000000}
+2025-12-02 05:26:18 - INFO - [mpc_aggregation_strategy.py:302] - [Round 6] 全局评估 (MPC): Acc=0.7993, AUC=0.9715, Loss=0.4145
+2025-12-02 05:26:18 - INFO - [server_grpc.py:352] - 第 6 轮聚合完成，进入第 7 轮。
+2025-12-02 05:26:18 - INFO - [server_grpc.py:268] - 向客户端 2 提供第6轮全局模型
+2025-12-02 05:26:18 - INFO - [server_grpc.py:268] - 向客户端 1 提供第6轮全局模型
+2025-12-02 05:26:18 - INFO - [server_grpc.py:268] - 向客户端 3 提供第6轮全局模型
+2025-12-02 05:28:27 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:28:27 - INFO - [mpc_aggregation_strategy.py:155] - [Round 7] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:28:27 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:28:34 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:28:34 - INFO - [mpc_aggregation_strategy.py:155] - [Round 7] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:28:34 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:28:39 - INFO - [server_grpc.py:217] - [Round 7] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:28:39 - INFO - [mpc_aggregation_strategy.py:155] - [Round 7] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:28:39 - INFO - [server_grpc.py:280] - [Round 7] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:28:39 - INFO - [mpc_aggregation_strategy.py:176] - [Round 7] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:28:39 - INFO - [mpc_aggregation_strategy.py:188] - [Round 7] 客户端权重: {'3': '0.3333', '2': '0.3333', '1': '0.3333'}
+2025-12-02 05:28:39 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:28:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.11s，速度 264903 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:28:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.16s，速度 273264 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:28:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.79s，速度 268526 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:28:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 275795 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:28:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 512868 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:28:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 799122 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:28:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 806823 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:28:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 276505 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:28:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.19s，速度 268724 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:28:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 796498 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:28:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 314723 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:28:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 279989 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:28:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 654352 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:28:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 274540 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:28:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.27s，速度 259483 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:29:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.65s，速度 272809 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:29:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.23s，速度 279089 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:29:19 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.65s，速度 272766 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:29:19 - INFO - [mpc_aggregation_strategy.py:228] - [Round 7] MPC参数聚合完成，总耗时 40.72s，平均速度 274667 元素/秒
+2025-12-02 05:29:19 - INFO - [server_grpc.py:299] - [Round 7] Server Aggregation Resources - CPU Time: 44.0600s, Memory Usage: 2531.67 MB
+2025-12-02 05:29:19 - INFO - [server_grpc.py:306] - [Round 7] 全局模型参数更新完成。
+2025-12-02 05:29:19 - INFO - [mpc_aggregation_strategy.py:236] - [Round 7] 开始MPC指标评估...
+2025-12-02 05:29:19 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9983000000, 'test_num': 12000000000, 'auc': 11741584110, 'loss': 15220079065, 'train_num': 48000000000}
+2025-12-02 05:29:19 - INFO - [mpc_aggregation_strategy.py:302] - [Round 7] 全局评估 (MPC): Acc=0.8319, AUC=0.9785, Loss=0.3171
+2025-12-02 05:29:19 - INFO - [server_grpc.py:352] - 第 7 轮聚合完成，进入第 8 轮。
+2025-12-02 05:29:19 - INFO - [server_grpc.py:268] - 向客户端 3 提供第7轮全局模型
+2025-12-02 05:29:19 - INFO - [server_grpc.py:268] - 向客户端 1 提供第7轮全局模型
+2025-12-02 05:29:19 - INFO - [server_grpc.py:268] - 向客户端 2 提供第7轮全局模型
+2025-12-02 05:31:27 - INFO - [server_grpc.py:217] - [Round 8] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:31:27 - INFO - [mpc_aggregation_strategy.py:155] - [Round 8] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:31:27 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:31:32 - INFO - [server_grpc.py:217] - [Round 8] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:31:32 - INFO - [mpc_aggregation_strategy.py:155] - [Round 8] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:31:32 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:31:39 - INFO - [server_grpc.py:217] - [Round 8] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:31:39 - INFO - [mpc_aggregation_strategy.py:155] - [Round 8] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:31:39 - INFO - [server_grpc.py:280] - [Round 8] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:31:39 - INFO - [mpc_aggregation_strategy.py:176] - [Round 8] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:31:39 - INFO - [mpc_aggregation_strategy.py:188] - [Round 8] 客户端权重: {'1': '0.3333', '2': '0.3333', '3': '0.3333'}
+2025-12-02 05:31:40 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:31:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.11s，速度 266803 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:31:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.17s，速度 272013 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:31:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.80s，速度 268153 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:31:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 274733 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:31:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 594121 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:31:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 792596 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:31:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 793418 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:31:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 277921 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:31:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.17s，速度 271853 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:31:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 787954 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:31:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 303897 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:31:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 263092 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:31:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 659319 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:31:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 272286 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:31:59 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.29s，速度 257734 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:32:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.60s，速度 274268 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:32:12 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.32s，速度 273059 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:32:20 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.59s，速度 274663 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:32:20 - INFO - [mpc_aggregation_strategy.py:228] - [Round 8] MPC参数聚合完成，总耗时 40.74s，平均速度 274484 元素/秒
+2025-12-02 05:32:20 - INFO - [server_grpc.py:299] - [Round 8] Server Aggregation Resources - CPU Time: 44.1400s, Memory Usage: 2531.09 MB
+2025-12-02 05:32:20 - INFO - [server_grpc.py:306] - [Round 8] 全局模型参数更新完成。
+2025-12-02 05:32:20 - INFO - [mpc_aggregation_strategy.py:236] - [Round 8] 开始MPC指标评估...
+2025-12-02 05:32:20 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 9897000000, 'test_num': 12000000000, 'auc': 11712660776, 'loss': 16281972935, 'train_num': 48000000000}
+2025-12-02 05:32:20 - INFO - [mpc_aggregation_strategy.py:302] - [Round 8] 全局评估 (MPC): Acc=0.8247, AUC=0.9761, Loss=0.3392
+2025-12-02 05:32:20 - INFO - [server_grpc.py:352] - 第 8 轮聚合完成，进入第 9 轮。
+2025-12-02 05:32:20 - INFO - [server_grpc.py:268] - 向客户端 2 提供第8轮全局模型
+2025-12-02 05:32:20 - INFO - [server_grpc.py:268] - 向客户端 3 提供第8轮全局模型
+2025-12-02 05:32:20 - INFO - [server_grpc.py:268] - 向客户端 1 提供第8轮全局模型
+2025-12-02 05:34:14 - INFO - [server_grpc.py:217] - [Round 9] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:34:14 - INFO - [mpc_aggregation_strategy.py:155] - [Round 9] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:34:14 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:34:36 - INFO - [server_grpc.py:217] - [Round 9] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:34:36 - INFO - [mpc_aggregation_strategy.py:155] - [Round 9] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:34:37 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:34:41 - INFO - [server_grpc.py:217] - [Round 9] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:34:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 9] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:34:41 - INFO - [server_grpc.py:280] - [Round 9] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:34:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 9] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:34:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 9] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
+2025-12-02 05:34:41 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:34:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.08s，速度 272758 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:34:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.20s，速度 267857 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:34:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.80s，速度 268103 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:34:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 277754 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:34:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 584878 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:34:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 784704 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:34:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 792559 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:34:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.48s，速度 275615 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:34:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 270747 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:34:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 795125 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:34:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 323528 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:34:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 268358 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:34:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 614398 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:34:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 270109 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:35:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.29s，速度 257059 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:35:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.62s，速度 273703 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:35:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.23s，速度 279101 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:35:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.63s，速度 273235 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:35:21 - INFO - [mpc_aggregation_strategy.py:228] - [Round 9] MPC参数聚合完成，总耗时 40.72s，平均速度 274679 元素/秒
+2025-12-02 05:35:21 - INFO - [server_grpc.py:299] - [Round 9] Server Aggregation Resources - CPU Time: 44.0800s, Memory Usage: 2414.91 MB
+2025-12-02 05:35:21 - INFO - [server_grpc.py:306] - [Round 9] 全局模型参数更新完成。
+2025-12-02 05:35:21 - INFO - [mpc_aggregation_strategy.py:236] - [Round 9] 开始MPC指标评估...
+2025-12-02 05:35:21 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10190000000, 'test_num': 12000000000, 'auc': 11785653998, 'loss': 12161724114, 'train_num': 48000000000}
+2025-12-02 05:35:21 - INFO - [mpc_aggregation_strategy.py:302] - [Round 9] 全局评估 (MPC): Acc=0.8492, AUC=0.9821, Loss=0.2534
+2025-12-02 05:35:21 - INFO - [server_grpc.py:352] - 第 9 轮聚合完成，进入第 10 轮。
+2025-12-02 05:35:22 - INFO - [server_grpc.py:268] - 向客户端 2 提供第9轮全局模型
+2025-12-02 05:35:22 - INFO - [server_grpc.py:268] - 向客户端 3 提供第9轮全局模型
+2025-12-02 05:35:22 - INFO - [server_grpc.py:268] - 向客户端 1 提供第9轮全局模型
+2025-12-02 05:37:27 - INFO - [server_grpc.py:217] - [Round 10] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:37:27 - INFO - [mpc_aggregation_strategy.py:155] - [Round 10] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:37:27 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:37:36 - INFO - [server_grpc.py:217] - [Round 10] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:37:36 - INFO - [mpc_aggregation_strategy.py:155] - [Round 10] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:37:36 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:37:41 - INFO - [server_grpc.py:217] - [Round 10] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:37:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 10] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:37:41 - INFO - [server_grpc.py:280] - [Round 10] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:37:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 10] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:37:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 10] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
+2025-12-02 05:37:41 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:37:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.12s，速度 264348 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:37:45 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.20s，速度 267540 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:37:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.87s，速度 265908 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:37:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 276200 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:37:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 560886 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:37:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 803954 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:37:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 791971 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:37:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.46s，速度 283520 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:37:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.19s，速度 269642 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:37:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 771349 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:37:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 321870 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:37:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 268568 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:37:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 638849 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:37:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 273410 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:38:01 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.24s，速度 262996 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:38:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.73s，速度 270290 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:38:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.16s，速度 283837 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:38:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.71s，速度 270752 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:38:22 - INFO - [mpc_aggregation_strategy.py:228] - [Round 10] MPC参数聚合完成，总耗时 40.89s，平均速度 273476 元素/秒
+2025-12-02 05:38:22 - INFO - [server_grpc.py:299] - [Round 10] Server Aggregation Resources - CPU Time: 44.2700s, Memory Usage: 2779.73 MB
+2025-12-02 05:38:22 - INFO - [server_grpc.py:306] - [Round 10] 全局模型参数更新完成。
+2025-12-02 05:38:22 - INFO - [mpc_aggregation_strategy.py:236] - [Round 10] 开始MPC指标评估...
+2025-12-02 05:38:22 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10320000000, 'test_num': 12000000000, 'auc': 11809784484, 'loss': 10404202198, 'train_num': 48000000000}
+2025-12-02 05:38:22 - INFO - [mpc_aggregation_strategy.py:302] - [Round 10] 全局评估 (MPC): Acc=0.8600, AUC=0.9841, Loss=0.2168
+2025-12-02 05:38:22 - INFO - [server_grpc.py:352] - 第 10 轮聚合完成，进入第 11 轮。
+2025-12-02 05:38:22 - INFO - [server_grpc.py:268] - 向客户端 2 提供第10轮全局模型
+2025-12-02 05:38:22 - INFO - [server_grpc.py:268] - 向客户端 3 提供第10轮全局模型
+2025-12-02 05:38:22 - INFO - [server_grpc.py:268] - 向客户端 1 提供第10轮全局模型
+2025-12-02 05:40:25 - INFO - [server_grpc.py:217] - [Round 11] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:40:25 - INFO - [mpc_aggregation_strategy.py:155] - [Round 11] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:40:25 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:40:36 - INFO - [server_grpc.py:217] - [Round 11] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:40:36 - INFO - [mpc_aggregation_strategy.py:155] - [Round 11] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:40:36 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:40:41 - INFO - [server_grpc.py:217] - [Round 11] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:40:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 11] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:40:41 - INFO - [server_grpc.py:280] - [Round 11] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:40:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 11] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:40:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 11] 客户端权重: {'2': '0.3333', '3': '0.3333', '1': '0.3333'}
+2025-12-02 05:40:42 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:40:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.07s，速度 276414 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:40:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.15s，速度 274164 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:40:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.83s，速度 267233 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:40:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 277771 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:40:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 523702 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:40:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 803181 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:40:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 802873 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:40:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.46s，速度 285514 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:40:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 270556 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:40:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 775265 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:40:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 316007 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:40:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.57s，速度 257134 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:40:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 678409 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:40:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.52s，速度 281565 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:41:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.28s，速度 258397 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:41:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.80s，速度 268030 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:41:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.22s，速度 279459 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:41:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.71s，速度 270980 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:41:22 - INFO - [mpc_aggregation_strategy.py:228] - [Round 11] MPC参数聚合完成，总耗时 40.90s，平均速度 273409 元素/秒
+2025-12-02 05:41:22 - INFO - [server_grpc.py:299] - [Round 11] Server Aggregation Resources - CPU Time: 44.2900s, Memory Usage: 2857.86 MB
+2025-12-02 05:41:22 - INFO - [server_grpc.py:306] - [Round 11] 全局模型参数更新完成。
+2025-12-02 05:41:22 - INFO - [mpc_aggregation_strategy.py:236] - [Round 11] 开始MPC指标评估...
+2025-12-02 05:41:22 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10388000000, 'test_num': 12000000000, 'auc': 11826969166, 'loss': 9175739311, 'train_num': 48000000000}
+2025-12-02 05:41:22 - INFO - [mpc_aggregation_strategy.py:302] - [Round 11] 全局评估 (MPC): Acc=0.8657, AUC=0.9856, Loss=0.1912
+2025-12-02 05:41:22 - INFO - [server_grpc.py:352] - 第 11 轮聚合完成，进入第 12 轮。
+2025-12-02 05:41:22 - INFO - [server_grpc.py:268] - 向客户端 3 提供第11轮全局模型
+2025-12-02 05:41:22 - INFO - [server_grpc.py:268] - 向客户端 2 提供第11轮全局模型
+2025-12-02 05:41:23 - INFO - [server_grpc.py:268] - 向客户端 1 提供第11轮全局模型
+2025-12-02 05:43:28 - INFO - [server_grpc.py:217] - [Round 12] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:43:28 - INFO - [mpc_aggregation_strategy.py:155] - [Round 12] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:43:28 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:43:33 - INFO - [server_grpc.py:217] - [Round 12] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:43:33 - INFO - [mpc_aggregation_strategy.py:155] - [Round 12] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:43:33 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:43:41 - INFO - [server_grpc.py:217] - [Round 12] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:43:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 12] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:43:41 - INFO - [server_grpc.py:280] - [Round 12] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:43:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 12] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:43:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 12] 客户端权重: {'1': '0.3333', '2': '0.3333', '3': '0.3333'}
+2025-12-02 05:43:41 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:43:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.10s，速度 269182 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:43:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.15s，速度 274269 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:43:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.86s，速度 266191 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:43:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 272527 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:43:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 570935 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:43:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 802773 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:43:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 808655 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:43:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 278226 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:43:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 270037 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:43:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 785581 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:43:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 311635 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:43:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 280778 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:43:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 649034 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:43:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.51s，速度 286551 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:44:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.27s，速度 260137 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:44:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.71s，速度 270981 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:44:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.23s，速度 279049 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:44:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.63s，速度 273525 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:44:22 - INFO - [mpc_aggregation_strategy.py:228] - [Round 12] MPC参数聚合完成，总耗时 40.76s，平均速度 274347 元素/秒
+2025-12-02 05:44:22 - INFO - [server_grpc.py:299] - [Round 12] Server Aggregation Resources - CPU Time: 44.1600s, Memory Usage: 2850.13 MB
+2025-12-02 05:44:22 - INFO - [server_grpc.py:306] - [Round 12] 全局模型参数更新完成。
+2025-12-02 05:44:22 - INFO - [mpc_aggregation_strategy.py:236] - [Round 12] 开始MPC指标评估...
+2025-12-02 05:44:22 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10447000000, 'test_num': 12000000000, 'auc': 11833198110, 'loss': 8598024371, 'train_num': 48000000000}
+2025-12-02 05:44:22 - INFO - [mpc_aggregation_strategy.py:302] - [Round 12] 全局评估 (MPC): Acc=0.8706, AUC=0.9861, Loss=0.1791
+2025-12-02 05:44:22 - INFO - [server_grpc.py:352] - 第 12 轮聚合完成，进入第 13 轮。
+2025-12-02 05:44:22 - INFO - [server_grpc.py:268] - 向客户端 3 提供第12轮全局模型
+2025-12-02 05:44:22 - INFO - [server_grpc.py:268] - 向客户端 2 提供第12轮全局模型
+2025-12-02 05:44:22 - INFO - [server_grpc.py:268] - 向客户端 1 提供第12轮全局模型
+2025-12-02 05:46:25 - INFO - [server_grpc.py:217] - [Round 13] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:46:25 - INFO - [mpc_aggregation_strategy.py:155] - [Round 13] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:46:25 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:46:37 - INFO - [server_grpc.py:217] - [Round 13] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:46:37 - INFO - [mpc_aggregation_strategy.py:155] - [Round 13] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:46:37 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:46:41 - INFO - [server_grpc.py:217] - [Round 13] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:46:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 13] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:46:41 - INFO - [server_grpc.py:280] - [Round 13] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:46:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 13] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:46:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 13] 客户端权重: {'1': '0.3333', '2': '0.3333', '3': '0.3333'}
+2025-12-02 05:46:41 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:46:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.08s，速度 273292 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:46:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.20s，速度 268564 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:46:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.83s，速度 267323 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:46:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 276414 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:46:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 644189 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:46:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 800404 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:46:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 802119 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:46:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 278328 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:46:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.16s，速度 273687 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:46:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 786746 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:46:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 315730 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:46:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.51s，速度 288134 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:46:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 634677 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:46:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.48s，速度 306720 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:47:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.23s，速度 263957 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:47:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.77s，速度 269159 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:47:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.28s，速度 275410 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:47:22 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.84s，速度 267011 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:47:22 - INFO - [mpc_aggregation_strategy.py:228] - [Round 13] MPC参数聚合完成，总耗时 40.95s，平均速度 273074 元素/秒
+2025-12-02 05:47:22 - INFO - [server_grpc.py:299] - [Round 13] Server Aggregation Resources - CPU Time: 44.3200s, Memory Usage: 2881.89 MB
+2025-12-02 05:47:22 - INFO - [server_grpc.py:306] - [Round 13] 全局模型参数更新完成。
+2025-12-02 05:47:22 - INFO - [mpc_aggregation_strategy.py:236] - [Round 13] 开始MPC指标评估...
+2025-12-02 05:47:22 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10271000000, 'test_num': 12000000000, 'auc': 11812705748, 'loss': 10256059614, 'train_num': 48000000000}
+2025-12-02 05:47:22 - INFO - [mpc_aggregation_strategy.py:302] - [Round 13] 全局评估 (MPC): Acc=0.8559, AUC=0.9844, Loss=0.2137
+2025-12-02 05:47:22 - INFO - [server_grpc.py:352] - 第 13 轮聚合完成，进入第 14 轮。
+2025-12-02 05:47:22 - INFO - [server_grpc.py:268] - 向客户端 3 提供第13轮全局模型
+2025-12-02 05:47:22 - INFO - [server_grpc.py:268] - 向客户端 1 提供第13轮全局模型
+2025-12-02 05:47:22 - INFO - [server_grpc.py:268] - 向客户端 2 提供第13轮全局模型
+2025-12-02 05:49:19 - INFO - [server_grpc.py:217] - [Round 14] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:49:19 - INFO - [mpc_aggregation_strategy.py:155] - [Round 14] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:49:19 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:49:38 - INFO - [server_grpc.py:217] - [Round 14] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:49:38 - INFO - [mpc_aggregation_strategy.py:155] - [Round 14] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:49:41 - INFO - [server_grpc.py:217] - [Round 14] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:49:41 - INFO - [mpc_aggregation_strategy.py:155] - [Round 14] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:49:41 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:49:41 - INFO - [server_grpc.py:280] - [Round 14] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:49:41 - INFO - [mpc_aggregation_strategy.py:176] - [Round 14] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:49:41 - INFO - [mpc_aggregation_strategy.py:188] - [Round 14] 客户端权重: {'2': '0.3333', '1': '0.3333', '3': '0.3333'}
+2025-12-02 05:49:41 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:49:42 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.09s，速度 270577 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:49:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.20s，速度 268220 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:49:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.83s，速度 267291 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:49:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 279759 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:49:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 520527 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:49:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 797132 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:49:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 809879 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:49:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.46s，速度 283077 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:49:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.14s，速度 276130 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:49:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 799626 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:49:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 312501 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:49:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 262238 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:49:57 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 629968 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:49:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 276743 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:50:00 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.26s，速度 260408 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:50:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.54s，速度 276303 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:50:13 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.23s，速度 278719 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:50:21 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.66s，速度 272537 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:50:21 - INFO - [mpc_aggregation_strategy.py:228] - [Round 14] MPC参数聚合完成，总耗时 40.63s，平均速度 275282 元素/秒
+2025-12-02 05:50:21 - INFO - [server_grpc.py:299] - [Round 14] Server Aggregation Resources - CPU Time: 44.0100s, Memory Usage: 2763.21 MB
+2025-12-02 05:50:21 - INFO - [server_grpc.py:306] - [Round 14] 全局模型参数更新完成。
+2025-12-02 05:50:21 - INFO - [mpc_aggregation_strategy.py:236] - [Round 14] 开始MPC指标评估...
+2025-12-02 05:50:21 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10364000000, 'test_num': 12000000000, 'auc': 11820614999, 'loss': 8889173702, 'train_num': 48000000000}
+2025-12-02 05:50:21 - INFO - [mpc_aggregation_strategy.py:302] - [Round 14] 全局评估 (MPC): Acc=0.8637, AUC=0.9851, Loss=0.1852
+2025-12-02 05:50:21 - INFO - [server_grpc.py:352] - 第 14 轮聚合完成，进入第 15 轮。
+2025-12-02 05:50:21 - INFO - [server_grpc.py:268] - 向客户端 2 提供第14轮全局模型
+2025-12-02 05:50:22 - INFO - [server_grpc.py:268] - 向客户端 1 提供第14轮全局模型
+2025-12-02 05:50:22 - INFO - [server_grpc.py:268] - 向客户端 3 提供第14轮全局模型
+2025-12-02 05:52:24 - INFO - [server_grpc.py:217] - [Round 15] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:52:24 - INFO - [mpc_aggregation_strategy.py:155] - [Round 15] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:52:24 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:52:36 - INFO - [server_grpc.py:217] - [Round 15] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:52:36 - INFO - [mpc_aggregation_strategy.py:155] - [Round 15] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:52:36 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:52:40 - INFO - [server_grpc.py:217] - [Round 15] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:52:40 - INFO - [mpc_aggregation_strategy.py:155] - [Round 15] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:52:40 - INFO - [server_grpc.py:280] - [Round 15] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:52:40 - INFO - [mpc_aggregation_strategy.py:176] - [Round 15] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:52:40 - INFO - [mpc_aggregation_strategy.py:188] - [Round 15] 客户端权重: {'2': '0.3333', '3': '0.3333', '1': '0.3333'}
+2025-12-02 05:52:40 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:52:41 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.08s，速度 272593 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:52:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.15s，速度 274884 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:52:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.77s，速度 269160 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:52:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 265719 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:52:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 593371 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:52:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 801611 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:52:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 809853 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:52:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.46s，速度 288011 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:52:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 270113 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:52:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 789303 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:52:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.26s，速度 282484 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:52:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 262440 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:52:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 670995 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:52:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.49s，速度 300538 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:52:59 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.22s，速度 265642 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:53:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.75s，速度 269579 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:53:12 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.28s，速度 275569 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:53:20 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.76s，速度 269458 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:53:20 - INFO - [mpc_aggregation_strategy.py:228] - [Round 15] MPC参数聚合完成，总耗时 40.86s，平均速度 273723 元素/秒
+2025-12-02 05:53:20 - INFO - [server_grpc.py:299] - [Round 15] Server Aggregation Resources - CPU Time: 44.2200s, Memory Usage: 2934.80 MB
+2025-12-02 05:53:20 - INFO - [server_grpc.py:306] - [Round 15] 全局模型参数更新完成。
+2025-12-02 05:53:20 - INFO - [mpc_aggregation_strategy.py:236] - [Round 15] 开始MPC指标评估...
+2025-12-02 05:53:20 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10551000000, 'test_num': 12000000000, 'auc': 11860307470, 'loss': 6914279609, 'train_num': 48000000000}
+2025-12-02 05:53:20 - INFO - [mpc_aggregation_strategy.py:302] - [Round 15] 全局评估 (MPC): Acc=0.8792, AUC=0.9884, Loss=0.1440
+2025-12-02 05:53:20 - INFO - [server_grpc.py:352] - 第 15 轮聚合完成，进入第 16 轮。
+2025-12-02 05:53:20 - INFO - [server_grpc.py:268] - 向客户端 1 提供第15轮全局模型
+2025-12-02 05:53:20 - INFO - [server_grpc.py:268] - 向客户端 2 提供第15轮全局模型
+2025-12-02 05:53:20 - INFO - [server_grpc.py:268] - 向客户端 3 提供第15轮全局模型
+2025-12-02 05:55:19 - INFO - [server_grpc.py:217] - [Round 16] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:55:19 - INFO - [mpc_aggregation_strategy.py:155] - [Round 16] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:55:19 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:55:31 - INFO - [server_grpc.py:217] - [Round 16] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:55:31 - INFO - [mpc_aggregation_strategy.py:155] - [Round 16] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:55:31 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:55:39 - INFO - [server_grpc.py:217] - [Round 16] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:55:39 - INFO - [mpc_aggregation_strategy.py:155] - [Round 16] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:55:39 - INFO - [server_grpc.py:280] - [Round 16] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:55:39 - INFO - [mpc_aggregation_strategy.py:176] - [Round 16] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:55:39 - INFO - [mpc_aggregation_strategy.py:188] - [Round 16] 客户端权重: {'1': '0.3333', '3': '0.3333', '2': '0.3333'}
+2025-12-02 05:55:40 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:55:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.08s，速度 271888 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:55:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.17s，速度 271938 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:55:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.87s，速度 266001 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:55:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 275044 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:55:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 572987 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:55:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 797173 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:55:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 799018 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:55:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 278114 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:55:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.16s，速度 272635 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:55:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 793963 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:55:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 302389 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:55:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 264154 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:55:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 606175 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:55:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.51s，速度 290294 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:55:59 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.28s，速度 258969 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:56:07 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.67s，速度 272244 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:56:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.28s，速度 275914 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:56:20 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.44s，速度 279649 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:56:20 - INFO - [mpc_aggregation_strategy.py:228] - [Round 16] MPC参数聚合完成，总耗时 40.62s，平均速度 275315 元素/秒
+2025-12-02 05:56:20 - INFO - [server_grpc.py:299] - [Round 16] Server Aggregation Resources - CPU Time: 43.9800s, Memory Usage: 2735.88 MB
+2025-12-02 05:56:20 - INFO - [server_grpc.py:306] - [Round 16] 全局模型参数更新完成。
+2025-12-02 05:56:20 - INFO - [mpc_aggregation_strategy.py:236] - [Round 16] 开始MPC指标评估...
+2025-12-02 05:56:20 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10396000000, 'test_num': 12000000000, 'auc': 11831495984, 'loss': 8529428567, 'train_num': 48000000000}
+2025-12-02 05:56:20 - INFO - [mpc_aggregation_strategy.py:302] - [Round 16] 全局评估 (MPC): Acc=0.8663, AUC=0.9860, Loss=0.1777
+2025-12-02 05:56:20 - INFO - [server_grpc.py:352] - 第 16 轮聚合完成，进入第 17 轮。
+2025-12-02 05:56:20 - INFO - [server_grpc.py:268] - 向客户端 2 提供第16轮全局模型
+2025-12-02 05:56:20 - INFO - [server_grpc.py:268] - 向客户端 3 提供第16轮全局模型
+2025-12-02 05:56:20 - INFO - [server_grpc.py:268] - 向客户端 1 提供第16轮全局模型
+2025-12-02 05:58:22 - INFO - [server_grpc.py:217] - [Round 17] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 05:58:22 - INFO - [mpc_aggregation_strategy.py:155] - [Round 17] 收到客户端 2 的MPC份额更新。
+2025-12-02 05:58:22 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 05:58:33 - INFO - [server_grpc.py:217] - [Round 17] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 05:58:33 - INFO - [mpc_aggregation_strategy.py:155] - [Round 17] 收到客户端 1 的MPC份额更新。
+2025-12-02 05:58:36 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 05:58:37 - INFO - [server_grpc.py:217] - [Round 17] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 05:58:37 - INFO - [mpc_aggregation_strategy.py:155] - [Round 17] 收到客户端 3 的MPC份额更新。
+2025-12-02 05:58:37 - INFO - [server_grpc.py:280] - [Round 17] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 05:58:37 - INFO - [mpc_aggregation_strategy.py:176] - [Round 17] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 05:58:37 - INFO - [mpc_aggregation_strategy.py:188] - [Round 17] 客户端权重: {'2': '0.3333', '1': '0.3333', '3': '0.3333'}
+2025-12-02 05:58:37 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 05:58:38 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.10s，速度 269312 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 05:58:40 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.16s，速度 272466 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 05:58:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.87s，速度 266107 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 05:58:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.49s，速度 299831 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 05:58:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 512851 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 05:58:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 803277 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 05:58:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 797996 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 05:58:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.45s，速度 293154 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 05:58:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.16s，速度 272944 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 05:58:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 783762 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 05:58:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 310066 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 05:58:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 268695 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 05:58:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 667816 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 05:58:54 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 279001 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 05:58:56 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.27s，速度 259314 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 05:59:05 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.67s，速度 272121 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 05:59:09 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.27s，速度 276097 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 05:59:18 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.56s，速度 275737 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 05:59:18 - INFO - [mpc_aggregation_strategy.py:228] - [Round 17] MPC参数聚合完成，总耗时 40.68s，平均速度 274946 元素/秒
+2025-12-02 05:59:18 - INFO - [server_grpc.py:299] - [Round 17] Server Aggregation Resources - CPU Time: 44.0500s, Memory Usage: 2896.39 MB
+2025-12-02 05:59:18 - INFO - [server_grpc.py:306] - [Round 17] 全局模型参数更新完成。
+2025-12-02 05:59:18 - INFO - [mpc_aggregation_strategy.py:236] - [Round 17] 开始MPC指标评估...
+2025-12-02 05:59:18 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10602000000, 'test_num': 12000000000, 'auc': 11864216581, 'loss': 6176346283, 'train_num': 48000000000}
+2025-12-02 05:59:18 - INFO - [mpc_aggregation_strategy.py:302] - [Round 17] 全局评估 (MPC): Acc=0.8835, AUC=0.9887, Loss=0.1287
+2025-12-02 05:59:18 - INFO - [server_grpc.py:352] - 第 17 轮聚合完成，进入第 18 轮。
+2025-12-02 05:59:18 - INFO - [server_grpc.py:268] - 向客户端 2 提供第17轮全局模型
+2025-12-02 05:59:18 - INFO - [server_grpc.py:268] - 向客户端 1 提供第17轮全局模型
+2025-12-02 05:59:18 - INFO - [server_grpc.py:268] - 向客户端 3 提供第17轮全局模型
+2025-12-02 06:01:20 - INFO - [server_grpc.py:217] - [Round 18] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 06:01:20 - INFO - [mpc_aggregation_strategy.py:155] - [Round 18] 收到客户端 1 的MPC份额更新。
+2025-12-02 06:01:20 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 06:01:30 - INFO - [server_grpc.py:217] - [Round 18] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 06:01:30 - INFO - [mpc_aggregation_strategy.py:155] - [Round 18] 收到客户端 3 的MPC份额更新。
+2025-12-02 06:01:30 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 06:01:36 - INFO - [server_grpc.py:217] - [Round 18] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 06:01:36 - INFO - [mpc_aggregation_strategy.py:155] - [Round 18] 收到客户端 2 的MPC份额更新。
+2025-12-02 06:01:36 - INFO - [server_grpc.py:280] - [Round 18] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 06:01:36 - INFO - [mpc_aggregation_strategy.py:176] - [Round 18] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 06:01:36 - INFO - [mpc_aggregation_strategy.py:188] - [Round 18] 客户端权重: {'1': '0.3333', '3': '0.3333', '2': '0.3333'}
+2025-12-02 06:01:36 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 06:01:37 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.10s，速度 269219 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 06:01:39 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.16s，速度 272590 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 06:01:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.90s，速度 265055 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 06:01:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 274709 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 06:01:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 615340 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 06:01:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 800877 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 06:01:48 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 791886 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 06:01:49 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.45s，速度 288675 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 06:01:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.18s，速度 270297 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 06:01:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 788067 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 06:01:51 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.24s，速度 304314 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 06:01:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.55s，速度 269993 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 06:01:52 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 724403 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 06:01:53 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.51s，速度 286355 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 06:01:55 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.24s，速度 263009 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 06:02:03 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.69s，速度 271522 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 06:02:08 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.29s，速度 274912 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 06:02:16 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.53s，速度 276747 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 06:02:16 - INFO - [mpc_aggregation_strategy.py:228] - [Round 18] MPC参数聚合完成，总耗时 40.73s，平均速度 274593 元素/秒
+2025-12-02 06:02:16 - INFO - [server_grpc.py:299] - [Round 18] Server Aggregation Resources - CPU Time: 44.0900s, Memory Usage: 2827.08 MB
+2025-12-02 06:02:16 - INFO - [server_grpc.py:306] - [Round 18] 全局模型参数更新完成。
+2025-12-02 06:02:16 - INFO - [mpc_aggregation_strategy.py:236] - [Round 18] 开始MPC指标评估...
+2025-12-02 06:02:16 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10626000000, 'test_num': 12000000000, 'auc': 11873557942, 'loss': 5892532780, 'train_num': 48000000000}
+2025-12-02 06:02:16 - INFO - [mpc_aggregation_strategy.py:302] - [Round 18] 全局评估 (MPC): Acc=0.8855, AUC=0.9895, Loss=0.1228
+2025-12-02 06:02:16 - INFO - [server_grpc.py:352] - 第 18 轮聚合完成，进入第 19 轮。
+2025-12-02 06:02:16 - INFO - [server_grpc.py:268] - 向客户端 3 提供第18轮全局模型
+2025-12-02 06:02:16 - INFO - [server_grpc.py:268] - 向客户端 1 提供第18轮全局模型
+2025-12-02 06:02:16 - INFO - [server_grpc.py:268] - 向客户端 2 提供第18轮全局模型
+2025-12-02 06:04:17 - INFO - [server_grpc.py:217] - [Round 19] 收到来自客户端 3 的更新，数据大小: 262121.42 KB
+2025-12-02 06:04:17 - INFO - [mpc_aggregation_strategy.py:155] - [Round 19] 收到客户端 3 的MPC份额更新。
+2025-12-02 06:04:17 - INFO - [server_grpc.py:146] - 客户端 3 开始订阅训练状态
+2025-12-02 06:04:26 - INFO - [server_grpc.py:217] - [Round 19] 收到来自客户端 1 的更新，数据大小: 262121.42 KB
+2025-12-02 06:04:26 - INFO - [mpc_aggregation_strategy.py:155] - [Round 19] 收到客户端 1 的MPC份额更新。
+2025-12-02 06:04:26 - INFO - [server_grpc.py:146] - 客户端 1 开始订阅训练状态
+2025-12-02 06:04:30 - INFO - [server_grpc.py:217] - [Round 19] 收到来自客户端 2 的更新，数据大小: 262121.42 KB
+2025-12-02 06:04:30 - INFO - [mpc_aggregation_strategy.py:155] - [Round 19] 收到客户端 2 的MPC份额更新。
+2025-12-02 06:04:30 - INFO - [server_grpc.py:280] - [Round 19] 所有客户端参数已收集完毕，开始聚合。
+2025-12-02 06:04:30 - INFO - [mpc_aggregation_strategy.py:176] - [Round 19] 开始MPC参数聚合（向量化 v2，加权）...
+2025-12-02 06:04:30 - INFO - [mpc_aggregation_strategy.py:188] - [Round 19] 客户端权重: {'3': '0.3333', '1': '0.3333', '2': '0.3333'}
+2025-12-02 06:04:31 - INFO - [server_grpc.py:146] - 客户端 2 开始订阅训练状态
+2025-12-02 06:04:32 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv1.weight (294,912 元素) 聚合完成，耗时 1.07s，速度 276719 元素/秒，进度: 298,179/11,183,582 (2.7%)
+2025-12-02 06:04:34 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.conv2.weight (589,824 元素) 聚合完成，耗时 2.17s，速度 271446 元素/秒，进度: 888,516/11,183,582 (7.9%)
+2025-12-02 06:04:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.89s，速度 265241 元素/秒，进度: 3,247,812/11,183,582 (29.0%)
+2025-12-02 06:04:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv1.weight (147,456 元素) 聚合完成，耗时 0.53s，速度 278225 元素/秒，进度: 3,396,100/11,183,582 (30.4%)
+2025-12-02 06:04:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv1.weight (36,864 元素) 聚合完成，耗时 0.07s，速度 515611 元素/秒，进度: 3,433,093/11,183,582 (30.7%)
+2025-12-02 06:04:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv1.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 794714 元素/秒，进度: 3,480,519/11,183,582 (31.1%)
+2025-12-02 06:04:43 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.0.conv2.weight (36,864 元素) 聚合完成，耗时 0.05s，速度 804799 元素/秒，进度: 3,517,447/11,183,582 (31.5%)
+2025-12-02 06:04:44 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.downsample.0.weight (131,072 元素) 聚合完成，耗时 0.47s，速度 277099 元素/秒，进度: 3,649,671/11,183,582 (32.6%)
+2025-12-02 06:04:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv1.weight (589,824 元素) 聚合完成，耗时 2.19s，速度 269207 元素/秒，进度: 4,239,761/11,183,582 (37.9%)
+2025-12-02 06:04:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.0.downsample.0.weight (32,768 元素) 聚合完成，耗时 0.04s，速度 792608 元素/秒，进度: 4,272,529/11,183,582 (38.2%)
+2025-12-02 06:04:46 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv1.weight (73,728 元素) 聚合完成，耗时 0.23s，速度 316756 元素/秒，进度: 4,354,135/11,183,582 (38.9%)
+2025-12-02 06:04:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.1.conv2.weight (147,456 元素) 聚合完成，耗时 0.56s，速度 262153 元素/秒，进度: 4,501,591/11,183,582 (40.3%)
+2025-12-02 06:04:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer1.1.conv2.weight (36,864 元素) 聚合完成，耗时 0.06s，速度 578930 元素/秒，进度: 4,541,530/11,183,582 (40.6%)
+2025-12-02 06:04:47 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer2.0.conv2.weight (147,456 元素) 聚合完成，耗时 0.54s，速度 275376 元素/秒，进度: 4,691,931/11,183,582 (42.0%)
+2025-12-02 06:04:50 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer3.1.conv2.weight (589,824 元素) 聚合完成，耗时 2.22s，速度 265978 元素/秒，进度: 5,283,100/11,183,582 (47.2%)
+2025-12-02 06:04:58 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv2.weight (2,359,296 元素) 聚合完成，耗时 8.69s，速度 271615 元素/秒，进度: 7,642,908/11,183,582 (68.3%)
+2025-12-02 06:05:03 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.0.conv1.weight (1,179,648 元素) 聚合完成，耗时 4.29s，速度 274877 元素/秒，进度: 8,824,094/11,183,582 (78.9%)
+2025-12-02 06:05:11 - INFO - [mpc_aggregation_strategy.py:220] - 参数 model.layer4.1.conv1.weight (2,359,296 元素) 聚合完成，耗时 8.77s，速度 268874 元素/秒，进度: 11,183,582/11,183,582 (100.0%)
+2025-12-02 06:05:11 - INFO - [mpc_aggregation_strategy.py:228] - [Round 19] MPC参数聚合完成，总耗时 41.00s，平均速度 272798 元素/秒
+2025-12-02 06:05:11 - INFO - [server_grpc.py:299] - [Round 19] Server Aggregation Resources - CPU Time: 44.3600s, Memory Usage: 2741.69 MB
+2025-12-02 06:05:11 - INFO - [server_grpc.py:306] - [Round 19] 全局模型参数更新完成。
+2025-12-02 06:05:11 - INFO - [mpc_aggregation_strategy.py:236] - [Round 19] 开始MPC指标评估...
+2025-12-02 06:05:11 - INFO - [mpc_aggregation_strategy.py:274] - 解密后的聚合指标(原始值): {'test_acc': 10600000000, 'test_num': 12000000000, 'auc': 11865088415, 'loss': 5775241894, 'train_num': 48000000000}
+2025-12-02 06:05:11 - INFO - [mpc_aggregation_strategy.py:302] - [Round 19] 全局评估 (MPC): Acc=0.8833, AUC=0.9888, Loss=0.1203
+2025-12-02 06:05:11 - INFO - [server_grpc.py:365] - [Round 19] 训练已收敛，准确率变化 (0.002167) 小于阈值 (0.01)。
+2025-12-02 06:05:11 - INFO - [server_grpc.py:316] - 训练结束。总耗时: 3473.21 秒
+2025-12-02 06:05:11 - INFO - [server_grpc.py:330] - 通信开销 (KB) 汇总:
            Total_KB
-1      3.145457e+06
-2      3.145457e+06
-3      3.145457e+06
-Total  9.436371e+06
-2025-12-01 12:35:34 - INFO - [server_grpc.py:343] - 全局模型评估指标汇总:
+1      4.980307e+06
+2      4.980307e+06
+3      4.980307e+06
+Total  1.494092e+07
+2025-12-02 06:05:11 - INFO - [server_grpc.py:343] - 全局模型评估指标汇总:
       Accuracy     AUC    Loss
 Round                         
-1       0.6306  0.9202  0.4916
-2       0.6787  0.9352  0.2215
-3       0.6527  0.9369  0.2477
-4       0.6735  0.9379  0.2481
-5       0.6933  0.9465  0.1479
-6       0.7050  0.9512  0.1165
-7       0.7240  0.9568  0.0971
-8       0.7428  0.9606  0.0569
-9       0.7331  0.9594  0.0655
-10      0.7613  0.9651  0.0309
-11      0.7568  0.9648  0.0401
-12      0.7621  0.9659  0.0428
-2025-12-01 12:35:35 - DEBUG - [server_grpc.py:198] - 客户端 1 状态订阅结束 (code=300)
-2025-12-01 12:35:35 - DEBUG - [server_grpc.py:198] - 客户端 3 状态订阅结束 (code=300)
-2025-12-01 12:35:35 - DEBUG - [server_grpc.py:198] - 客户端 2 状态订阅结束 (code=300)
-2025-12-01 12:35:35 - DEBUG - [server_grpc.py:201] - 客户端 1 状态订阅流已关闭
-2025-12-01 12:35:35 - DEBUG - [server_grpc.py:201] - 客户端 3 状态订阅流已关闭
-2025-12-01 12:35:35 - DEBUG - [server_grpc.py:201] - 客户端 2 状态订阅流已关闭
-2025-12-01 12:35:35 - INFO - [server_grpc.py:268] - 向客户端 1 提供第12轮全局模型
-2025-12-01 12:35:36 - INFO - [server_grpc.py:268] - 向客户端 3 提供第12轮全局模型
-2025-12-01 12:35:36 - INFO - [server_grpc.py:268] - 向客户端 2 提供第12轮全局模型
+1       0.6555  0.9259  0.9794
+2       0.7118  0.9395  0.7677
+3       0.7518  0.9532  0.6247
+4       0.7665  0.9609  0.5681
+5       0.8148  0.9722  0.3948
+6       0.7993  0.9715  0.4145
+7       0.8319  0.9785  0.3171
+8       0.8247  0.9761  0.3392
+9       0.8492  0.9821  0.2534
+10      0.8600  0.9841  0.2168
+11      0.8657  0.9856  0.1912
+12      0.8706  0.9861  0.1791
+13      0.8559  0.9844  0.2137
+14      0.8637  0.9851  0.1852
+15      0.8792  0.9884  0.1440
+16      0.8663  0.9860  0.1777
+17      0.8835  0.9887  0.1287
+18      0.8855  0.9895  0.1228
+19      0.8833  0.9888  0.1203
+2025-12-02 06:05:13 - INFO - [server_grpc.py:268] - 向客户端 3 提供第19轮全局模型
+2025-12-02 06:05:13 - INFO - [server_grpc.py:268] - 向客户端 2 提供第19轮全局模型
+2025-12-02 06:05:13 - INFO - [server_grpc.py:268] - 向客户端 1 提供第19轮全局模型

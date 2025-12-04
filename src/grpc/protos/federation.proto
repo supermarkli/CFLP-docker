@@ -53,6 +53,16 @@ message TrainingStatusResponse {
     int32 submitted_clients = 5;
 }
 
+// 客户端延迟指标（用于服务端统一记录）
+message ClientLatencyMetrics {
+    double training_time = 1;      // 本地训练耗时（秒）
+    double encryption_time = 2;    // 加密/处理耗时（秒）
+    double upload_time = 3;        // 上传耗时（秒）
+    int64 payload_size_bytes = 4;  // 上传数据大小（字节）
+    double peak_memory_mb = 5;     // 峰值内存占用（MB）
+    double cpu_percent = 6;        // CPU 利用率（%）
+}
+
 // 统一的客户端更新消息
 message ClientUpdate {
     string client_id = 1;
@@ -64,6 +74,9 @@ message ClientUpdate {
         TeePayload tee = 5;
         MpcPayload mpc = 6;
     }
+    
+    // 客户端延迟指标（所有模式通用）
+    ClientLatencyMetrics latency_metrics = 7;
 }
 
 // "none" 模式的载荷
@@ -223,4 +236,7 @@ message HeClientUpdateChunk {
     // --- 流控制元数据 ---
     string layer_name = 5; // 当前块所属的层名称
     bool is_last_chunk_for_layer = 6; // 标记是否为当前层的最后一个块
+    
+    // --- 延迟指标: 仅在第一个块中发送 ---
+    ClientLatencyMetrics latency_metrics = 7;
 } 

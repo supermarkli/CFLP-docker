@@ -170,6 +170,12 @@ class HeAggregationStrategy(AggregationStrategy):
                     
                     logger.info(f"[Round {round_num+1}] 开始接收来自客户端 {client_id} 的CKKS流式更新...")
                     
+                    # 记录客户端延迟指标
+                    if chunk.HasField('latency_metrics'):
+                        lm = chunk.latency_metrics
+                        logger.info(f"[LATENCY] round={round_num+1} client={client_id} stage=training time_sec={lm.training_time:.4f}")
+                        logger.info(f"[RESOURCE] round={round_num+1} client={client_id} peak_memory_mb={lm.peak_memory_mb:.2f} cpu_percent={lm.cpu_percent:.1f}")
+                    
                     # 处理第一个块中的指标 (解压并反序列化)
                     metrics_bytes = chunk.metrics.test_acc
                     if metrics_bytes:
@@ -220,6 +226,8 @@ class HeAggregationStrategy(AggregationStrategy):
             # --- 流处理结束 ---
             elapsed = time.time() - start_time
             with self.server.lock:
+                # 记录上传大小（PAYLOAD 日志）
+                logger.info(f"[PAYLOAD] round={round_num+1} client={client_id} upload_size_bytes={total_bytes_received} upload_size_mb={total_bytes_received/1024/1024:.4f}")
                 logger.info(f"[Round {round_num+1}] 客户端 {client_id} 数据接收完成: "
                            f"{layers_received} 层, {total_bytes_received/1024:.1f}KB, {elapsed:.2f}s")
                 self.server.completed_clients[round_num].add(client_id)
@@ -302,6 +310,9 @@ class HeAggregationStrategy(AggregationStrategy):
         logger.info(f"[Round {round_num+1}] 聚合 {len(layer_keys)} 个参数层, "
                    f"来自 {num_clients} 个客户端")
         
+        # 记录聚合开始时间（密文操作）
+        aggregation_start = time.time()
+        
         def aggregate_single_layer(key):
             """聚合单个参数层 (可并行执行), 按 data_size 加权"""
             # 获取该层的所有客户端的 CKKS 向量列表
@@ -325,39 +336,45 @@ class HeAggregationStrategy(AggregationStrategy):
                 # 加权求和后不需要再除，因为权重之和为1
                 aggregated_vectors.append(weighted_vector)
             
+            return key, aggregated_vectors, shape
+        
+        # 阶段1: 密文聚合
+        aggregated_ciphertexts = {}
+        with ThreadPoolExecutor(max_workers=AGGREGATION_WORKERS) as executor:
+            futures = {executor.submit(aggregate_single_layer, key): key for key in layer_keys}
+            for future in as_completed(futures):
+                key, vectors, shape = future.result()
+                aggregated_ciphertexts[key] = {'vectors': vectors, 'shape': shape}
+        
+        aggregation_time = time.time() - aggregation_start
+        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
+        
+        # 阶段2: 解密
+        decrypt_start = time.time()
+        aggregated_params = {}
+        
+        for key, data in aggregated_ciphertexts.items():
+            vectors = data['vectors']
+            shape = data['shape']
+            
             # 解密并重构数组
             decrypted_flat = []
-            for vec in aggregated_vectors:
+            for vec in vectors:
                 decrypted_flat.extend(vec.decrypt())
             
             # 截断到原始大小并重塑形状
             total_elements = int(np.prod(shape))
             decrypted_array = np.array(decrypted_flat[:total_elements]).reshape(shape)
-            
-            return key, decrypted_array
+            aggregated_params[key] = decrypted_array
         
-        aggregated_params = {}
-        
-        # 使用线程池并行聚合不同层
-        # 注意：TenSEAL 的某些操作可能有 GIL 限制，但解密操作通常是 CPU 密集型的
-        with ThreadPoolExecutor(max_workers=AGGREGATION_WORKERS) as executor:
-            futures = {executor.submit(aggregate_single_layer, key): key for key in layer_keys}
-            
-            completed = 0
-            for future in as_completed(futures):
-                key, decrypted_array = future.result()
-                aggregated_params[key] = decrypted_array
-                completed += 1
-                
-                # 每完成 10 层或全部完成时输出进度
-                if completed % 10 == 0 or completed == len(layer_keys):
-                    logger.debug(f"[Round {round_num+1}] 聚合进度: {completed}/{len(layer_keys)} 层")
+        decrypt_time = time.time() - decrypt_start
+        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec={decrypt_time:.4f}")
 
         elapsed = time.time() - start_time
         logger.info(f"[Round {round_num+1}] CKKS密文聚合完成: {len(layer_keys)} 层, 耗时: {elapsed:.2f}s")
         return aggregated_params
         
-    def evaluate_metrics(self, round_num):
+    def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """解密并评估加密的指标。"""
         client_ids = list(self.server.client_parameters[round_num].keys())
         
@@ -397,13 +414,15 @@ class HeAggregationStrategy(AggregationStrategy):
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num]
 
-        avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
-        avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
         avg_loss = total_loss / total_train_num if total_train_num > 0 else 0
-
-        self.server.rs_test_acc.append(avg_acc)
         self.server.rs_train_loss.append(avg_loss)
-        self.server.rs_auc.append(avg_auc)
-        
-        logger.info(f"[Round {round_num+1}] 全局评估 (CKKS): "
-                   f"Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+
+        if not skip_acc_auc:
+            avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
+            avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
+            self.server.rs_test_acc.append(avg_acc)
+            self.server.rs_auc.append(avg_auc)
+            logger.info(f"[Round {round_num+1}] 客户端聚合评估 (CKKS): "
+                       f"Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+        else:
+            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss (CKKS)={avg_loss:.4f}")

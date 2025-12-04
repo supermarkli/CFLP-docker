@@ -66,6 +66,12 @@ class NoneAggregationStrategy(AggregationStrategy):
 
     def aggregate_parameters(self, round_num):
         """聚合明文客户端参数 (FedAvg)"""
+        import time
+        
+        # BASE 模式无解密，记录解密时间为 0
+        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec=0.0000")
+        
+        aggregation_start = time.time()
         active_clients = [self.server.clients[cid] for cid in self.server.client_parameters[round_num].keys()]
         parameters_list = list(self.server.client_parameters[round_num].values())
         
@@ -79,10 +85,12 @@ class NoneAggregationStrategy(AggregationStrategy):
         for param_name in param_structure.keys():
             aggregated[param_name] = sum(weight * params[param_name] for params, weight in zip(parameters_list, client_weights))
         
+        aggregation_time = time.time() - aggregation_start
+        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
         logger.info(f"[Round {round_num+1}] 明文参数聚合完成。")
         return aggregated
 
-    def evaluate_metrics(self, round_num):
+    def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """评估明文指标"""
         total_test_acc, total_test_num = 0, 0
         total_auc, total_loss, total_train_num = 0, 0, 0
@@ -101,14 +109,18 @@ class NoneAggregationStrategy(AggregationStrategy):
         # 清理本轮存储的指标
         for c in clients_in_round: c.metrics = None
         
-        avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
-        avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
         avg_loss = total_loss / total_train_num if total_train_num > 0 else 0
-        
-        self.server.rs_test_acc.append(avg_acc)
         self.server.rs_train_loss.append(avg_loss)
-        self.server.rs_auc.append(avg_auc)
-        logger.info(f"[Round {round_num+1}] 全局评估: Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+        
+        if not skip_acc_auc:
+            # 如果不跳过 acc/auc，则使用客户端聚合的指标
+            avg_acc = total_test_acc / total_test_num if total_test_num > 0 else 0
+            avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
+            self.server.rs_test_acc.append(avg_acc)
+            self.server.rs_auc.append(avg_auc)
+            logger.info(f"[Round {round_num+1}] 客户端聚合评估: Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+        else:
+            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss={avg_loss:.4f}")
 
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num] 

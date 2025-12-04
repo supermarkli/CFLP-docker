@@ -32,6 +32,9 @@ class TeeClientStrategy(ClientStrategy):
 
     def prepare_update_request(self, current_round, model_parameters, metrics):
         """创建在TEE模式下加密的参数更新消息"""
+        import time
+        encrypt_start = time.time()
+        
         # 1. 创建包含明文参数和指标的载荷
         serialized_params = serialize_parameters(model_parameters)
         training_metrics = federation_pb2.TrainingMetrics(**metrics)
@@ -58,6 +61,9 @@ class TeeClientStrategy(ClientStrategy):
         aesgcm = AESGCM(symmetric_key)
         nonce = os.urandom(12)  # 96-bit nonce is recommended
         encrypted_payload = aesgcm.encrypt(nonce, serialized_payload, None)
+
+        encrypt_time = time.time() - encrypt_start
+        logger.info(f"[TEE] 参数加密完成 (RSA+AES)，耗时: {encrypt_time:.4f}s，密文大小: {len(encrypted_payload)/1024/1024:.2f} MB")
 
         # 4. 创建 TEE 载荷
         tee_payload = federation_pb2.TeePayload(

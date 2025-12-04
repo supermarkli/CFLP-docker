@@ -90,11 +90,85 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         self.logger=logger
         self.communication_costs = {} # <-- 新增：用于存储每轮各客户端的通信开销
         
+        # 加载全局测试集用于评估全局模型
+        self.global_test_loader = self._load_global_test_set()
+        
         self.aggregation_strategy = self._create_aggregation_strategy()
         if not self.aggregation_strategy:
             raise ValueError(f"不支持的隐私模式或初始化策略失败: {self.privacy_mode}")
 
         logger.info(f"服务器初始化完成 (模式: {self.privacy_mode})，等待 {self.expected_clients} 个客户端注册...")
+    
+    def _load_global_test_set(self):
+        """加载全局测试集用于评估全局模型"""
+        import numpy as np
+        global_test_path = f"/app/data/global/{self.dataset_name}_test.npz"
+        
+        try:
+            test_data = np.load(global_test_path)
+            X_test = test_data["X_test"]
+            y_test = test_data["y_test"]
+            
+            X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
+            y_test_tensor = torch.tensor(y_test, dtype=torch.long)
+            test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
+            
+            eval_batch_size = config['training'].get('eval_batch_size', 512)
+            test_loader = DataLoader(test_dataset, batch_size=eval_batch_size, shuffle=False)
+            
+            logger.info(f"成功加载全局测试集: {global_test_path}, 样本数: {len(X_test)}")
+            return test_loader
+        except FileNotFoundError:
+            logger.warning(f"未找到全局测试集: {global_test_path}，将使用客户端聚合指标进行评估")
+            return None
+        except Exception as e:
+            logger.error(f"加载全局测试集时出错: {e}")
+            return None
+    
+    def evaluate_global_model(self, round_num):
+        """使用全局测试集评估全局模型"""
+        if self.global_test_loader is None:
+            return None, None, None
+        
+        self.global_model.eval()
+        test_acc = 0
+        test_num = 0
+        all_probs = []
+        all_labels = []
+        
+        with torch.no_grad():
+            for x, y in self.global_test_loader:
+                x = x.to(self.device)
+                y = y.to(self.device)
+                output = self.global_model(x)
+                test_acc += (torch.sum(torch.argmax(output, dim=1) == y)).item()
+                test_num += y.shape[0]
+                
+                # 收集用于计算 AUC
+                probs = torch.softmax(output, dim=1).cpu().numpy()
+                all_probs.append(probs)
+                all_labels.append(y.cpu().numpy())
+        
+        accuracy = test_acc / test_num if test_num > 0 else 0
+        
+        # 计算 AUC
+        try:
+            from sklearn import metrics
+            from sklearn.preprocessing import label_binarize
+            import numpy as np
+            
+            all_probs = np.concatenate(all_probs, axis=0)
+            all_labels = np.concatenate(all_labels, axis=0)
+            
+            num_classes = all_probs.shape[1]
+            labels_binarized = label_binarize(all_labels, classes=np.arange(num_classes))
+            auc = metrics.roc_auc_score(labels_binarized, all_probs, average='micro')
+        except Exception as e:
+            logger.warning(f"计算 AUC 时出错: {e}")
+            auc = 0
+        
+        logger.info(f"[Round {round_num+1}] 全局模型评估 (全局测试集): Acc={accuracy:.4f}, AUC={auc:.4f}")
+        return accuracy, auc, test_num
 
     def _create_aggregation_strategy(self):
         """根据配置创建并返回相应的聚合策略实例。"""
@@ -205,7 +279,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         统一的更新提交入口。
         将请求直接转发给当前加载的聚合策略进行处理。
         """
-        # 计算并记录通信开销
+        receive_start = time.time()
+        
         client_id = request.client_id
         current_round = request.round
         request_size = request.ByteSize()
@@ -213,6 +288,14 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         if current_round not in self.communication_costs:
             self.communication_costs[current_round] = {}
         self.communication_costs[current_round][client_id] = request_size
+        
+        # 记录客户端延迟指标（统一格式，用于画图）
+        if request.HasField('latency_metrics'):
+            lm = request.latency_metrics
+            logger.info(f"[LATENCY] round={current_round+1} client={client_id} stage=training time_sec={lm.training_time:.4f}")
+            logger.info(f"[LATENCY] round={current_round+1} client={client_id} stage=encryption time_sec={lm.encryption_time:.4f}")
+            logger.info(f"[PAYLOAD] round={current_round+1} client={client_id} upload_size_bytes={lm.payload_size_bytes} upload_size_mb={lm.payload_size_bytes/1024/1024:.4f}")
+            logger.info(f"[RESOURCE] round={current_round+1} client={client_id} peak_memory_mb={lm.peak_memory_mb:.2f} cpu_percent={lm.cpu_percent:.1f}")
         
         logger.info(f"[Round {current_round+1}] 收到来自客户端 {client_id} 的更新，数据大小: {request_size / 1024:.2f} KB")
 
@@ -279,28 +362,25 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             with self.status_condition:  # 使用 Condition 替代 Lock
                 logger.info(f"[Round {round_num+1}] 所有客户端参数已收集完毕，开始聚合。")
                 
-                # --- 通用资源监控 Start ---
+                # --- 系统资源监控 Start ---
                 process = psutil.Process()
                 start_cpu_time = process.cpu_times().user + process.cpu_times().system
                 start_memory = process.memory_info().rss
-                # --- 通用资源监控 End ---
+                cpu_percent_start = process.cpu_percent()
+                aggregation_start = time.time()
+                # --- 系统资源监控 End ---
 
                 aggregated_params = self.aggregation_strategy.aggregate_parameters(round_num)
                 
-                # --- 通用资源监控 End & Log ---
+                # --- 系统资源监控 End & Log ---
+                aggregation_time = time.time() - aggregation_start
                 end_cpu_time = process.cpu_times().user + process.cpu_times().system
-                current_memory = process.memory_info().rss
-                
+                peak_memory = process.memory_info().rss / 1024 / 1024  # MB
+                cpu_percent = process.cpu_percent()
                 cpu_time_used = end_cpu_time - start_cpu_time
-                memory_usage = current_memory
                 
-                # 对于非 SGX 模式，记录主进程的资源消耗
-                if self.privacy_mode != 'sgx':
-                    logger.info(f"[Round {round_num+1}] Server Aggregation Resources - CPU Time: {cpu_time_used:.4f}s, Memory Usage: {memory_usage / 1024 / 1024:.2f} MB")
-                else:
-                    # SGX 模式下，主要计算在 Enclave 中，主进程开销较小，但记录下来也无妨，作为对比
-                    logger.info(f"[Round {round_num+1}] Server Process (Host) Resources - CPU Time: {cpu_time_used:.4f}s, Memory Usage: {memory_usage / 1024 / 1024:.2f} MB (See previous log for Enclave resources)")
-                # --- 通用资源监控 End ---
+                # 统一格式的资源日志
+                logger.info(f"[RESOURCE] round={round_num+1} server peak_memory_mb={peak_memory:.2f} cpu_percent={cpu_percent:.1f} cpu_time_sec={cpu_time_used:.4f}")
 
                 self.global_model.set_parameters(aggregated_params)
                 logger.info(f"[Round {round_num+1}] 全局模型参数更新完成。")
@@ -354,9 +434,32 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             logger.error(f"处理轮次 {round_num} 完成时出错: {e}", exc_info=True)
 
     def evaluate(self, round_num):
-        """评估所有客户端的平均指标，并检查收敛"""
-        self.aggregation_strategy.evaluate_metrics(round_num)
+        """
+        评估全局模型性能。
+        
+        优先使用全局测试集进行评估（更准确），
+        如果全局测试集不可用，则使用客户端聚合指标。
+        """
+        # 优先使用全局测试集评估
+        if self.global_test_loader is not None:
+            accuracy, auc, test_num = self.evaluate_global_model(round_num)
+            if accuracy is not None:
+                self.rs_test_acc.append(accuracy)
+                self.rs_auc.append(auc)
+                # 对于全局测试集评估，loss 需要单独计算或使用客户端聚合
+                self.aggregation_strategy.evaluate_metrics(round_num, skip_acc_auc=True)
+        else:
+            # 回退到使用客户端聚合指标
+            self.aggregation_strategy.evaluate_metrics(round_num)
 
+        # 输出每轮准确率日志（用于收敛曲线）
+        if len(self.rs_test_acc) > 0:
+            current_acc = self.rs_test_acc[-1]
+            current_auc = self.rs_auc[-1] if len(self.rs_auc) > 0 else 0
+            current_loss = self.rs_train_loss[-1] if len(self.rs_train_loss) > 0 else 0
+            logger.info(f"[CONVERGENCE] round={round_num+1} accuracy={current_acc:.4f} auc={current_auc:.4f} loss={current_loss:.4f}")
+
+        # 检查收敛
         if len(self.rs_test_acc) >= self.converge_window:
             recent_accs = self.rs_test_acc[-(self.converge_window):]
             acc_delta = max(recent_accs) - min(recent_accs)

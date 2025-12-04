@@ -209,7 +209,7 @@ class HeClientStrategy(ClientStrategy):
             he=he_payload
         )
     
-    def prepare_stream_update_request(self, current_round, model_parameters, metrics):
+    def prepare_stream_update_request(self, current_round, model_parameters, metrics, latency_info=None):
         """返回一个生成器，用于流式传输加密的模型更新。"""
         
         # 使用闭包捕获 self 引用
@@ -247,14 +247,25 @@ class HeClientStrategy(ClientStrategy):
                 test_num=b'', auc=b'', loss=b'', train_num=b''
             )
             
-            # --- 2. 发送第一个包含元数据和指标的块 ---
+            # --- 2. 准备延迟指标 ---
+            latency_metrics = None
+            if latency_info:
+                latency_metrics = federation_pb2.ClientLatencyMetrics(
+                    training_time=latency_info.get('training_time', 0),
+                    encryption_time=latency_info.get('encryption_time', 0),
+                    peak_memory_mb=latency_info.get('peak_memory_mb', 0),
+                    cpu_percent=latency_info.get('cpu_percent', 0)
+                )
+            
+            # --- 3. 发送第一个包含元数据和指标的块 ---
             initial_chunk = federation_pb2.HeClientUpdateChunk(
                 client_id=client_id,
                 round=current_round,
                 metrics=encrypted_metrics_proto,
                 parameters_chunk={},
                 is_last_chunk_for_layer=True,
-                layer_name="metadata"
+                layer_name="metadata",
+                latency_metrics=latency_metrics
             )
             total_bytes_sent += len(encrypted_metrics_bytes)
             yield initial_chunk

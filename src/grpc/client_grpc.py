@@ -18,6 +18,8 @@ import random
 import json
 import hashlib
 import gc
+import psutil
+import tracemalloc
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -87,6 +89,14 @@ class FederatedLearningClient:
         self.client_id = os.environ.get('CLIENT_ID') or str(uuid.uuid4())
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
+        # GPU 信息日志
+        if torch.cuda.is_available():
+            gpu_name = torch.cuda.get_device_name(0)
+            gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
+            logger.info(f"🚀 使用 GPU 训练: {gpu_name} ({gpu_memory:.1f} GB)")
+        else:
+            logger.info(f"⚠️ 未检测到 GPU，使用 CPU 训练")
+        
         self.dataset_name = config['data']['dataset']
         self.model_name = config['model']['name']
         
@@ -97,7 +107,6 @@ class FederatedLearningClient:
         self.batch_size = config['training']['batch_size']
         self.server_host = config['grpc']['server_host']
         self.server_port = config['grpc']['server_port']
-        self._init_data(data)
         self.logger = logger 
 
         self.stub = None
@@ -107,11 +116,30 @@ class FederatedLearningClient:
         self.continue_training = True
 
         self.loss = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(
+        # 使用 SGD 优化器（与实验配置一致）
+        lr = config['training']['learning_rate']
+        momentum = config['training'].get('momentum', 0.9)
+        weight_decay = config['training'].get('weight_decay', 0.0005)
+        self.optimizer = optim.SGD(
             self.model.parameters(), 
-            lr=config['training']['learning_rate'],
-            weight_decay=config['training'].get('weight_decay', 5e-4)
+            lr=lr,
+            momentum=momentum,
+            weight_decay=weight_decay
         )
+        logger.info(f"[Client {self.client_id}] 优化器: SGD (lr={lr}, momentum={momentum}, weight_decay={weight_decay})")
+        
+        max_rounds = config['federation'].get('max_rounds', 100)
+        local_epochs = config['training'].get('epochs', 3)
+        T_max = max_rounds * local_epochs
+        self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
+            self.optimizer, 
+            T_max=T_max,
+            eta_min=0.0  # 最小学习率为 0
+        )
+        logger.info(f"[Client {self.client_id}] 学习率调度: CosineAnnealingLR (T_max={T_max})")
+        
+        # 初始化数据（数据增强日志在 _init_data 中输出）
+        self._init_data(data)
         
 
     def setup_connection_and_register(self):
@@ -222,19 +250,42 @@ class FederatedLearningClient:
                 # 获取训练时的数据增强 transform
                 train_transform = get_train_transform(self.dataset_name)
                 train_dataset = AugmentedDataset(X_train, y_train, transform=train_transform)
-                self.train_data = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=True)
+                # 使用配置中的 num_workers 和 prefetch_factor
+                num_workers = config['training'].get('num_workers', 0)  # 默认 0（单进程）
+                prefetch_factor = config['training'].get('prefetch_factor', 2)
+                self.train_data = DataLoader(
+                    train_dataset, 
+                    batch_size=self.batch_size, 
+                    shuffle=True, 
+                    drop_last=True,
+                    num_workers=num_workers,
+                    prefetch_factor=prefetch_factor if num_workers > 0 else None
+                )
                 self.data_size = len(train_dataset)
+                # 数据增强日志
+                if train_transform is not None:
+                    logger.info(f"[Client {self.client_id}] 数据增强已启用")
                 logger.debug(f"数据集划分完成 - 训练集: {X_train.shape}，数据增强: {train_transform is not None}")
             else:
                 self.train_data = None
                 self.data_size = 0
                 logger.warning("未提供训练集数据")
             if X_test is not None and y_test is not None:
-                # 测试集不使用数据增强
+                # 测试集不使用数据增强，使用 eval_batch_size
+                eval_batch_size = config['training'].get('eval_batch_size', self.batch_size)
                 X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
                 y_test_tensor = torch.tensor(y_test, dtype=torch.long)
                 test_dataset = TensorDataset(X_test_tensor, y_test_tensor)
-                self.test_data = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False, drop_last=False)
+                num_workers = config['training'].get('num_workers', 0)
+                prefetch_factor = config['training'].get('prefetch_factor', 2)
+                self.test_data = DataLoader(
+                    test_dataset, 
+                    batch_size=eval_batch_size, 
+                    shuffle=False, 
+                    drop_last=False,
+                    num_workers=num_workers,
+                    prefetch_factor=prefetch_factor if num_workers > 0 else None
+                )
                 logger.debug(f"数据集划分完成 - 测试集: {X_test_tensor.shape}")
             else:
                 self.test_data = None
@@ -261,6 +312,9 @@ class FederatedLearningClient:
                     self.optimizer.zero_grad()
                     loss.backward()
                     self.optimizer.step()
+                # 每个 epoch 后更新学习率（CosineAnnealingLR）
+                if hasattr(self, 'scheduler') and self.scheduler is not None:
+                    self.scheduler.step()
         except Exception as e:
             logger.error(f"本地训练失败: {str(e)}")
             raise
@@ -417,31 +471,86 @@ class FederatedLearningClient:
             logger.error("注册阶段发生连接错误，客户端退出。")
             return
 
+        # 获取进程对象用于资源监控
+        process = psutil.Process()
+        
         while self.continue_training:
+            round_start_time = time.time()
+            
+            # 开始内存追踪
+            tracemalloc.start()
+            peak_memory_before = process.memory_info().rss / 1024 / 1024  # MB
+            cpu_percent_start = process.cpu_percent()
+            
+            # === 阶段1: 本地训练 ===
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}开始训练...")
+            train_start = time.time()
             self.train(epochs=config['training']['epochs'])
+            train_time = time.time() - train_start
             
             metrics_data = self.get_metrics()
+            local_acc = metrics_data['test_acc'] / metrics_data['test_num'] if metrics_data['test_num'] > 0 else 0
             
             model_parameters = self.model.get_parameters()
+            payload_size_bytes = 0
+            encrypt_time = 0
+            upload_time = 0
+            
+            # 收集资源统计（在加密前获取，因为加密会消耗大量资源）
+            peak_memory_mid = process.memory_info().rss / 1024 / 1024
+            cpu_percent_mid = process.cpu_percent()
             
             if self.privacy_mode == 'he':
-                # HE模式使用新的流式接口
-                update_generator = self.strategy.prepare_stream_update_request(self.current_round, model_parameters, metrics_data)
+                # === 阶段2: 加密 (HE模式 - 流式) ===
+                encrypt_start = time.time()
+                # 收集延迟信息用于发送给服务端
+                latency_info = {
+                    'training_time': train_time,
+                    'encryption_time': 0,  # 流式模式下加密时间在生成器中
+                    'peak_memory_mb': max(peak_memory_before, peak_memory_mid),
+                    'cpu_percent': max(cpu_percent_start, cpu_percent_mid)
+                }
+                update_generator = self.strategy.prepare_stream_update_request(
+                    self.current_round, model_parameters, metrics_data, latency_info
+                )
+                encrypt_time = time.time() - encrypt_start
+                
+                # === 阶段3: 上传 (HE模式 - 流式) ===
+                upload_start = time.time()
                 success = self._submit_update_stream_with_retry(update_generator)
+                upload_time = time.time() - upload_start
+                
                 if not success:
                     logger.error(f"[Round {self.current_round+1}] HE流式提交失败，终止训练。")
                     self.continue_training = False
-                    # 这里可以添加更复杂的错误处理，例如重试整个轮次
-                    continue # 直接进入下一轮的循环检查（实际上会因为continue_training=False而退出）
+                    tracemalloc.stop()
+                    continue
             else:
-                # 其他模式使用原有的接口
+                # === 阶段2: 加密/处理 (非HE模式) ===
+                encrypt_start = time.time()
                 update_request = self.strategy.prepare_update_request(self.current_round, model_parameters, metrics_data)
+                encrypt_time = time.time() - encrypt_start
+                payload_size_bytes = update_request.ByteSize()
+                
+                # 收集最终资源统计
+                peak_memory_after_encrypt = process.memory_info().rss / 1024 / 1024
+                cpu_percent_after = process.cpu_percent()
+                
+                # 添加延迟指标到请求中
+                update_request.latency_metrics.training_time = train_time
+                update_request.latency_metrics.encryption_time = encrypt_time
+                update_request.latency_metrics.payload_size_bytes = payload_size_bytes
+                update_request.latency_metrics.peak_memory_mb = max(peak_memory_before, peak_memory_mid, peak_memory_after_encrypt)
+                update_request.latency_metrics.cpu_percent = max(cpu_percent_start, cpu_percent_mid, cpu_percent_after)
+                
+                # === 阶段3: 上传 ===
+                upload_start = time.time()
                 self._submit_update_with_retry(update_request)
+                upload_time = time.time() - upload_start
 
             logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
 
-            # 使用流式订阅等待服务器聚合完成（替代原来的轮询循环）
+            # 使用流式订阅等待服务器聚合完成
             status_response = self._wait_for_training_status()
             
             if status_response.code == 300:
@@ -450,15 +559,30 @@ class FederatedLearningClient:
             elif status_response.code == 500:
                 logger.error(f"[Round {self.current_round+1}] 连接错误，终止训练。")
                 self.continue_training = False
-                
+            
+            # === 阶段5: 下载 ===
+            download_start = time.time()
             global_model_request = federation_pb2.GetModelRequest(client_id=self.client_id, round=self.current_round)
             global_model_response = self.stub.GetGlobalModel(global_model_request)
+            download_size_bytes = global_model_response.ByteSize()
             global_params = deserialize_parameters(global_model_response.parameters)
             self.model.set_parameters(global_params)
-            logger.info(f"[Round {self.current_round+1}] 成功更新全局模型。")
+            download_time = time.time() - download_start
+            
+            # 收集最终系统资源统计
+            current_mem, peak_mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+            peak_memory_final = process.memory_info().rss / 1024 / 1024  # MB
+            
+            round_time = time.time() - round_start_time
+            
+            # 本地日志（客户端控制台）
+            logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id} 本轮完成: "
+                       f"训练={train_time:.2f}s, 加密={encrypt_time:.2f}s, "
+                       f"上传={upload_time:.2f}s, 下载={download_time:.2f}s, "
+                       f"总耗时={round_time:.2f}s")
             
             self.current_round += 1
-            # 注意：不再需要检查 max_rounds，服务器会在达到时发送 code=300 通知客户端
 
         logger.info("客户端训练流程结束。")
 
@@ -486,21 +610,34 @@ class FederatedLearningClient:
 
 
 def load_client_data():
-    """加载客户端训练集和测试集数据"""
+    """
+    加载客户端训练集和本地验证集数据
+    
+    数据结构：
+    - /app/data/{dataset}_train.npz: 本地训练集 (X_train, y_train)
+    - /app/data/{dataset}_val.npz: 本地验证集 (X_val, y_val) - 用于客户端本地评估
+    
+    注意：全局测试集保存在 /app/data/global/ 目录，由服务端加载进行全局评估
+    """
     dataset_name = config['data']['dataset']
     train_path = f"/app/data/{dataset_name}_train.npz"
-    test_path = f"/app/data/{dataset_name}_test.npz"
+    val_path = f"/app/data/{dataset_name}_val.npz"
     
     try:
+        # 加载本地训练集
         train_data = np.load(train_path)
-        test_data = np.load(test_path)
         X_train = train_data["X_train"]
         y_train = train_data["y_train"]
-        X_test = test_data["X_test"]
-        y_test = test_data["y_test"]
         logger.info(f"成功加载客户端训练集: {train_path}, 形状: X_train={X_train.shape}, y_train={y_train.shape}")
-        logger.info(f"成功加载客户端测试集: {test_path}, 形状: X_test={X_test.shape}, y_test={y_test.shape}")
-        return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
+        
+        # 加载本地验证集
+        val_data = np.load(val_path)
+        X_val = val_data["X_val"]
+        y_val = val_data["y_val"]
+        logger.info(f"成功加载客户端验证集: {val_path}, 形状: X_val={X_val.shape}, y_val={y_val.shape}")
+        
+        # 返回数据，使用 X_test/y_test 作为键名以保持与现有代码的兼容性
+        return {"X_train": X_train, "y_train": y_train, "X_test": X_val, "y_test": y_val}
     except FileNotFoundError as e:
         logger.error(f"无法找到数据文件: {e}")
         return None
