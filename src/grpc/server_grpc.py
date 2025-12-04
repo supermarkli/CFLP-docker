@@ -66,7 +66,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         # 从配置中读取数据集和模型名称
         self.dataset_name = config['data']['dataset']
         self.model_name = config['model']['name']
-        logger.info(f"服务器配置: Dataset={self.dataset_name}, Model={self.model_name}")
+        logger.info(f"[Server] 配置: Dataset={self.dataset_name}, Model={self.model_name}")
 
         self.global_model = get_model(self.model_name, self.dataset_name).to(self.device)
         self.clients = {}
@@ -97,7 +97,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         if not self.aggregation_strategy:
             raise ValueError(f"不支持的隐私模式或初始化策略失败: {self.privacy_mode}")
 
-        logger.info(f"服务器初始化完成 (模式: {self.privacy_mode})，等待 {self.expected_clients} 个客户端注册...")
+        logger.info(f"[Server] 初始化完成 (模式: {self.privacy_mode.upper()})，等待 {self.expected_clients} 个客户端注册")
     
     def _load_global_test_set(self):
         """加载全局测试集用于评估全局模型"""
@@ -116,13 +116,13 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             eval_batch_size = config['training'].get('eval_batch_size', 512)
             test_loader = DataLoader(test_dataset, batch_size=eval_batch_size, shuffle=False)
             
-            logger.info(f"成功加载全局测试集: {global_test_path}, 样本数: {len(X_test)}")
+            logger.info(f"[Server] 加载全局测试集: {global_test_path}, 样本数: {len(X_test)}")
             return test_loader
         except FileNotFoundError:
-            logger.warning(f"未找到全局测试集: {global_test_path}，将使用客户端聚合指标进行评估")
+            logger.warning(f"[Server] 未找到全局测试集: {global_test_path}，使用客户端聚合指标评估")
             return None
         except Exception as e:
-            logger.error(f"加载全局测试集时出错: {e}")
+            logger.error(f"[Server] 加载全局测试集出错: {e}")
             return None
     
     def evaluate_global_model(self, round_num):
@@ -164,10 +164,10 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             labels_binarized = label_binarize(all_labels, classes=np.arange(num_classes))
             auc = metrics.roc_auc_score(labels_binarized, all_probs, average='micro')
         except Exception as e:
-            logger.warning(f"计算 AUC 时出错: {e}")
+            logger.warning(f"[Server] 计算 AUC 出错: {e}")
             auc = 0
         
-        logger.info(f"[Round {round_num+1}] 全局模型评估 (全局测试集): Acc={accuracy:.4f}, AUC={auc:.4f}")
+        logger.info(f"[Round {round_num+1}] 全局评估: Acc={accuracy:.4f}, AUC={auc:.4f}")
         return accuracy, auc, test_num
 
     def _create_aggregation_strategy(self):
@@ -187,7 +187,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
 
     def RegisterAndSetup(self, request, context):
         client_id = request.client_id
-        logger.info(f"接收到客户端 {client_id} 的注册请求 (模型: {request.model_type}, 数据量: {request.data_size})")
+        logger.info(f"[Server] 收到客户端 {client_id} 注册请求 (模型: {request.model_type}, 数据量: {request.data_size})")
 
         with self.status_condition:  # 使用 Condition 替代 Lock
             if client_id not in self.clients:
@@ -196,16 +196,16 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     model_type=request.model_type,
                     data_size=request.data_size
                 )
-                logger.info(f"客户端 {client_id} 注册成功。当前 {len(self.clients)}/{self.expected_clients} 个客户端。")
+                logger.info(f"[Server] 客户端 {client_id} 注册成功 ({len(self.clients)}/{self.expected_clients})")
  
             response = self.aggregation_strategy.prepare_setup_response(request)
 
             if len(self.clients) >= self.expected_clients:
                 self.next_step = True
-                logger.info(f"所有客户端已注册，设置 next_step=True，准备开始训练。")
+                logger.info(f"[Server] 所有客户端已注册，准备开始训练")
                 if self.start_time is None:
                     self.start_time = time.time()
-                    logger.info("联邦学习流程计时开始")
+                    logger.info("[Server] 联邦学习计时开始")
                 # 唤醒所有等待状态更新的客户端
                 self.status_condition.notify_all()
 
@@ -217,7 +217,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         使用 Condition 变量实现高效的等待/通知机制，消除轮询导致的锁竞争。
         """
         client_id = request.client_id
-        logger.info(f"客户端 {client_id} 开始订阅训练状态")
+        logger.debug(f"[Server] 客户端 {client_id} 订阅训练状态")
         
         while context.is_active():
             with self.status_condition:
@@ -241,10 +241,10 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 # 检查是否达到最大轮次（训练结束）
                 if current_round + 1 >= self.max_rounds:
                     code = 300
-                    message = f"达到最大训练轮次 ({self.max_rounds})，训练结束"
+                    message = f"达到最大轮次 ({self.max_rounds})，训练结束"
                 elif converged:
                     code = 300
-                    message = "训练已收敛，提前终止"
+                    message = "训练已收敛"
                 elif next_step:
                     code = 200
                     message = "可以开始训练"
@@ -265,14 +265,14 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             try:
                 yield response
             except Exception as e:
-                logger.warning(f"客户端 {client_id} 订阅连接中断: {e}")
+                logger.warning(f"[Server] 客户端 {client_id} 订阅中断: {e}")
                 break
             
             # 推送完成后退出（每次订阅只等待一个状态变化）
-            logger.debug(f"客户端 {client_id} 状态订阅结束 (code={code})")
+            logger.debug(f"[Server] 客户端 {client_id} 状态订阅结束 (code={code})")
             break
         
-        logger.debug(f"客户端 {client_id} 状态订阅流已关闭")
+        logger.debug(f"[Server] 客户端 {client_id} 订阅流关闭")
 
     def SubmitUpdate(self, request, context):
         """
@@ -292,12 +292,11 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         # 记录客户端延迟指标（统一格式，用于画图）
         if request.HasField('latency_metrics'):
             lm = request.latency_metrics
-            logger.info(f"[LATENCY] round={current_round+1} client={client_id} stage=training time_sec={lm.training_time:.4f}")
-            logger.info(f"[LATENCY] round={current_round+1} client={client_id} stage=encryption time_sec={lm.encryption_time:.4f}")
-            logger.info(f"[PAYLOAD] round={current_round+1} client={client_id} upload_size_bytes={lm.payload_size_bytes} upload_size_mb={lm.payload_size_bytes/1024/1024:.4f}")
-            logger.info(f"[RESOURCE] round={current_round+1} client={client_id} peak_memory_mb={lm.peak_memory_mb:.2f} cpu_percent={lm.cpu_percent:.1f}")
+            logger.info(f"[Round {current_round+1}][Client {client_id}][LATENCY] training={lm.training_time:.4f}s, encryption={lm.encryption_time:.4f}s")
+            logger.info(f"[Round {current_round+1}][Client {client_id}][PAYLOAD] upload={lm.payload_size_bytes/1024/1024:.2f} MB")
+            logger.info(f"[Round {current_round+1}][Client {client_id}][RESOURCE] peak_memory={lm.peak_memory_mb:.2f} MB, cpu={lm.cpu_percent:.1f}%")
         
-        logger.info(f"[Round {current_round+1}] 收到来自客户端 {client_id} 的更新，数据大小: {request_size / 1024:.2f} KB")
+        logger.info(f"[Round {current_round+1}] 收到客户端 {client_id} 更新，大小: {request_size / 1024:.2f} KB")
 
         return self.aggregation_strategy.aggregate(request, context)
 
@@ -328,8 +327,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         # --- 通信开销统计 End ---
 
         if self.privacy_mode != 'he':
-            logger.error("非HE模式下调用了SubmitUpdateHeStream")
-            return federation_pb2.ServerUpdate(code=400, message="此接口仅在HE模式下可用。")
+            logger.error("[Server] 非 HE 模式调用了 SubmitUpdateHeStream")
+            return federation_pb2.ServerUpdate(code=400, message="此接口仅在HE模式下可用")
         
         # 将 *新的、带追踪的* 请求流和上下文直接传递给策略进行处理
         response = self.aggregation_strategy.aggregate_stream(tracked_iterator, context)
@@ -339,7 +338,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             if current_round not in self.communication_costs:
                 self.communication_costs[current_round] = {}
             self.communication_costs[current_round][client_id] = total_size
-            logger.info(f"[Round {current_round+1}] 收到来自客户端 {client_id} 的流式更新，数据总大小: {total_size / 1024:.2f} KB")
+            logger.info(f"[Round {current_round+1}] 收到客户端 {client_id} HE 流式更新，大小: {total_size / 1024:.2f} KB")
 
         return response
 
@@ -348,7 +347,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         client_id = request.client_id
         round_num = request.round
         model_parameters = self.global_model.get_parameters()
-        logger.info(f"向客户端 {client_id} 提供第{round_num+1}轮全局模型")
+        logger.debug(f"[Round {round_num+1}] 向客户端 {client_id} 提供全局模型")
         
         model_params = federation_pb2.ModelParameters(
             parameters=serialize_parameters(model_parameters)
@@ -360,7 +359,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
         """处理轮次完成，聚合参数并更新全局模型"""
         try:
             with self.status_condition:  # 使用 Condition 替代 Lock
-                logger.info(f"[Round {round_num+1}] 所有客户端参数已收集完毕，开始聚合。")
+                logger.info(f"[Round {round_num+1}] 所有客户端更新已收集，开始聚合")
                 
                 # --- 系统资源监控 Start ---
                 process = psutil.Process()
@@ -380,10 +379,10 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 cpu_time_used = end_cpu_time - start_cpu_time
                 
                 # 统一格式的资源日志
-                logger.info(f"[RESOURCE] round={round_num+1} server peak_memory_mb={peak_memory:.2f} cpu_percent={cpu_percent:.1f} cpu_time_sec={cpu_time_used:.4f}")
+                logger.info(f"[Round {round_num+1}][Server][RESOURCE] peak_memory={peak_memory:.2f} MB, cpu={cpu_percent:.1f}%, cpu_time={cpu_time_used:.4f}s")
 
                 self.global_model.set_parameters(aggregated_params)
-                logger.info(f"[Round {round_num+1}] 全局模型参数更新完成。")
+                logger.info(f"[Round {round_num+1}] 全局模型更新完成")
                 
                 self.evaluate(round_num) 
 
@@ -393,7 +392,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     self.status_condition.notify_all()
                     self.end_time = time.time()
                     elapsed = self.end_time - self.start_time
-                    logger.info(f"训练结束。总耗时: {elapsed:.2f} 秒")
+                    logger.info(f"[Server] 训练结束，总耗时: {elapsed:.2f}s")
 
                     # --- 保存通信开销 ---
                     try:
@@ -407,9 +406,9 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                         total_row = costs_df.sum().to_frame().T
                         total_row.index = ['Total']
                         costs_df = pd.concat([costs_df, total_row])
-                        logger.info("通信开销 (KB) 汇总:\n" + costs_df[['Total_KB']].to_string())
+                        logger.info("[Server] 通信开销汇总 (KB):\n" + costs_df[['Total_KB']].to_string())
                     except Exception as e:
-                        logger.error(f"计算通信开销失败: {e}")
+                        logger.error(f"[Server] 计算通信开销失败: {e}")
                     # --- 保存通信开销 End ---
 
                     # 创建并打印评估指标表格
@@ -420,7 +419,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                         "Loss": [f"{loss:.4f}" for loss in self.rs_train_loss]
                     }
                     df = pd.DataFrame(eval_results).set_index("Round")
-                    logger.info("全局模型评估指标汇总:\n" + df.to_string())
+                    logger.info("[Server] 评估指标汇总:\n" + df.to_string())
 
                     prefix = f"{self.privacy_mode}_"
                     plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc, prefix=prefix)
@@ -429,9 +428,9 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     self.next_step = True
                     # 唤醒所有等待状态更新的客户端（进入下一轮）
                     self.status_condition.notify_all()
-                    logger.info(f"第 {round_num+1} 轮聚合完成，进入第 {self.current_round+1} 轮。")
+                    logger.info(f"[Round {round_num+1}] 聚合完成，进入 Round {self.current_round+1}")
         except Exception as e:
-            logger.error(f"处理轮次 {round_num} 完成时出错: {e}", exc_info=True)
+            logger.error(f"[Server] 处理 Round {round_num} 出错: {e}", exc_info=True)
 
     def evaluate(self, round_num):
         """
@@ -465,7 +464,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             acc_delta = max(recent_accs) - min(recent_accs)
             if acc_delta < self.acc_delta_threshold:
                 self.converged = True
-                logger.info(f"[Round {round_num+1}] 训练已收敛，准确率变化 ({acc_delta:.6f}) 小于阈值 ({self.acc_delta_threshold})。")
+                logger.info(f"[Round {round_num+1}] 训练收敛: Acc 变化 ({acc_delta:.6f}) < 阈值 ({self.acc_delta_threshold})")
 
 
 def serve():
@@ -494,10 +493,10 @@ def serve():
             certificate_chain = f.read()
         server_credentials = grpc.ssl_server_credentials([(private_key, certificate_chain)])
         server.add_secure_port(f"0.0.0.0:{port}", server_credentials)
-        logger.info(f"联邦学习安全服务器正在启动，监听端口: {port}")
+        logger.info(f"[Server] 启动 (SSL/TLS)，监听端口: {port}")
     except FileNotFoundError:
         server.add_insecure_port(f"[::]:{port}")
-        logger.warning(f"未找到证书文件，使用不安全模式启动服务器于端口: {port}")
+        logger.warning(f"[Server] 未找到证书，使用不安全模式启动，端口: {port}")
 
     server.start()
     server.wait_for_termination()

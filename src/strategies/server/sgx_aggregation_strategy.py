@@ -28,17 +28,17 @@ class SgxAggregationStrategy(AggregationStrategy):
 
     def _connect_to_enclave(self):
         """建立到聚合器enclave的TCP套接字连接。"""
-        self.server.logger.info(f"正在尝试连接到SGX聚合器enclave at {ENCLAVE_HOST}:{ENCLAVE_PORT}...")
+        self.server.logger.debug(f"[Server] 连接 SGX Enclave {ENCLAVE_HOST}:{ENCLAVE_PORT}...")
         for i in range(MAX_RETRIES):
             try:
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((ENCLAVE_HOST, ENCLAVE_PORT))
-                self.server.logger.info("✅ 成功连接到SGX聚合器enclave。")
+                self.server.logger.info("[Server] ✅ 连接 SGX Enclave 成功")
                 return client_socket
             except (socket.error, ConnectionRefusedError) as e:
-                self.server.logger.warning(f"连接enclave失败: {e}。等待聚合器启动... ({i+1}/{MAX_RETRIES})")
+                self.server.logger.warning(f"[Server] Enclave 连接失败，重试 ({i+1}/{MAX_RETRIES})")
                 time.sleep(RETRY_INTERVAL)
-        raise ConnectionError("❌ 多次重试后未能连接到SGX聚合器enclave。")
+        raise ConnectionError("[Server] ❌ 多次重试后未能连接 SGX Enclave")
 
     def _recv_exact(self, sock, length):
         """精确接收指定长度的数据"""
@@ -52,12 +52,12 @@ class SgxAggregationStrategy(AggregationStrategy):
 
     def _get_initial_attestation(self):
         """从enclave获取公钥和证明quote。"""
-        self.server.logger.info("正在从enclave请求初始证明数据...")
+        self.server.logger.info("[Server] SGX 模式：请求 Enclave 证明...")
         enclave_socket = self._connect_to_enclave()
         enclave_socket.sendall(b"GET_ATTESTATION")
         response_bytes = enclave_socket.recv(4096)
         pubkey_pem, quote = pickle.loads(response_bytes)
-        self.server.logger.info("✅ 已从enclave收到公钥和quote。")
+        self.server.logger.info("[Server] ✅ 收到 Enclave 公钥和 Quote")
         enclave_socket.close()
         return pubkey_pem, quote
 
@@ -89,7 +89,7 @@ class SgxAggregationStrategy(AggregationStrategy):
                 return federation_pb2.ServerUpdate(code=400, message=f"轮次不匹配，服务器当前为 {self.server.current_round} 轮")
 
             self.server.client_parameters[round_num][client_id] = payload
-            self.server.logger.info(f"已收到并存储来自客户端 {client_id} 的第 {round_num+1} 轮SGX更新。")
+            self.server.logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} SGX 更新")
 
             if len(self.server.client_parameters[round_num]) >= self.server.expected_clients:
                 threading.Thread(target=self.server.process_round_completion, args=(round_num,)).start()
@@ -101,7 +101,7 @@ class SgxAggregationStrategy(AggregationStrategy):
         使用流式协议将参数的聚合委托给SGX enclave。
         逐个发送客户端数据，避免内存峰值。
         """
-        self.server.logger.info(f"[第 {round_num+1} 轮] 正在将聚合任务委托给SGX enclave（流式模式）。")
+        self.server.logger.info(f"[Round {round_num+1}] 委托 SGX Enclave 聚合...")
         
         client_updates = self.server.client_parameters[round_num]
         num_clients = len(client_updates)
@@ -116,7 +116,7 @@ class SgxAggregationStrategy(AggregationStrategy):
 
             # 2. 发送客户端数量 (4字节)
             enclave_socket.sendall(num_clients.to_bytes(4, byteorder='big'))
-            self.server.logger.info(f"📤 开始流式发送 {num_clients} 个客户端的数据...")
+            self.server.logger.debug(f"[Round {round_num+1}] 发送 {num_clients} 个客户端数据到 Enclave...")
 
             # 3. 逐个发送客户端数据
             for i, (client_id, update_payload) in enumerate(client_updates.items()):
@@ -137,9 +137,9 @@ class SgxAggregationStrategy(AggregationStrategy):
                 enclave_socket.sendall(data_length.to_bytes(8, byteorder='big'))
                 enclave_socket.sendall(client_data)
                 
-                self.server.logger.info(f"📤 已发送客户端 {i+1}/{num_clients} 的数据 ({data_length / 1024 / 1024:.2f} MB)")
+                self.server.logger.debug(f"[Round {round_num+1}] 发送客户端 {i+1}/{num_clients} ({data_length / 1024 / 1024:.2f} MB)")
 
-            self.server.logger.info("📤 所有客户端数据已发送，等待Enclave处理结果...")
+            self.server.logger.debug(f"[Round {round_num+1}] 等待 Enclave 处理...")
 
             # 4. 接收结果长度 (8字节)
             length_bytes = self._recv_exact(enclave_socket, 8)
@@ -150,9 +150,9 @@ class SgxAggregationStrategy(AggregationStrategy):
             
             result = pickle.loads(response_data)
             if "error" in result:
-                raise RuntimeError(f"Enclave返回错误: {result['error']}")
+                raise RuntimeError(f"Enclave 返回错误: {result['error']}")
 
-            self.server.logger.info("✅ 已从SGX enclave收到聚合后的参数和指标。")
+            self.server.logger.info(f"[Round {round_num+1}] ✅ 收到 Enclave 聚合结果")
             self.last_aggregated_metrics = result.get('metrics', {})
             aggregated_params = result.get('params', {})
             
@@ -164,8 +164,8 @@ class SgxAggregationStrategy(AggregationStrategy):
             decryption_time = enclave_cpu_time * 0.3
             aggregation_time = enclave_cpu_time * 0.7
             
-            self.server.logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec={decryption_time:.4f}")
-            self.server.logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
+            self.server.logger.info(f"[Round {round_num+1}][LATENCY] decryption={decryption_time:.4f}s")
+            self.server.logger.info(f"[Round {round_num+1}][LATENCY] aggregation={aggregation_time:.4f}s")
             
             return {k: v for k, v in aggregated_params.items()}
         finally:
@@ -176,7 +176,7 @@ class SgxAggregationStrategy(AggregationStrategy):
         使用由enclave计算并返回的聚合指标。
         """
         if self.last_aggregated_metrics is None:
-            self.server.logger.warning(f"[第 {round_num+1} 轮] 没有可用的聚合指标。")
+            self.server.logger.warning(f"[Round {round_num+1}] 没有可用的聚合指标")
             return
 
         total_samples = self.last_aggregated_metrics.get('total_samples', 0)
@@ -194,17 +194,17 @@ class SgxAggregationStrategy(AggregationStrategy):
             if not skip_acc_auc:
                 self.server.rs_test_acc.append(avg_acc)
                 self.server.rs_auc.append(avg_auc)
-                self.server.logger.info(f"[第 {round_num+1} 轮] 客户端聚合指标 (SGX) - 准确率: {avg_acc:.4f}, AUC: {avg_auc:.4f}, 损失: {avg_loss:.4f}")
+                self.server.logger.info(f"[Round {round_num+1}] 客户端聚合 (SGX): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
             else:
-                self.server.logger.info(f"[第 {round_num+1} 轮] 客户端聚合 Loss (SGX)={avg_loss:.4f}")
+                self.server.logger.info(f"[Round {round_num+1}] 客户端聚合 (SGX): Loss={avg_loss:.4f}")
             
-            self.server.logger.info(f"[第 {round_num+1} 轮] Enclave资源 - CPU耗时: {server_cpu:.4f}s, 内存使用: {server_mem/1024/1024:.2f} MB")
+            self.server.logger.info(f"[Round {round_num+1}][Enclave][RESOURCE] cpu_time={server_cpu:.4f}s, memory={server_mem/1024/1024:.2f} MB")
         else:
-            self.server.logger.warning(f"[第 {round_num+1} 轮] 聚合指标中总样本数为0。")
+            self.server.logger.warning(f"[Round {round_num+1}] 聚合指标中总样本数为 0")
         
         self.last_aggregated_metrics = None
         
         # 清理本轮的加密参数缓存，避免内存泄漏
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num]
-            self.server.logger.debug(f"[第 {round_num+1} 轮] 已清理 client_parameters 缓存")
+            self.server.logger.debug(f"[Round {round_num+1}] 已清理 client_parameters 缓存")

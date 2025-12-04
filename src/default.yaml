@@ -18,9 +18,9 @@ federation:
   # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
   privacy_mode: "none" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
-  max_rounds: 100  # 与实验配置一致（100 轮）
+  max_rounds: 10000  # 与实验配置一致（100 轮）
   convergence:
-    acc_delta_threshold: 0.0001  # 与实验配置一致
+    acc_delta_threshold: 0.005  # 与实验配置一致
     window: 4  # 与实验配置一致（检查最近4轮）
 
 grpc:
@@ -33,10 +33,10 @@ grpc:
 training:
   batch_size: 128        # 训练批次大小（与实验配置一致）
   eval_batch_size: 512   # 评估批次大小（与实验配置一致）
-  learning_rate: 0.1     # SGD 初始学习率（与实验配置一致）
+  learning_rate: 0.01     # SGD 初始学习率（与实验配置一致）
   momentum: 0.9          # SGD 动量系数（与实验配置一致）
   weight_decay: 0.0005   # L2 正则化系数（与实验配置一致）
-  epochs: 3              # 每轮本地训练轮数（local_epochs，与实验配置一致）
+  epochs: 5              # 每轮本地训练轮数（local_epochs，与实验配置一致）
   num_workers: 4         # DataLoader 多进程数（GPU 模式，与实验配置一致）
   prefetch_factor: 2     # 数据预取批次数（与实验配置一致）
   use_amp: true          # 混合精度训练（GPU 模式，与实验配置一致）

@@ -89,13 +89,14 @@ class FederatedLearningClient:
         self.client_id = os.environ.get('CLIENT_ID') or str(uuid.uuid4())
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # GPU 信息日志
+        # GPU 信息日志（初始化时还没有 client_id，稍后输出）
+        self._gpu_info = None
         if torch.cuda.is_available():
             gpu_name = torch.cuda.get_device_name(0)
             gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
-            logger.info(f"🚀 使用 GPU 训练: {gpu_name} ({gpu_memory:.1f} GB)")
+            self._gpu_info = f"🚀 使用 GPU 训练: {gpu_name} ({gpu_memory:.1f} GB)"
         else:
-            logger.info(f"⚠️ 未检测到 GPU，使用 CPU 训练")
+            self._gpu_info = "⚠️ 未检测到 GPU，使用 CPU 训练"
         
         self.dataset_name = config['data']['dataset']
         self.model_name = config['model']['name']
@@ -126,6 +127,8 @@ class FederatedLearningClient:
             momentum=momentum,
             weight_decay=weight_decay
         )
+        # 输出 GPU 和优化器信息
+        logger.info(f"[Client {self.client_id}] {self._gpu_info}")
         logger.info(f"[Client {self.client_id}] 优化器: SGD (lr={lr}, momentum={momentum}, weight_decay={weight_decay})")
         
         max_rounds = config['federation'].get('max_rounds', 100)
@@ -137,6 +140,7 @@ class FederatedLearningClient:
             eta_min=0.0  # 最小学习率为 0
         )
         logger.info(f"[Client {self.client_id}] 学习率调度: CosineAnnealingLR (T_max={T_max})")
+        logger.info(f"[Client {self.client_id}] 数据集: {self.dataset_name}, 模型: {self.model_name}")
         
         # 初始化数据（数据增强日志在 _init_data 中输出）
         self._init_data(data)
@@ -163,9 +167,9 @@ class FederatedLearningClient:
                     ('grpc.http2.min_ping_interval_without_data_ms', 10000),
                 ]
             )
-            logger.info(f"客户端 {self.client_id} 初始化完成，数据集大小: {self.data_size}，使用安全通道(SSL/TLS)连接服务器{self.server_host}:{self.server_port}。")
+            logger.info(f"[Client {self.client_id}] 初始化完成，数据量: {self.data_size}，使用 SSL/TLS 连接 {self.server_host}:{self.server_port}")
         except FileNotFoundError:
-            logger.warning(f"未找到CA证书，使用不安全通道连接服务器。")
+            logger.warning(f"[Client {self.client_id}] 未找到 CA 证书，使用不安全通道连接")
             channel = grpc.insecure_channel(
                 f"{self.server_host}:{self.server_port}",
                 options=[
@@ -194,18 +198,18 @@ class FederatedLearningClient:
         for attempt in range(max_retries):
             try:
                 setup_response = self.stub.RegisterAndSetup(register_request)
-                logger.info(f"客户端{self.client_id}注册成功。")
+                logger.info(f"[Client {self.client_id}] 注册成功")
                 break 
             except grpc._channel._InactiveRpcError as e:
                 if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
-                    logger.warning(f"无法连接到服务器 (详情: {e.details()})，将在 {retry_interval} 秒后重试 ({attempt+1}/{max_retries})...")
+                    logger.warning(f"[Client {self.client_id}] 连接失败，{retry_interval}s 后重试 ({attempt+1}/{max_retries})")
                     time.sleep(retry_interval)
                 else:
-                    logger.error(f"多次尝试后仍无法连接到服务器，放弃连接。详情: {e.details()}")
+                    logger.error(f"[Client {self.client_id}] 多次重试后仍无法连接服务器")
                     raise e
         
         self.privacy_mode = setup_response.privacy_mode
-        logger.info(f"服务器运行模式为: {self.privacy_mode.upper()}")
+        logger.info(f"[Client {self.client_id}] 服务器模式: {self.privacy_mode.upper()}")
 
         # 1. Create the strategy based on the mode
         self.strategy = self._create_strategy(setup_response)
@@ -216,7 +220,7 @@ class FederatedLearningClient:
         # 3. Deserialize the initial model
         initial_parameters = deserialize_parameters(setup_response.initial_model.parameters)
         self.model.set_parameters(initial_parameters)
-        logger.info(f"客户端{self.client_id}已设置初始模型参数。")
+        logger.info(f"[Client {self.client_id}] 已设置初始模型参数")
 
     def _create_strategy(self, setup_response):
         """根据服务器响应创建并返回相应的客户端策略实例。"""
@@ -236,7 +240,7 @@ class FederatedLearningClient:
             sgx_strategy.setup(setup_response)
             return sgx_strategy
         else:
-            logger.error(f"接收到未知的隐私模式: {self.privacy_mode}")
+            logger.error(f"[Client {self.client_id}] 未知的隐私模式: {self.privacy_mode}")
             return None
 
     def _init_data(self, data):
@@ -264,12 +268,12 @@ class FederatedLearningClient:
                 self.data_size = len(train_dataset)
                 # 数据增强日志
                 if train_transform is not None:
-                    logger.info(f"[Client {self.client_id}] 数据增强已启用")
-                logger.debug(f"数据集划分完成 - 训练集: {X_train.shape}，数据增强: {train_transform is not None}")
+                    logger.info(f"[Client {self.client_id}] 数据增强: 已启用")
+                logger.debug(f"[Client {self.client_id}] 数据划分完成 - 训练集: {X_train.shape}")
             else:
                 self.train_data = None
                 self.data_size = 0
-                logger.warning("未提供训练集数据")
+                logger.warning(f"[Client {self.client_id}] 未提供训练集数据")
             if X_test is not None and y_test is not None:
                 # 测试集不使用数据增强，使用 eval_batch_size
                 eval_batch_size = config['training'].get('eval_batch_size', self.batch_size)
@@ -286,12 +290,12 @@ class FederatedLearningClient:
                     num_workers=num_workers,
                     prefetch_factor=prefetch_factor if num_workers > 0 else None
                 )
-                logger.debug(f"数据集划分完成 - 测试集: {X_test_tensor.shape}")
+                logger.debug(f"[Client {self.client_id}] 数据划分完成 - 验证集: {X_test_tensor.shape}")
             else:
                 self.test_data = None
-                logger.warning("未提供测试集数据")
+                logger.warning(f"[Client {self.client_id}] 未提供验证集数据")
         else:
-            logger.warning("未提供数据，训练集和测试集将为空")
+            logger.warning(f"[Client {self.client_id}] 未提供数据，训练集和验证集为空")
             self.train_data = None
             self.test_data = None
             self.data_size = 0
@@ -299,7 +303,7 @@ class FederatedLearningClient:
     def train(self, epochs=1):
         """本地训练模型"""
         if self.train_data is None:
-            logger.warning(f"客户端 {self.client_id}: 没有可用的训练数据")
+            logger.warning(f"[Client {self.client_id}] 没有可用的训练数据")
             return None
         try:
             self.model.train()
@@ -316,7 +320,7 @@ class FederatedLearningClient:
                 if hasattr(self, 'scheduler') and self.scheduler is not None:
                     self.scheduler.step()
         except Exception as e:
-            logger.error(f"本地训练失败: {str(e)}")
+            logger.error(f"[Client {self.client_id}] 本地训练失败: {str(e)}")
             raise
 
     def train_metrics(self):
@@ -379,11 +383,11 @@ class FederatedLearningClient:
         """使用重试逻辑提交统一的更新请求。"""
         max_retries = config['grpc']['max_retries']
         retry_interval = config['grpc']['retry_interval']
-        log_prefix = f"[{self.privacy_mode.upper()}] [轮次 {self.current_round + 1}]"
+        log_prefix = f"[Client {self.client_id}][Round {self.current_round + 1}]"
         
         # 记录数据大小
         payload_size = update_request.ByteSize()
-        logger.info(f"{log_prefix} 客户端 {self.client_id} 开始传输更新数据，大小: {payload_size / 1024 / 1024:.2f} MB")
+        logger.info(f"{log_prefix} 开始上传更新，大小: {payload_size / 1024 / 1024:.2f} MB")
         
         import time as _time
         start_time = _time.time()
@@ -393,34 +397,34 @@ class FederatedLearningClient:
                 server_response = self.stub.SubmitUpdate(update_request)
                 elapsed = _time.time() - start_time
                 speed = payload_size / elapsed / 1024 / 1024 if elapsed > 0 else 0
-                logger.info(f"{log_prefix} 客户端 {self.client_id} 传输完成，耗时 {elapsed:.2f}s，速度 {speed:.2f} MB/s")
+                logger.info(f"{log_prefix} 上传完成，耗时 {elapsed:.2f}s，速度 {speed:.2f} MB/s")
                 return server_response  # 成功则返回响应
             except grpc._channel._InactiveRpcError as e:
                 if e.code() == grpc.StatusCode.UNAVAILABLE and attempt < max_retries - 1:
-                    logger.warning(f"{log_prefix} 提交更新失败 (服务器不可达)，将在 {retry_interval} 秒后重试...")
+                    logger.warning(f"{log_prefix} 上传失败，{retry_interval}s 后重试...")
                     time.sleep(retry_interval)
                 else:
-                    logger.error(f"{log_prefix} 多次尝试后仍无法提交更新，训练终止。")
+                    logger.error(f"{log_prefix} 多次重试后仍无法上传，训练终止")
                     raise e  # 将异常重新抛出，由上层处理
         
-        raise RuntimeError(f"{log_prefix} 多次尝试后仍无法提交更新。")
+        raise RuntimeError(f"{log_prefix} 多次重试后仍无法上传")
 
     def _submit_update_stream_with_retry(self, update_generator):
         """带重试逻辑的流式提交更新。"""
-        log_prefix = f"[HE Stream] [轮次 {self.current_round + 1}]"
+        log_prefix = f"[Client {self.client_id}][Round {self.current_round + 1}]"
         try:
             server_response = self.stub.SubmitUpdateHeStream(update_generator())
             if server_response.code == 200:
-                logger.info(f"{log_prefix} 客户端 {self.client_id} 已成功提交流式更新。")
+                logger.info(f"{log_prefix} HE 流式上传成功")
                 return True
             else:
-                logger.error(f"{log_prefix} 提交流式更新失败，服务器返回错误: code={server_response.code}, message='{server_response.message}'")
+                logger.error(f"{log_prefix} HE 流式上传失败: code={server_response.code}")
                 return False
         except grpc._channel._InactiveRpcError as e:
-            logger.error(f"{log_prefix} 提交流式更新时发生gRPC连接错误: {e.details()}")
+            logger.error(f"{log_prefix} HE 流式上传 gRPC 错误: {e.details()}")
             return False
         except Exception as e:
-            logger.error(f"{log_prefix} 提交流式更新时发生未知错误: {str(e)}", exc_info=True)
+            logger.error(f"{log_prefix} HE 流式上传未知错误: {str(e)}", exc_info=True)
             return False
 
     def _wait_for_training_status(self, wait_for_code=200):
@@ -435,22 +439,23 @@ class FederatedLearningClient:
         """
         status_request = federation_pb2.ClientInfo(client_id=self.client_id)
         
+        log_prefix = f"[Client {self.client_id}][Round {self.current_round+1}]"
         try:
             # 使用流式 RPC 订阅状态
             for status_response in self.stub.SubscribeTrainingStatus(status_request):
                 if status_response.code == 200:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}收到训练许可")
+                    logger.info(f"{log_prefix} 收到训练许可")
                     return status_response
                 elif status_response.code == 300:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}检测到服务器收敛信号")
+                    logger.info(f"{log_prefix} 检测到收敛信号")
                     return status_response
                 elif status_response.code == 100:
-                    logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待中 (进度: {status_response.submitted_clients}/{status_response.total_clients})")
+                    logger.debug(f"{log_prefix} 等待中 ({status_response.submitted_clients}/{status_response.total_clients})")
                     # 继续等待下一个流式响应，无需 sleep
                 else:
-                    logger.warning(f"[Round {self.current_round+1}] 客户端{self.client_id}收到未知状态码 {status_response.code}")
+                    logger.warning(f"{log_prefix} 未知状态码: {status_response.code}")
         except grpc.RpcError as e:
-            logger.error(f"订阅训练状态时发生 gRPC 错误: {e.code()} - {e.details()}")
+            logger.error(f"{log_prefix} gRPC 错误: {e.code()} - {e.details()}")
             # 发生错误时返回一个表示需要重试的响应
             return federation_pb2.TrainingStatusResponse(code=500, message="gRPC连接错误")
         
@@ -462,13 +467,13 @@ class FederatedLearningClient:
         self.setup_connection_and_register()
         
         # 使用流式订阅等待所有客户端注册完成
-        logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待所有客户端注册...")
+        logger.info(f"[Client {self.client_id}] 等待所有客户端注册...")
         status_response = self._wait_for_training_status()
         if status_response.code == 300:
-            logger.info("训练已收敛，客户端退出。")
+            logger.info(f"[Client {self.client_id}] 训练已收敛，退出")
             return
         elif status_response.code == 500:
-            logger.error("注册阶段发生连接错误，客户端退出。")
+            logger.error(f"[Client {self.client_id}] 注册阶段连接错误，退出")
             return
 
         # 获取进程对象用于资源监控
@@ -482,8 +487,10 @@ class FederatedLearningClient:
             peak_memory_before = process.memory_info().rss / 1024 / 1024  # MB
             cpu_percent_start = process.cpu_percent()
             
+            log_prefix = f"[Client {self.client_id}][Round {self.current_round+1}]"
+            
             # === 阶段1: 本地训练 ===
-            logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}开始训练...")
+            logger.info(f"{log_prefix} 开始训练...")
             train_start = time.time()
             self.train(epochs=config['training']['epochs'])
             train_time = time.time() - train_start
@@ -521,7 +528,7 @@ class FederatedLearningClient:
                 upload_time = time.time() - upload_start
                 
                 if not success:
-                    logger.error(f"[Round {self.current_round+1}] HE流式提交失败，终止训练。")
+                    logger.error(f"{log_prefix} HE 流式上传失败，终止训练")
                     self.continue_training = False
                     tracemalloc.stop()
                     continue
@@ -548,16 +555,16 @@ class FederatedLearningClient:
                 self._submit_update_with_retry(update_request)
                 upload_time = time.time() - upload_start
 
-            logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}等待全局模型更新...")
+            logger.info(f"{log_prefix} 等待全局模型更新...")
 
             # 使用流式订阅等待服务器聚合完成
             status_response = self._wait_for_training_status()
             
             if status_response.code == 300:
-                logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id}检测到服务器收敛信号，终止训练。")
+                logger.info(f"{log_prefix} 检测到收敛信号，终止训练")
                 self.continue_training = False
             elif status_response.code == 500:
-                logger.error(f"[Round {self.current_round+1}] 连接错误，终止训练。")
+                logger.error(f"{log_prefix} 连接错误，终止训练")
                 self.continue_training = False
             
             # === 阶段5: 下载 ===
@@ -577,14 +584,12 @@ class FederatedLearningClient:
             round_time = time.time() - round_start_time
             
             # 本地日志（客户端控制台）
-            logger.info(f"[Round {self.current_round+1}] 客户端{self.client_id} 本轮完成: "
-                       f"训练={train_time:.2f}s, 加密={encrypt_time:.2f}s, "
-                       f"上传={upload_time:.2f}s, 下载={download_time:.2f}s, "
-                       f"总耗时={round_time:.2f}s")
+            logger.info(f"{log_prefix} 本轮完成: 训练={train_time:.2f}s, 加密={encrypt_time:.2f}s, "
+                       f"上传={upload_time:.2f}s, 下载={download_time:.2f}s, 总耗时={round_time:.2f}s")
             
             self.current_round += 1
 
-        logger.info("客户端训练流程结束。")
+        logger.info(f"[Client {self.client_id}] 训练流程结束")
 
     def get_metrics(self):
         """计算并返回所有相关指标的字典。"""
@@ -592,7 +597,7 @@ class FederatedLearningClient:
         test_acc, test_num, auc = self.test_metrics()
         loss, train_num = self.train_metrics()
 
-        logger.info(f"[Round {self.current_round+1}] 本地评估: Acc={test_acc/test_num if test_num>0 else 0:.4f}, AUC={auc:.4f}, Loss={loss:.4f}")
+        logger.info(f"[Client {self.client_id}][Round {self.current_round+1}] 本地评估: Acc={test_acc/test_num if test_num>0 else 0:.4f}, AUC={auc:.4f}, Loss={loss:.4f}")
 
         return {
             'test_acc': test_acc,
@@ -605,7 +610,7 @@ class FederatedLearningClient:
     def __del__(self):
         if self.channel:
             self.channel.close()
-            logger.info(f"客户端 {self.client_id}: gRPC 通道已关闭。")
+            logger.info(f"[Client {self.client_id}] gRPC 通道已关闭")
 
 
 
@@ -623,36 +628,38 @@ def load_client_data():
     train_path = f"/app/data/{dataset_name}_train.npz"
     val_path = f"/app/data/{dataset_name}_val.npz"
     
+    client_id = os.environ.get('CLIENT_ID', 'unknown')
     try:
         # 加载本地训练集
         train_data = np.load(train_path)
         X_train = train_data["X_train"]
         y_train = train_data["y_train"]
-        logger.info(f"成功加载客户端训练集: {train_path}, 形状: X_train={X_train.shape}, y_train={y_train.shape}")
+        logger.info(f"[Client {client_id}] 加载训练集: {train_path}, 形状: {X_train.shape}")
         
         # 加载本地验证集
         val_data = np.load(val_path)
         X_val = val_data["X_val"]
         y_val = val_data["y_val"]
-        logger.info(f"成功加载客户端验证集: {val_path}, 形状: X_val={X_val.shape}, y_val={y_val.shape}")
+        logger.info(f"[Client {client_id}] 加载验证集: {val_path}, 形状: {X_val.shape}")
         
         # 返回数据，使用 X_test/y_test 作为键名以保持与现有代码的兼容性
         return {"X_train": X_train, "y_train": y_train, "X_test": X_val, "y_test": y_val}
     except FileNotFoundError as e:
-        logger.error(f"无法找到数据文件: {e}")
+        logger.error(f"[Client {client_id}] 无法找到数据文件: {e}")
         return None
 
 
 def main():
+    client_id = os.environ.get('CLIENT_ID', 'unknown')
     client_data = load_client_data()
     if client_data:
         client = FederatedLearningClient(data=client_data)
         try:
             client.participate_in_training()
         except Exception as e:
-            logger.error(f"训练过程中发生致命错误: {e}", exc_info=True)
+            logger.error(f"[Client {client_id}] 训练过程中发生致命错误: {e}", exc_info=True)
     else:
-        logger.error("无法加载数据，客户端无法启动。")
+        logger.error(f"[Client {client_id}] 无法加载数据，客户端无法启动")
 
 if __name__ == "__main__":
     main() 

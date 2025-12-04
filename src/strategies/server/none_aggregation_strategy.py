@@ -37,7 +37,7 @@ class NoneAggregationStrategy(AggregationStrategy):
                 self.server.clients[client_id].metrics = metrics_data
                 self.server.client_parameters[round_num][client_id] = params
                 
-                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} 的明文更新。")
+                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} 明文更新")
 
                 # 2. 检查是否所有客户端都已提交，如果是则启动聚合
                 submitted_clients = len(self.server.client_parameters[round_num])
@@ -52,7 +52,7 @@ class NoneAggregationStrategy(AggregationStrategy):
                 )
 
         except Exception as e:
-            logger.error(f"处理明文更新时出错: {e}", exc_info=True)
+            logger.error(f"[Server] 处理明文更新出错: {e}", exc_info=True)
             return federation_pb2.ServerUpdate(code=500, message=f"服务器错误: {str(e)}")
 
     def _process_plaintext_update(self, payload):
@@ -69,7 +69,7 @@ class NoneAggregationStrategy(AggregationStrategy):
         import time
         
         # BASE 模式无解密，记录解密时间为 0
-        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec=0.0000")
+        logger.info(f"[Round {round_num+1}][LATENCY] decryption=0.0000s")
         
         aggregation_start = time.time()
         active_clients = [self.server.clients[cid] for cid in self.server.client_parameters[round_num].keys()]
@@ -86,8 +86,8 @@ class NoneAggregationStrategy(AggregationStrategy):
             aggregated[param_name] = sum(weight * params[param_name] for params, weight in zip(parameters_list, client_weights))
         
         aggregation_time = time.time() - aggregation_start
-        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
-        logger.info(f"[Round {round_num+1}] 明文参数聚合完成。")
+        logger.info(f"[Round {round_num+1}][LATENCY] aggregation={aggregation_time:.4f}s")
+        logger.info(f"[Round {round_num+1}] 明文聚合完成")
         return aggregated
 
     def evaluate_metrics(self, round_num, skip_acc_auc=False):
@@ -118,9 +118,9 @@ class NoneAggregationStrategy(AggregationStrategy):
             avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
             self.server.rs_test_acc.append(avg_acc)
             self.server.rs_auc.append(avg_auc)
-            logger.info(f"[Round {round_num+1}] 客户端聚合评估: Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合: Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
         else:
-            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合: Loss={avg_loss:.4f}")
 
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num] 

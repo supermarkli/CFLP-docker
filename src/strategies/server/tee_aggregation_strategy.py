@@ -16,16 +16,16 @@ logger = get_logger()
 class TeeAggregationStrategy(AggregationStrategy):
     def __init__(self, server_instance):
         super().__init__(server_instance)
-        logger.info("启动TEE模式：正在生成RSA密钥对用于模拟Enclave...")
+        logger.info("[Server] TEE 模式：生成 RSA 密钥对...")
         self.private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
         self.public_key = self.private_key.public_key()
         
-        logger.info("启动TEE模式：正在模拟生成身份指纹(MRENCLAVE)...")
+        logger.info("[Server] TEE 模式：生成 MRENCLAVE 指纹...")
         model_str = str(self.server.global_model.state_dict())
         self.mrenclave = hashlib.sha256(model_str.encode()).hexdigest()
 
     def prepare_setup_response(self, request):
-        logger.info(f"向客户端 {request.client_id} 提供模拟的证明报告和公钥。")
+        logger.debug(f"[Server] 向客户端 {request.client_id} 提供 TEE 证明报告和公钥")
         response = federation_pb2.SetupResponse(
             privacy_mode=self.server.privacy_mode,
             initial_model=federation_pb2.ModelParameters(
@@ -59,7 +59,7 @@ class TeeAggregationStrategy(AggregationStrategy):
             params_and_metrics = federation_pb2.ParametersAndMetrics()
             params_and_metrics.ParseFromString(decrypted_payload_bytes)
             decrypt_time = time.time() - decrypt_start
-            logger.info(f"[TEE] 客户端 {request.client_id} 解密耗时: {decrypt_time:.4f}s")
+            logger.debug(f"[Round {round_num+1}] 客户端 {request.client_id} 解密: {decrypt_time:.4f}s")
 
             # 2. 调用与 'none' 模式类似的明文处理逻辑
             with self.server.lock:
@@ -71,7 +71,7 @@ class TeeAggregationStrategy(AggregationStrategy):
                 self.server.clients[request.client_id].metrics = metrics_data
                 self.server.client_parameters[round_num][request.client_id] = params
                 
-                logger.info(f"[Round {round_num+1}] 收到并解密了客户端 {request.client_id} 的TEE模式更新。")
+                logger.info(f"[Round {round_num+1}] 收到客户端 {request.client_id} TEE 更新")
 
                 submitted_clients = len(self.server.client_parameters[round_num])
                 if submitted_clients >= self.server.expected_clients:
@@ -84,7 +84,7 @@ class TeeAggregationStrategy(AggregationStrategy):
                 )
 
         except Exception as e:
-            logger.error(f"处理TEE更新失败: {e}", exc_info=True)
+            logger.error(f"[Server] 处理 TEE 更新失败: {e}", exc_info=True)
             return federation_pb2.ServerUpdate(code=500, message="解密或处理TEE载荷时发生错误")
 
     def _process_plaintext_update(self, params_and_metrics):
@@ -101,9 +101,8 @@ class TeeAggregationStrategy(AggregationStrategy):
         """聚合明文客户端参数 (FedAvg)"""
         import time
         
-        # TEE 模式解密发生在 aggregate() 中（接收时解密），这里记录为 0
-        # 但实际解密时间已在 aggregate() 中按客户端记录
-        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec=0.0000")
+        # TEE 模式解密发生在 aggregate() 中（接收时解密），聚合时无需解密
+        logger.info(f"[Round {round_num+1}][LATENCY] decryption=0.0000s (已在接收时解密)")
         
         aggregation_start = time.time()
         active_clients = [self.server.clients[cid] for cid in self.server.client_parameters[round_num].keys()]
@@ -120,8 +119,8 @@ class TeeAggregationStrategy(AggregationStrategy):
             aggregated[param_name] = sum(weight * params[param_name] for params, weight in zip(parameters_list, client_weights))
         
         aggregation_time = time.time() - aggregation_start
-        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
-        logger.info(f"[Round {round_num+1}] TEE模式下明文参数聚合完成。")
+        logger.info(f"[Round {round_num+1}][LATENCY] aggregation={aggregation_time:.4f}s")
+        logger.info(f"[Round {round_num+1}] TEE 聚合完成")
         return aggregated
 
     def evaluate_metrics(self, round_num, skip_acc_auc=False):
@@ -151,9 +150,9 @@ class TeeAggregationStrategy(AggregationStrategy):
             avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
             self.server.rs_test_acc.append(avg_acc)
             self.server.rs_auc.append(avg_auc)
-            logger.info(f"[Round {round_num+1}] 客户端聚合评估 (TEE): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合 (TEE): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
         else:
-            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss (TEE)={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合 (TEE): Loss={avg_loss:.4f}")
 
         # 清理本轮的参数
         if round_num in self.server.client_parameters:

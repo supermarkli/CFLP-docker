@@ -12,12 +12,14 @@ services:
       dockerfile: src/docker/Dockerfile.server
     ports:
       - "50051:50051"
+      - "50052:50052"
     environment:
       - GRPC_SERVER_PORT=50051
     volumes:
       - ../../certs/server:/app/certs:ro
       - ../../logs:/app/logs
       - ../../out:/app/out
+      - ../../data:/app/data
     networks:
       - federated-network
     depends_on:

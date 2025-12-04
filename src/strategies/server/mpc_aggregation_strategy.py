@@ -22,7 +22,7 @@ logger = get_logger()
 class MpcAggregationStrategy(AggregationStrategy):
     def __init__(self, server_instance):
         super().__init__(server_instance)
-        logger.info("MPC 聚合策略已初始化（高性能向量化版本 v2）。")
+        logger.info("[Server] MPC 聚合策略已初始化")
         self.shamir_k = int(config['mpc']['shamir_k'])
         self.shamir_n = int(config['mpc']['shamir_n'])
         self.scaling_factor = int(config['mpc']['scaling_factor'])
@@ -54,7 +54,7 @@ class MpcAggregationStrategy(AggregationStrategy):
             coeff = (numerator * _mod_inverse(denominator, prime)) % prime
             self.lagrange_coeffs.append(coeff)
         
-        logger.info(f"已预计算拉格朗日系数: {self.lagrange_coeffs}")
+        logger.debug(f"[Server] 预计算拉格朗日系数: {self.lagrange_coeffs}")
 
     def _to_signed_int(self, n):
         """将从有限域恢复出的数字转换为带符号整数。"""
@@ -123,7 +123,7 @@ class MpcAggregationStrategy(AggregationStrategy):
         return result
 
     def prepare_setup_response(self, request):
-        logger.info(f"为客户端 {request.client_id} 准备MPC模式的设置响应。")
+        logger.debug(f"[Server] 为客户端 {request.client_id} 准备 MPC 设置响应")
         response = federation_pb2.SetupResponse(
             privacy_mode=self.server.privacy_mode,
             initial_model=federation_pb2.ModelParameters(
@@ -152,7 +152,7 @@ class MpcAggregationStrategy(AggregationStrategy):
                 self.server.clients[client_id].shared_metrics = payload.parameters_and_metrics.metrics
                 self.server.client_parameters[round_num][client_id] = payload.parameters_and_metrics.parameters.parameters
                 
-                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} 的MPC份额更新。")
+                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} MPC 份额更新")
 
                 submitted_clients = len(self.server.client_parameters[round_num])
                 if submitted_clients >= self.server.expected_clients:
@@ -168,12 +168,12 @@ class MpcAggregationStrategy(AggregationStrategy):
                 )
 
         except Exception as e:
-            logger.error(f"处理MPC份额时出错: {e}", exc_info=True)
+            logger.error(f"[Server] 处理 MPC 份额出错: {e}", exc_info=True)
             return federation_pb2.ServerUpdate(code=500, message=f"服务器错误: {str(e)}")
 
     def aggregate_parameters(self, round_num):
         """聚合指定轮次的客户端模型参数份额（按 data_size 加权）"""
-        logger.info(f"[Round {round_num+1}] 开始MPC参数聚合（向量化 v2，加权）...")
+        logger.info(f"[Round {round_num+1}] 开始 MPC 参数聚合...")
         total_start = time.time()
         
         client_ids = list(self.server.client_parameters[round_num].keys())
@@ -185,7 +185,7 @@ class MpcAggregationStrategy(AggregationStrategy):
         total_data_size = sum(self.server.clients[cid].data_size for cid in client_ids)
         client_weights = {cid: self.server.clients[cid].data_size / total_data_size 
                          for cid in client_ids} if total_data_size > 0 else {cid: 1.0/len(client_ids) for cid in client_ids}
-        logger.info(f"[Round {round_num+1}] 客户端权重: {dict((k, f'{v:.4f}') for k, v in client_weights.items())}")
+        logger.debug(f"[Round {round_num+1}] 客户端权重: {dict((k, f'{v:.4f}') for k, v in client_weights.items())}")
 
         aggregated_params = {}
         param_structure = client_updates[0]
@@ -222,10 +222,9 @@ class MpcAggregationStrategy(AggregationStrategy):
             
             if num_elements > 10000:
                 speed = num_elements / key_time if key_time > 0 else 0
-                logger.info(
-                    f"参数 {key} ({num_elements:,} 元素) 聚合完成，"
-                    f"耗时 {key_time:.2f}s，速度 {speed:.0f} 元素/秒，"
-                    f"进度: {processed_elements:,}/{total_elements:,} ({100*processed_elements/total_elements:.1f}%)"
+                logger.debug(
+                    f"[Round {round_num+1}] 参数 {key} ({num_elements:,} 元素) 聚合完成, "
+                    f"{key_time:.2f}s, 进度 {100*processed_elements/total_elements:.1f}%"
                 )
 
         total_time = time.time() - total_start
@@ -236,18 +235,15 @@ class MpcAggregationStrategy(AggregationStrategy):
         aggregation_time = total_time * 0.4  # 份额加法约占 40%
         decryption_time = total_time * 0.6   # 拉格朗日插值恢复约占 60%
         
-        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
-        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec={decryption_time:.4f}")
+        logger.info(f"[Round {round_num+1}][LATENCY] aggregation={aggregation_time:.4f}s")
+        logger.info(f"[Round {round_num+1}][LATENCY] decryption={decryption_time:.4f}s")
         
-        logger.info(
-            f"[Round {round_num+1}] MPC参数聚合完成，"
-            f"总耗时 {total_time:.2f}s，平均速度 {speed:.0f} 元素/秒"
-        )
+        logger.info(f"[Round {round_num+1}] MPC 聚合完成, 耗时 {total_time:.2f}s")
         return aggregated_params
 
     def evaluate_metrics(self, round_num, skip_acc_auc=False):
         """评估指定轮次的客户端指标份额"""
-        logger.info(f"[Round {round_num+1}] 开始MPC指标评估...")
+        logger.debug(f"[Round {round_num+1}] 开始 MPC 指标评估...")
         clients_in_round = [
             self.server.clients[cid] 
             for cid in self.server.client_parameters[round_num].keys()
@@ -285,7 +281,7 @@ class MpcAggregationStrategy(AggregationStrategy):
             
             decrypted_metrics[key] = self._to_signed_int(result)
 
-        logger.info(f"解密后的聚合指标(原始值): {decrypted_metrics}")
+        logger.debug(f"[Round {round_num+1}] 解密后聚合指标: {decrypted_metrics}")
 
         scaling_factor = self.scaling_factor
         
@@ -314,9 +310,9 @@ class MpcAggregationStrategy(AggregationStrategy):
             avg_auc = (total_auc_num / scaling_factor) / final_test_num
             self.server.rs_test_acc.append(avg_acc)
             self.server.rs_auc.append(avg_auc)
-            logger.info(f"[Round {round_num+1}] 客户端聚合评估 (MPC): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合 (MPC): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
         else:
-            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss (MPC)={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合 (MPC): Loss={avg_loss:.4f}")
 
         if round_num in self.server.client_parameters:
             del self.server.client_parameters[round_num]

@@ -36,14 +36,14 @@ def setup_logging(create_file=False):
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
-    # 创建格式化器
+    # 创建格式化器（简洁格式，不包含文件名和行号）
     console_formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+        '%(asctime)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     
     file_formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+        '%(asctime)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     

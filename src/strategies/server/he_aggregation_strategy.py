@@ -35,7 +35,7 @@ class HeAggregationStrategy(AggregationStrategy):
         import tenseal as ts
         self.ts = ts
         
-        logger.info("启动HE模式：正在生成CKKS上下文...")
+        logger.info("[Server] HE 模式：生成 CKKS 上下文...")
         
         # 从配置读取 CKKS 参数
         poly_mod_degree = config['encryption']['poly_modulus_degree']
@@ -47,12 +47,7 @@ class HeAggregationStrategy(AggregationStrategy):
         configured_chunk_size = config['encryption']['chunk_size']
         
         if configured_chunk_size > max_slots:
-            logger.warning(
-                f"⚠️  配置错误: chunk_size ({configured_chunk_size}) 超过 CKKS 最大容量!\n"
-                f"   CKKS slots 限制: poly_modulus_degree / 2 = {poly_mod_degree} / 2 = {max_slots}\n"
-                f"   自动校正 chunk_size: {configured_chunk_size} → {max_slots}\n"
-                f"   请修改 default.yaml 中的 chunk_size 配置以消除此警告。"
-            )
+            logger.warning(f"[Server] chunk_size ({configured_chunk_size}) > CKKS 最大容量 ({max_slots})，自动校正")
             self.n_slots = max_slots
         else:
             self.n_slots = configured_chunk_size
@@ -70,8 +65,7 @@ class HeAggregationStrategy(AggregationStrategy):
         self.public_context = self.context.copy()
         self.public_context.make_context_public()  # 移除私钥
         
-        logger.info(f"CKKS上下文生成完毕: poly_mod={poly_mod_degree}, "
-                   f"slots={self.n_slots}/{max_slots}, 压缩={'启用' if ENABLE_COMPRESSION else '禁用'}")
+        logger.info(f"[Server] CKKS 上下文就绪: poly_mod={poly_mod_degree}, slots={self.n_slots}/{max_slots}")
 
     def _decompress(self, data: bytes) -> bytes:
         """解压数据 (自动检测是否压缩)"""
@@ -91,7 +85,7 @@ class HeAggregationStrategy(AggregationStrategy):
 
     def prepare_setup_response(self, request):
         """向客户端发送公钥上下文。"""
-        logger.info(f"向客户端 {request.client_id} 提供CKKS公钥上下文。")
+        logger.debug(f"[Server] 向客户端 {request.client_id} 提供 CKKS 公钥上下文")
         
         response = federation_pb2.SetupResponse(
             privacy_mode=self.server.privacy_mode,
@@ -124,7 +118,7 @@ class HeAggregationStrategy(AggregationStrategy):
                 self.server.clients[client_id].encrypted_metrics = metrics_data
                 self.server.client_parameters[round_num][client_id] = params
                 
-                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} 的CKKS密文更新。")
+                logger.info(f"[Round {round_num+1}] 收到客户端 {client_id} CKKS 密文更新")
 
                 submitted_clients = len(self.server.client_parameters[round_num])
                 if submitted_clients >= self.server.expected_clients:
@@ -140,7 +134,7 @@ class HeAggregationStrategy(AggregationStrategy):
                 )
 
         except Exception as e:
-            logger.error(f"处理CKKS密文更新时出错: {e}", exc_info=True)
+            logger.error(f"[Server] 处理 CKKS 密文更新出错: {e}", exc_info=True)
             return federation_pb2.ServerUpdate(code=500, message=f"服务器错误: {str(e)}")
 
     def aggregate_stream(self, request_iterator, context):
@@ -168,13 +162,13 @@ class HeAggregationStrategy(AggregationStrategy):
                             context.set_details(msg)
                             return federation_pb2.ServerUpdate(code=400, message=msg)
                     
-                    logger.info(f"[Round {round_num+1}] 开始接收来自客户端 {client_id} 的CKKS流式更新...")
+                    logger.info(f"[Round {round_num+1}] 接收客户端 {client_id} CKKS 流式更新...")
                     
                     # 记录客户端延迟指标
                     if chunk.HasField('latency_metrics'):
                         lm = chunk.latency_metrics
-                        logger.info(f"[LATENCY] round={round_num+1} client={client_id} stage=training time_sec={lm.training_time:.4f}")
-                        logger.info(f"[RESOURCE] round={round_num+1} client={client_id} peak_memory_mb={lm.peak_memory_mb:.2f} cpu_percent={lm.cpu_percent:.1f}")
+                        logger.info(f"[Round {round_num+1}][Client {client_id}][LATENCY] training={lm.training_time:.4f}s")
+                        logger.info(f"[Round {round_num+1}][Client {client_id}][RESOURCE] peak_memory={lm.peak_memory_mb:.2f} MB, cpu={lm.cpu_percent:.1f}%")
                     
                     # 处理第一个块中的指标 (解压并反序列化)
                     metrics_bytes = chunk.metrics.test_acc
@@ -227,14 +221,13 @@ class HeAggregationStrategy(AggregationStrategy):
             elapsed = time.time() - start_time
             with self.server.lock:
                 # 记录上传大小（PAYLOAD 日志）
-                logger.info(f"[PAYLOAD] round={round_num+1} client={client_id} upload_size_bytes={total_bytes_received} upload_size_mb={total_bytes_received/1024/1024:.4f}")
-                logger.info(f"[Round {round_num+1}] 客户端 {client_id} 数据接收完成: "
-                           f"{layers_received} 层, {total_bytes_received/1024:.1f}KB, {elapsed:.2f}s")
+                logger.info(f"[Round {round_num+1}][Client {client_id}][PAYLOAD] upload={total_bytes_received/1024/1024:.2f} MB")
+                logger.info(f"[Round {round_num+1}] 客户端 {client_id} 接收完成: {layers_received} 层, {elapsed:.2f}s")
                 self.server.completed_clients[round_num].add(client_id)
                 
                 completed_clients_count = len(self.server.completed_clients[round_num])
                 if completed_clients_count >= self.server.expected_clients:
-                    logger.info(f"[Round {round_num+1}] 所有客户端更新完毕，触发聚合。")
+                    logger.info(f"[Round {round_num+1}] 所有客户端更新完毕，开始聚合")
                     threading.Thread(
                         target=self.server.process_round_completion, 
                         args=(round_num,)
@@ -247,7 +240,7 @@ class HeAggregationStrategy(AggregationStrategy):
             )
 
         except Exception as e:
-            logger.error(f"处理CKKS流式密文更新时出错: {e}", exc_info=True)
+            logger.error(f"[Server] 处理 CKKS 流式更新出错: {e}", exc_info=True)
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"服务器内部错误: {e}")
             return federation_pb2.ServerUpdate(code=500, message=f"服务器错误: {str(e)}")
@@ -285,7 +278,7 @@ class HeAggregationStrategy(AggregationStrategy):
         按 data_size 加权聚合以保证 FedAvg 一致性。
         """
         start_time = time.time()
-        logger.info(f"[Round {round_num+1}] 开始CKKS密文聚合...")
+        logger.info(f"[Round {round_num+1}] 开始 CKKS 密文聚合...")
         
         client_ids = list(self.server.client_parameters[round_num].keys())
         num_clients = len(client_ids)
@@ -296,19 +289,18 @@ class HeAggregationStrategy(AggregationStrategy):
         # 计算各客户端的权重 (按 data_size 加权)
         total_data_size = sum(self.server.clients[cid].data_size for cid in client_ids)
         if total_data_size == 0:
-            logger.warning(f"[Round {round_num+1}] 总数据量为0，使用简单平均")
+            logger.warning(f"[Round {round_num+1}] 总数据量为 0，使用简单平均")
             client_weights = [1.0 / num_clients for _ in client_ids]
         else:
             client_weights = [self.server.clients[cid].data_size / total_data_size for cid in client_ids]
         
-        logger.info(f"[Round {round_num+1}] 客户端权重: {dict(zip(client_ids, [f'{w:.4f}' for w in client_weights]))}")
+        logger.debug(f"[Round {round_num+1}] 客户端权重: {dict(zip(client_ids, [f'{w:.4f}' for w in client_weights]))}")
         
         # 获取第一个客户端的参数结构
         first_client_params = self.server.client_parameters[round_num][client_ids[0]]
         layer_keys = list(first_client_params.keys())
         
-        logger.info(f"[Round {round_num+1}] 聚合 {len(layer_keys)} 个参数层, "
-                   f"来自 {num_clients} 个客户端")
+        logger.debug(f"[Round {round_num+1}] 聚合 {len(layer_keys)} 层, {num_clients} 个客户端")
         
         # 记录聚合开始时间（密文操作）
         aggregation_start = time.time()
@@ -347,7 +339,7 @@ class HeAggregationStrategy(AggregationStrategy):
                 aggregated_ciphertexts[key] = {'vectors': vectors, 'shape': shape}
         
         aggregation_time = time.time() - aggregation_start
-        logger.info(f"[LATENCY] round={round_num+1} stage=aggregation time_sec={aggregation_time:.4f}")
+        logger.info(f"[Round {round_num+1}][LATENCY] aggregation={aggregation_time:.4f}s")
         
         # 阶段2: 解密
         decrypt_start = time.time()
@@ -368,10 +360,10 @@ class HeAggregationStrategy(AggregationStrategy):
             aggregated_params[key] = decrypted_array
         
         decrypt_time = time.time() - decrypt_start
-        logger.info(f"[LATENCY] round={round_num+1} stage=decryption time_sec={decrypt_time:.4f}")
+        logger.info(f"[Round {round_num+1}][LATENCY] decryption={decrypt_time:.4f}s")
 
         elapsed = time.time() - start_time
-        logger.info(f"[Round {round_num+1}] CKKS密文聚合完成: {len(layer_keys)} 层, 耗时: {elapsed:.2f}s")
+        logger.info(f"[Round {round_num+1}] CKKS 聚合完成: {len(layer_keys)} 层, 耗时 {elapsed:.2f}s")
         return aggregated_params
         
     def evaluate_metrics(self, round_num, skip_acc_auc=False):
@@ -422,7 +414,6 @@ class HeAggregationStrategy(AggregationStrategy):
             avg_auc = total_auc / total_test_num if total_test_num > 0 else 0
             self.server.rs_test_acc.append(avg_acc)
             self.server.rs_auc.append(avg_auc)
-            logger.info(f"[Round {round_num+1}] 客户端聚合评估 (CKKS): "
-                       f"Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合 (CKKS): Acc={avg_acc:.4f}, AUC={avg_auc:.4f}, Loss={avg_loss:.4f}")
         else:
-            logger.info(f"[Round {round_num+1}] 客户端聚合 Loss (CKKS)={avg_loss:.4f}")
+            logger.info(f"[Round {round_num+1}] 客户端聚合 (CKKS): Loss={avg_loss:.4f}")
