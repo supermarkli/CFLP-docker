@@ -92,20 +92,22 @@ class TeeAggregationStrategy(AggregationStrategy):
             # 确保 report_data 是 64 字节（TDX 要求）
             report_data = report_data.ljust(self.TDX_REPORT_DATA_SIZE, b'\x00')
             
-            # TDX_CMD_GET_REPORT ioctl 命令
-            # 参考: https://github.com/intel/SGXDataCenterAttestationPrimitives
-            TDX_CMD_GET_REPORT = 0xc0104401  # _IOWR('T', 1, struct tdx_report_req)
+            # TDX_CMD_GET_REPORT0 ioctl 命令（Linux 6.x 内核）
+            # 定义: _IOWR('T', 1, struct tdx_report_req)
+            # struct tdx_report_req { __u8 reportdata[64]; __u8 tdreport[1024]; }
+            # 计算: _IOC(3, ord('T'), 1, 64+1024) = 0xc4405401
+            TDX_CMD_GET_REPORT0 = 0xc4405401
             
             # 构建请求结构
             # struct tdx_report_req {
-            #     __u8 report_data[64];
-            #     __u8 td_report[1024];
+            #     __u8 reportdata[TDX_REPORTDATA_LEN];  // 64 字节
+            #     __u8 tdreport[TDX_REPORT_LEN];        // 1024 字节
             # }
             req_buffer = bytearray(64 + 1024)
             req_buffer[:64] = report_data
             
             with open(self.TDX_GUEST_DEVICE, "rb+", buffering=0) as f:
-                fcntl.ioctl(f.fileno(), TDX_CMD_GET_REPORT, req_buffer)
+                fcntl.ioctl(f.fileno(), TDX_CMD_GET_REPORT0, req_buffer)
             
             td_report = bytes(req_buffer[64:])
             

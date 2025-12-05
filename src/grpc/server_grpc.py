@@ -39,7 +39,7 @@ from src.models.models import get_model
 from src.grpc.generated import federation_pb2
 from src.grpc.generated import federation_pb2_grpc
 from src.utils.parameter_utils import serialize_parameters, deserialize_parameters
-from src.utils.draw import plot_global_convergence_curve
+# from src.utils.draw import plot_global_convergence_curve
 from src.utils.config_utils import config
 from src.strategies.server.none_aggregation_strategy import NoneAggregationStrategy
 from src.strategies.server.he_aggregation_strategy import HeAggregationStrategy
@@ -422,7 +422,7 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                     logger.info("[Server] 评估指标汇总:\n" + df.to_string())
 
                     prefix = f"{self.privacy_mode}_"
-                    plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc, prefix=prefix)
+                                        # plot_global_convergence_curve(self.rs_test_acc, self.rs_train_loss, self.rs_auc, prefix=prefix)
                 else:
                     self.current_round += 1
                     self.next_step = True

@@ -7,13 +7,18 @@ services:
       context: ../..
       dockerfile: src/docker/Dockerfile.server
     ports:
-      - "50051:50051"
       - "50052:50052"
+      - "50051:50051"
     volumes:
       - ../../certs/server:/app/certs:ro
       - ../../logs:/app/logs
       - ../../out:/app/out
       - ../../data:/app/data
+    devices:
+      - /dev/tdx_guest:/dev/tdx_guest
+    privileged: true
+    security_opt:
+      - seccomp:unconfined
     networks:
       - federated-network
 
