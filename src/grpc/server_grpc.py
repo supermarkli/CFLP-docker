@@ -458,13 +458,13 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
             current_loss = self.rs_train_loss[-1] if len(self.rs_train_loss) > 0 else 0
             logger.info(f"[CONVERGENCE] round={round_num+1} accuracy={current_acc:.4f} auc={current_auc:.4f} loss={current_loss:.4f}")
 
-        # 检查收敛
-        if len(self.rs_test_acc) >= self.converge_window:
-            recent_accs = self.rs_test_acc[-(self.converge_window):]
-            acc_delta = max(recent_accs) - min(recent_accs)
-            if acc_delta < self.acc_delta_threshold:
-                self.converged = True
-                logger.info(f"[Round {round_num+1}] 训练收敛: Acc 变化 ({acc_delta:.6f}) < 阈值 ({self.acc_delta_threshold})")
+        # [已禁用] 早停检测 - 统一使用 max_rounds=40 轮固定训练
+        # if len(self.rs_test_acc) >= self.converge_window:
+        #     recent_accs = self.rs_test_acc[-(self.converge_window):]
+        #     acc_delta = max(recent_accs) - min(recent_accs)
+        #     if acc_delta < self.acc_delta_threshold:
+        #         self.converged = True
+        #         logger.info(f"[Round {round_num+1}] 训练收敛: Acc 变化 ({acc_delta:.6f}) < 阈值 ({self.acc_delta_threshold})")
 
 
 def serve():
