@@ -43,6 +43,8 @@ class TeeAggregationStrategy(AggregationStrategy):
     def aggregate(self, request, context):
         import time
         payload = request.tee
+        round_num = request.round  # 先获取 round_num
+        
         if not payload:
             return federation_pb2.ServerUpdate(code=400, message="请求载荷与 'tee' 模式不匹配。")
 
@@ -63,7 +65,6 @@ class TeeAggregationStrategy(AggregationStrategy):
 
             # 2. 调用与 'none' 模式类似的明文处理逻辑
             with self.server.lock:
-                round_num = request.round
                 if round_num != self.server.current_round:
                     return federation_pb2.ServerUpdate(code=400, message=f"轮次不匹配，服务器当前轮次为 {self.server.current_round}")
                 
