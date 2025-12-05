@@ -13,10 +13,10 @@ federation:
   # 隐私保护模式:
   # "none" - 标准联邦学习，明文传输。
   # "he"   - 使用同态加密保护模型参数。
-  # "tee"  - 使用TDX（可信执行环境）在服务器端保护明文聚合。
+  # "tee"  - 使用TDX（Trust Domain Extensions）在服务器端保护聚合，VM级别机密计算。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
-  # "sgx"  - 使用SGX（可信执行环境）在服务器端保护明文聚合。
-  privacy_mode: "tee" # <--- 总开关，可在此处切换实验模式
+  # "sgx"  - 使用SGX（Software Guard Extensions）在Enclave内保护聚合，进程级别机密计算。
+  privacy_mode: "sgx" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 10000  # 与实验配置一致（100 轮）
   convergence:
@@ -25,7 +25,7 @@ federation:
 
 grpc:
   server_host: "10.16.56.126"
-  server_port: 50052
+  server_port: 50051
   max_retries: 5
   retry_interval: 1
   max_workers: 10
@@ -74,10 +74,32 @@ mpc:
   # prime_mod: "170141183460469231731687303715884105727" # 2^127 - 1 (高安全版本)
 
 sgx:
-  # 客户端用于验证聚合器Enclave身份的MRENCLAVE值。
-  # 这个值是在 'gramine-sgx-sign' 过程中打印出来的，需要用真实值替换。
+  # === Intel SGX (Software Guard Extensions) 配置 ===
+  # SGX 是进程级别的机密计算技术，代码和数据在 Enclave 内受保护
+  # 客户端用于验证聚合器 Enclave 身份的 MRENCLAVE 值
+  # 这个值是在 'gramine-sgx-sign' 过程中打印出来的，需要用真实值替换
   expected_mrenclave: "11403bebc6ccf54d6da6cb62d24f5ea813677a10738e600bd4dcf82ac36263a0"
 
 tee:
-  # 客户端用于验证服务端TEE身份的“代码指纹”。
+  # === Intel TDX (Trust Domain Extensions) 配置 ===
+  # TDX 是 VM 级别的机密计算技术，整个 TD 虚拟机受硬件保护
+  # 
+  # 安全模型：
+  # - 聚合器运行在 TDX Trust Domain (TD) 中
+  # - 所有 TD 内存由 MKTME 硬件加密，主机/VMM 无法访问
+  # - 客户端通过 TD Quote 验证聚合器身份
+  # - 数据使用 RSA+AES 加密传输，只有 TD 内的私钥能解密
+  
+  # 是否允许在非 TDX 硬件上运行（开发/测试用）
+  # 生产环境应设为 false
+  allow_simulated: true
+  
+  # [传统配置，用于非 TDX 环境的回退验证]
+  # 当无法生成真实 TD Quote 时，使用此值进行模拟验证
   expected_mrenclave: "08a4668e1b5055c8dea11d8631ffa5ae51db16dbf3741cc5c7c0d69f1b66708b"
+  
+  # [可选] 预期的 TD 测量值（用于严格验证）
+  # 在生产环境中，客户端应验证 TD Quote 中的这些值
+  # expected_mrtd: ""        # TD 的初始测量值
+  # expected_rtmr0: ""       # 运行时测量寄存器 0
+  # expected_rtmr1: ""       # 运行时测量寄存器 1

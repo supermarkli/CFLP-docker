@@ -1,0 +1,645 @@
+2025-12-04 16:11:41 - INFO - 日志文件已创建: logs/he_20251204_161141.log
+2025-12-04 16:11:41 - INFO - [Server] 配置: Dataset=cifar10, Model=resnet18
+2025-12-04 16:11:42 - INFO - [Server] 加载全局测试集: /app/data/global/cifar10_test.npz, 样本数: 10000
+2025-12-04 16:11:42 - INFO - [Server] HE 模式：生成 CKKS 上下文...
+2025-12-04 16:11:43 - INFO - [Server] CKKS 上下文就绪: poly_mod=8192, slots=4096/4096
+2025-12-04 16:11:43 - INFO - [Server] 初始化完成 (模式: HE)，等待 3 个客户端注册
+2025-12-04 16:11:43 - INFO - [Server] 启动 (SSL/TLS)，监听端口: 50051
+2025-12-04 16:12:37 - INFO - [Server] 收到客户端 3 注册请求 (模型: resnet18, 数据量: 11332)
+2025-12-04 16:12:37 - INFO - [Server] 客户端 3 注册成功 (1/3)
+2025-12-04 16:12:38 - INFO - [Server] 收到客户端 2 注册请求 (模型: resnet18, 数据量: 18309)
+2025-12-04 16:12:38 - INFO - [Server] 客户端 2 注册成功 (2/3)
+2025-12-04 16:12:38 - INFO - [Server] 收到客户端 1 注册请求 (模型: resnet18, 数据量: 15357)
+2025-12-04 16:12:39 - INFO - [Server] 客户端 1 注册成功 (3/3)
+2025-12-04 16:12:40 - INFO - [Server] 所有客户端已注册，准备开始训练
+2025-12-04 16:12:40 - INFO - [Server] 联邦学习计时开始
+2025-12-04 16:13:15 - INFO - [Round 1] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:13:15 - INFO - [Round 1][Client 3][LATENCY] training=13.8553s
+2025-12-04 16:13:15 - INFO - [Round 1][Client 3][RESOURCE] peak_memory=1560.91 MB, cpu=94.2%
+2025-12-04 16:13:23 - INFO - [Round 1] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:13:23 - INFO - [Round 1][Client 1][LATENCY] training=18.7683s
+2025-12-04 16:13:23 - INFO - [Round 1][Client 1][RESOURCE] peak_memory=1683.23 MB, cpu=94.3%
+2025-12-04 16:13:25 - INFO - [Round 1] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:13:25 - INFO - [Round 1][Client 2][LATENCY] training=20.9452s
+2025-12-04 16:13:25 - INFO - [Round 1][Client 2][RESOURCE] peak_memory=1748.53 MB, cpu=93.3%
+2025-12-04 16:17:02 - INFO - [Round 1][Client 3][PAYLOAD] upload=897.57 MB
+2025-12-04 16:17:02 - INFO - [Round 1] 客户端 3 接收完成: 122 层, 226.87s
+2025-12-04 16:17:02 - INFO - [Round 1] 收到客户端 3 HE 流式更新，大小: 919310.72 KB
+2025-12-04 16:17:21 - INFO - [Round 1][Client 2][PAYLOAD] upload=897.63 MB
+2025-12-04 16:17:21 - INFO - [Round 1] 客户端 2 接收完成: 122 层, 236.69s
+2025-12-04 16:17:21 - INFO - [Round 1] 收到客户端 2 HE 流式更新，大小: 919369.54 KB
+2025-12-04 16:17:21 - INFO - [Round 1][Client 1][PAYLOAD] upload=897.59 MB
+2025-12-04 16:17:21 - INFO - [Round 1] 客户端 1 接收完成: 122 层, 238.33s
+2025-12-04 16:17:21 - INFO - [Round 1] 所有客户端更新完毕，开始聚合
+2025-12-04 16:17:21 - INFO - [Round 1] 收到客户端 1 HE 流式更新，大小: 919323.14 KB
+2025-12-04 16:17:21 - INFO - [Round 1] 所有客户端更新已收集，开始聚合
+2025-12-04 16:17:21 - INFO - [Round 1] 开始 CKKS 密文聚合...
+2025-12-04 16:17:54 - INFO - [Round 1][LATENCY] aggregation=33.0444s
+2025-12-04 16:17:58 - INFO - [Round 1][LATENCY] decryption=3.7339s
+2025-12-04 16:17:58 - INFO - [Round 1] CKKS 聚合完成: 122 层, 耗时 36.78s
+2025-12-04 16:17:58 - INFO - [Round 1][Server][RESOURCE] peak_memory=4923.54 MB, cpu=102.8%, cpu_time=37.8100s
+2025-12-04 16:17:58 - INFO - [Round 1] 全局模型更新完成
+2025-12-04 16:18:09 - INFO - [Round 1] 全局评估: Acc=0.2340, AUC=0.7201
+2025-12-04 16:18:09 - INFO - [Round 1] 客户端聚合 (CKKS): Loss=0.8586
+2025-12-04 16:18:09 - INFO - [CONVERGENCE] round=1 accuracy=0.2340 auc=0.7201 loss=0.8586
+2025-12-04 16:18:09 - INFO - [Round 1] 聚合完成，进入 Round 2
+2025-12-04 16:18:40 - INFO - [Round 2] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:18:40 - INFO - [Round 2][Client 3][LATENCY] training=15.8158s
+2025-12-04 16:18:40 - INFO - [Round 2][Client 3][RESOURCE] peak_memory=1720.57 MB, cpu=95.2%
+2025-12-04 16:18:43 - INFO - [Round 2] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:18:43 - INFO - [Round 2][Client 1][LATENCY] training=19.7451s
+2025-12-04 16:18:43 - INFO - [Round 2][Client 1][RESOURCE] peak_memory=1846.73 MB, cpu=95.5%
+2025-12-04 16:18:46 - INFO - [Round 2] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:18:46 - INFO - [Round 2][Client 2][LATENCY] training=21.6880s
+2025-12-04 16:18:46 - INFO - [Round 2][Client 2][RESOURCE] peak_memory=1911.84 MB, cpu=95.5%
+2025-12-04 16:22:27 - INFO - [Round 2][Client 2][PAYLOAD] upload=897.62 MB
+2025-12-04 16:22:27 - INFO - [Round 2] 客户端 2 接收完成: 122 层, 221.80s
+2025-12-04 16:22:27 - INFO - [Round 2] 收到客户端 2 HE 流式更新，大小: 919361.76 KB
+2025-12-04 16:22:42 - INFO - [Round 2][Client 1][PAYLOAD] upload=897.61 MB
+2025-12-04 16:22:42 - INFO - [Round 2] 客户端 1 接收完成: 122 层, 238.28s
+2025-12-04 16:22:42 - INFO - [Round 2] 收到客户端 1 HE 流式更新，大小: 919347.83 KB
+2025-12-04 16:22:43 - INFO - [Round 2][Client 3][PAYLOAD] upload=897.59 MB
+2025-12-04 16:22:43 - INFO - [Round 2] 客户端 3 接收完成: 122 层, 243.43s
+2025-12-04 16:22:43 - INFO - [Round 2] 所有客户端更新完毕，开始聚合
+2025-12-04 16:22:43 - INFO - [Round 2] 收到客户端 3 HE 流式更新，大小: 919330.36 KB
+2025-12-04 16:22:43 - INFO - [Round 2] 所有客户端更新已收集，开始聚合
+2025-12-04 16:22:43 - INFO - [Round 2] 开始 CKKS 密文聚合...
+2025-12-04 16:23:13 - INFO - [Round 2][LATENCY] aggregation=29.6767s
+2025-12-04 16:23:16 - INFO - [Round 2][LATENCY] decryption=3.3553s
+2025-12-04 16:23:16 - INFO - [Round 2] CKKS 聚合完成: 122 层, 耗时 33.03s
+2025-12-04 16:23:16 - INFO - [Round 2][Server][RESOURCE] peak_memory=5025.01 MB, cpu=102.6%, cpu_time=33.9200s
+2025-12-04 16:23:16 - INFO - [Round 2] 全局模型更新完成
+2025-12-04 16:23:27 - INFO - [Round 2] 全局评估: Acc=0.5393, AUC=0.9261
+2025-12-04 16:23:27 - INFO - [Round 2] 客户端聚合 (CKKS): Loss=0.5685
+2025-12-04 16:23:27 - INFO - [CONVERGENCE] round=2 accuracy=0.5393 auc=0.9261 loss=0.5685
+2025-12-04 16:23:27 - INFO - [Round 2] 聚合完成，进入 Round 3
+2025-12-04 16:23:57 - INFO - [Round 3] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:23:57 - INFO - [Round 3][Client 3][LATENCY] training=14.5015s
+2025-12-04 16:23:57 - INFO - [Round 3][Client 3][RESOURCE] peak_memory=1759.97 MB, cpu=94.6%
+2025-12-04 16:24:01 - INFO - [Round 3] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:24:01 - INFO - [Round 3][Client 1][LATENCY] training=18.4946s
+2025-12-04 16:24:01 - INFO - [Round 3][Client 1][RESOURCE] peak_memory=1888.80 MB, cpu=94.7%
+2025-12-04 16:24:04 - INFO - [Round 3] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:24:04 - INFO - [Round 3][Client 2][LATENCY] training=22.0747s
+2025-12-04 16:24:04 - INFO - [Round 3][Client 2][RESOURCE] peak_memory=1952.08 MB, cpu=82.6%
+2025-12-04 16:27:28 - INFO - [Round 3][Client 1][PAYLOAD] upload=897.58 MB
+2025-12-04 16:27:28 - INFO - [Round 3] 客户端 1 接收完成: 122 层, 207.37s
+2025-12-04 16:27:28 - INFO - [Round 3] 收到客户端 1 HE 流式更新，大小: 919317.76 KB
+2025-12-04 16:27:50 - INFO - [Round 3][Client 2][PAYLOAD] upload=897.60 MB
+2025-12-04 16:27:50 - INFO - [Round 3] 客户端 2 接收完成: 122 层, 225.68s
+2025-12-04 16:27:50 - INFO - [Round 3] 收到客户端 2 HE 流式更新，大小: 919333.85 KB
+2025-12-04 16:28:01 - INFO - [Round 3][Client 3][PAYLOAD] upload=897.60 MB
+2025-12-04 16:28:01 - INFO - [Round 3] 客户端 3 接收完成: 122 层, 243.40s
+2025-12-04 16:28:01 - INFO - [Round 3] 所有客户端更新完毕，开始聚合
+2025-12-04 16:28:01 - INFO - [Round 3] 收到客户端 3 HE 流式更新，大小: 919335.98 KB
+2025-12-04 16:28:01 - INFO - [Round 3] 所有客户端更新已收集，开始聚合
+2025-12-04 16:28:01 - INFO - [Round 3] 开始 CKKS 密文聚合...
+2025-12-04 16:28:30 - INFO - [Round 3][LATENCY] aggregation=29.7423s
+2025-12-04 16:28:34 - INFO - [Round 3][LATENCY] decryption=3.8957s
+2025-12-04 16:28:34 - INFO - [Round 3] CKKS 聚合完成: 122 层, 耗时 33.64s
+2025-12-04 16:28:34 - INFO - [Round 3][Server][RESOURCE] peak_memory=5095.20 MB, cpu=102.6%, cpu_time=34.5400s
+2025-12-04 16:28:34 - INFO - [Round 3] 全局模型更新完成
+2025-12-04 16:28:46 - INFO - [Round 3] 全局评估: Acc=0.6595, AUC=0.9554
+2025-12-04 16:28:46 - INFO - [Round 3] 客户端聚合 (CKKS): Loss=0.5671
+2025-12-04 16:28:46 - INFO - [CONVERGENCE] round=3 accuracy=0.6595 auc=0.9554 loss=0.5671
+2025-12-04 16:28:46 - INFO - [Round 3] 聚合完成，进入 Round 4
+2025-12-04 16:29:16 - INFO - [Round 4] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:29:16 - INFO - [Round 4][Client 3][LATENCY] training=15.3667s
+2025-12-04 16:29:16 - INFO - [Round 4][Client 3][RESOURCE] peak_memory=1800.44 MB, cpu=94.6%
+2025-12-04 16:29:20 - INFO - [Round 4] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:29:20 - INFO - [Round 4][Client 1][LATENCY] training=19.2692s
+2025-12-04 16:29:20 - INFO - [Round 4][Client 1][RESOURCE] peak_memory=1912.60 MB, cpu=95.0%
+2025-12-04 16:29:22 - INFO - [Round 4] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:29:22 - INFO - [Round 4][Client 2][LATENCY] training=22.3414s
+2025-12-04 16:29:22 - INFO - [Round 4][Client 2][RESOURCE] peak_memory=1985.23 MB, cpu=88.7%
+2025-12-04 16:33:08 - INFO - [Round 4][Client 3][PAYLOAD] upload=897.57 MB
+2025-12-04 16:33:08 - INFO - [Round 4] 客户端 3 接收完成: 122 层, 231.65s
+2025-12-04 16:33:08 - INFO - [Round 4] 收到客户端 3 HE 流式更新，大小: 919303.36 KB
+2025-12-04 16:33:18 - INFO - [Round 4][Client 2][PAYLOAD] upload=897.62 MB
+2025-12-04 16:33:18 - INFO - [Round 4] 客户端 2 接收完成: 122 层, 235.82s
+2025-12-04 16:33:18 - INFO - [Round 4] 收到客户端 2 HE 流式更新，大小: 919362.23 KB
+2025-12-04 16:33:19 - INFO - [Round 4][Client 1][PAYLOAD] upload=897.60 MB
+2025-12-04 16:33:19 - INFO - [Round 4] 客户端 1 接收完成: 122 层, 238.88s
+2025-12-04 16:33:19 - INFO - [Round 4] 所有客户端更新完毕，开始聚合
+2025-12-04 16:33:19 - INFO - [Round 4] 收到客户端 1 HE 流式更新，大小: 919340.50 KB
+2025-12-04 16:33:19 - INFO - [Round 4] 所有客户端更新已收集，开始聚合
+2025-12-04 16:33:19 - INFO - [Round 4] 开始 CKKS 密文聚合...
+2025-12-04 16:33:49 - INFO - [Round 4][LATENCY] aggregation=29.8263s
+2025-12-04 16:33:53 - INFO - [Round 4][LATENCY] decryption=3.7007s
+2025-12-04 16:33:53 - INFO - [Round 4] CKKS 聚合完成: 122 层, 耗时 33.53s
+2025-12-04 16:33:53 - INFO - [Round 4][Server][RESOURCE] peak_memory=5084.57 MB, cpu=102.7%, cpu_time=34.4300s
+2025-12-04 16:33:53 - INFO - [Round 4] 全局模型更新完成
+2025-12-04 16:34:04 - INFO - [Round 4] 全局评估: Acc=0.7454, AUC=0.9715
+2025-12-04 16:34:04 - INFO - [Round 4] 客户端聚合 (CKKS): Loss=0.4137
+2025-12-04 16:34:04 - INFO - [CONVERGENCE] round=4 accuracy=0.7454 auc=0.9715 loss=0.4137
+2025-12-04 16:34:04 - INFO - [Round 4] 聚合完成，进入 Round 5
+2025-12-04 16:34:38 - INFO - [Round 5] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:34:38 - INFO - [Round 5][Client 3][LATENCY] training=18.6277s
+2025-12-04 16:34:38 - INFO - [Round 5][Client 3][RESOURCE] peak_memory=1829.71 MB, cpu=84.1%
+2025-12-04 16:34:39 - INFO - [Round 5] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:34:39 - INFO - [Round 5][Client 1][LATENCY] training=20.1561s
+2025-12-04 16:34:39 - INFO - [Round 5][Client 1][RESOURCE] peak_memory=1952.08 MB, cpu=95.4%
+2025-12-04 16:34:40 - INFO - [Round 5] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:34:40 - INFO - [Round 5][Client 2][LATENCY] training=22.1628s
+2025-12-04 16:34:40 - INFO - [Round 5][Client 2][RESOURCE] peak_memory=2013.52 MB, cpu=95.1%
+2025-12-04 16:38:09 - INFO - [Round 5][Client 3][PAYLOAD] upload=897.60 MB
+2025-12-04 16:38:09 - INFO - [Round 5] 客户端 3 接收完成: 122 层, 211.03s
+2025-12-04 16:38:09 - INFO - [Round 5] 收到客户端 3 HE 流式更新，大小: 919335.97 KB
+2025-12-04 16:38:32 - INFO - [Round 5][Client 2][PAYLOAD] upload=897.59 MB
+2025-12-04 16:38:32 - INFO - [Round 5] 客户端 2 接收完成: 122 层, 232.10s
+2025-12-04 16:38:32 - INFO - [Round 5] 收到客户端 2 HE 流式更新，大小: 919332.18 KB
+2025-12-04 16:38:40 - INFO - [Round 5][Client 1][PAYLOAD] upload=897.58 MB
+2025-12-04 16:38:40 - INFO - [Round 5] 客户端 1 接收完成: 122 层, 240.72s
+2025-12-04 16:38:40 - INFO - [Round 5] 所有客户端更新完毕，开始聚合
+2025-12-04 16:38:40 - INFO - [Round 5] 收到客户端 1 HE 流式更新，大小: 919316.15 KB
+2025-12-04 16:38:40 - INFO - [Round 5] 所有客户端更新已收集，开始聚合
+2025-12-04 16:38:40 - INFO - [Round 5] 开始 CKKS 密文聚合...
+2025-12-04 16:39:09 - INFO - [Round 5][LATENCY] aggregation=29.7518s
+2025-12-04 16:39:13 - INFO - [Round 5][LATENCY] decryption=3.0179s
+2025-12-04 16:39:13 - INFO - [Round 5] CKKS 聚合完成: 122 层, 耗时 32.77s
+2025-12-04 16:39:13 - INFO - [Round 5][Server][RESOURCE] peak_memory=5110.80 MB, cpu=102.7%, cpu_time=33.6700s
+2025-12-04 16:39:13 - INFO - [Round 5] 全局模型更新完成
+2025-12-04 16:39:24 - INFO - [Round 5] 全局评估: Acc=0.7931, AUC=0.9807
+2025-12-04 16:39:24 - INFO - [Round 5] 客户端聚合 (CKKS): Loss=0.3468
+2025-12-04 16:39:24 - INFO - [CONVERGENCE] round=5 accuracy=0.7931 auc=0.9807 loss=0.3468
+2025-12-04 16:39:24 - INFO - [Round 5] 聚合完成，进入 Round 6
+2025-12-04 16:39:55 - INFO - [Round 6] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:39:55 - INFO - [Round 6][Client 3][LATENCY] training=15.9265s
+2025-12-04 16:39:55 - INFO - [Round 6][Client 3][RESOURCE] peak_memory=1860.51 MB, cpu=94.5%
+2025-12-04 16:39:59 - INFO - [Round 6] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:39:59 - INFO - [Round 6][Client 1][LATENCY] training=19.6800s
+2025-12-04 16:39:59 - INFO - [Round 6][Client 1][RESOURCE] peak_memory=1957.24 MB, cpu=95.0%
+2025-12-04 16:40:01 - INFO - [Round 6] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:40:01 - INFO - [Round 6][Client 2][LATENCY] training=21.9808s
+2025-12-04 16:40:01 - INFO - [Round 6][Client 2][RESOURCE] peak_memory=2038.80 MB, cpu=94.5%
+2025-12-04 16:43:42 - INFO - [Round 6][Client 3][PAYLOAD] upload=897.61 MB
+2025-12-04 16:43:42 - INFO - [Round 6] 客户端 3 接收完成: 122 层, 227.41s
+2025-12-04 16:43:42 - INFO - [Round 6] 收到客户端 3 HE 流式更新，大小: 919344.10 KB
+2025-12-04 16:43:45 - INFO - [Round 6][Client 1][PAYLOAD] upload=897.63 MB
+2025-12-04 16:43:45 - INFO - [Round 6] 客户端 1 接收完成: 122 层, 226.71s
+2025-12-04 16:43:45 - INFO - [Round 6] 收到客户端 1 HE 流式更新，大小: 919368.51 KB
+2025-12-04 16:44:00 - INFO - [Round 6][Client 2][PAYLOAD] upload=897.61 MB
+2025-12-04 16:44:00 - INFO - [Round 6] 客户端 2 接收完成: 122 层, 239.32s
+2025-12-04 16:44:00 - INFO - [Round 6] 所有客户端更新完毕，开始聚合
+2025-12-04 16:44:00 - INFO - [Round 6] 收到客户端 2 HE 流式更新，大小: 919351.73 KB
+2025-12-04 16:44:00 - INFO - [Round 6] 所有客户端更新已收集，开始聚合
+2025-12-04 16:44:00 - INFO - [Round 6] 开始 CKKS 密文聚合...
+2025-12-04 16:44:30 - INFO - [Round 6][LATENCY] aggregation=29.6975s
+2025-12-04 16:44:34 - INFO - [Round 6][LATENCY] decryption=3.9004s
+2025-12-04 16:44:34 - INFO - [Round 6] CKKS 聚合完成: 122 层, 耗时 33.60s
+2025-12-04 16:44:34 - INFO - [Round 6][Server][RESOURCE] peak_memory=5090.73 MB, cpu=102.6%, cpu_time=34.4800s
+2025-12-04 16:44:34 - INFO - [Round 6] 全局模型更新完成
+2025-12-04 16:44:45 - INFO - [Round 6] 全局评估: Acc=0.7961, AUC=0.9813
+2025-12-04 16:44:45 - INFO - [Round 6] 客户端聚合 (CKKS): Loss=0.2649
+2025-12-04 16:44:45 - INFO - [CONVERGENCE] round=6 accuracy=0.7961 auc=0.9813 loss=0.2649
+2025-12-04 16:44:45 - INFO - [Round 6] 聚合完成，进入 Round 7
+2025-12-04 16:45:15 - INFO - [Round 7] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:45:15 - INFO - [Round 7][Client 3][LATENCY] training=14.4504s
+2025-12-04 16:45:15 - INFO - [Round 7][Client 3][RESOURCE] peak_memory=1881.10 MB, cpu=93.6%
+2025-12-04 16:45:21 - INFO - [Round 7] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:45:21 - INFO - [Round 7][Client 1][LATENCY] training=20.3182s
+2025-12-04 16:45:21 - INFO - [Round 7][Client 1][RESOURCE] peak_memory=1986.46 MB, cpu=87.8%
+2025-12-04 16:45:22 - INFO - [Round 7] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:45:22 - INFO - [Round 7][Client 2][LATENCY] training=22.3927s
+2025-12-04 16:45:22 - INFO - [Round 7][Client 2][RESOURCE] peak_memory=2060.79 MB, cpu=88.0%
+2025-12-04 16:48:53 - INFO - [Round 7][Client 2][PAYLOAD] upload=897.59 MB
+2025-12-04 16:48:53 - INFO - [Round 7] 客户端 2 接收完成: 122 层, 210.77s
+2025-12-04 16:48:53 - INFO - [Round 7] 收到客户端 2 HE 流式更新，大小: 919331.83 KB
+2025-12-04 16:49:05 - INFO - [Round 7][Client 3][PAYLOAD] upload=897.63 MB
+2025-12-04 16:49:05 - INFO - [Round 7] 客户端 3 接收完成: 122 层, 230.41s
+2025-12-04 16:49:05 - INFO - [Round 7] 收到客户端 3 HE 流式更新，大小: 919372.40 KB
+2025-12-04 16:49:20 - INFO - [Round 7][Client 1][PAYLOAD] upload=897.60 MB
+2025-12-04 16:49:20 - INFO - [Round 7] 客户端 1 接收完成: 122 层, 239.11s
+2025-12-04 16:49:20 - INFO - [Round 7] 所有客户端更新完毕，开始聚合
+2025-12-04 16:49:20 - INFO - [Round 7] 收到客户端 1 HE 流式更新，大小: 919335.79 KB
+2025-12-04 16:49:20 - INFO - [Round 7] 所有客户端更新已收集，开始聚合
+2025-12-04 16:49:20 - INFO - [Round 7] 开始 CKKS 密文聚合...
+2025-12-04 16:49:49 - INFO - [Round 7][LATENCY] aggregation=29.6209s
+2025-12-04 16:49:53 - INFO - [Round 7][LATENCY] decryption=3.6007s
+2025-12-04 16:49:53 - INFO - [Round 7] CKKS 聚合完成: 122 层, 耗时 33.22s
+2025-12-04 16:49:53 - INFO - [Round 7][Server][RESOURCE] peak_memory=5109.08 MB, cpu=102.6%, cpu_time=34.0900s
+2025-12-04 16:49:53 - INFO - [Round 7] 全局模型更新完成
+2025-12-04 16:50:04 - INFO - [Round 7] 全局评估: Acc=0.8210, AUC=0.9852
+2025-12-04 16:50:04 - INFO - [Round 7] 客户端聚合 (CKKS): Loss=0.2641
+2025-12-04 16:50:04 - INFO - [CONVERGENCE] round=7 accuracy=0.8210 auc=0.9852 loss=0.2641
+2025-12-04 16:50:04 - INFO - [Round 7] 聚合完成，进入 Round 8
+2025-12-04 16:50:38 - INFO - [Round 8] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:50:38 - INFO - [Round 8][Client 3][LATENCY] training=17.9114s
+2025-12-04 16:50:38 - INFO - [Round 8][Client 3][RESOURCE] peak_memory=1886.69 MB, cpu=79.9%
+2025-12-04 16:50:40 - INFO - [Round 8] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:50:40 - INFO - [Round 8][Client 1][LATENCY] training=20.7816s
+2025-12-04 16:50:40 - INFO - [Round 8][Client 1][RESOURCE] peak_memory=2009.23 MB, cpu=88.0%
+2025-12-04 16:50:40 - INFO - [Round 8] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:50:40 - INFO - [Round 8][Client 2][LATENCY] training=21.3374s
+2025-12-04 16:50:40 - INFO - [Round 8][Client 2][RESOURCE] peak_memory=2080.23 MB, cpu=94.9%
+2025-12-04 16:54:35 - INFO - [Round 8][Client 3][PAYLOAD] upload=897.62 MB
+2025-12-04 16:54:35 - INFO - [Round 8] 客户端 3 接收完成: 122 层, 237.16s
+2025-12-04 16:54:35 - INFO - [Round 8] 收到客户端 3 HE 流式更新，大小: 919353.22 KB
+2025-12-04 16:54:39 - INFO - [Round 8][Client 2][PAYLOAD] upload=897.58 MB
+2025-12-04 16:54:39 - INFO - [Round 8] 客户端 2 接收完成: 122 层, 238.82s
+2025-12-04 16:54:39 - INFO - [Round 8] 收到客户端 2 HE 流式更新，大小: 919317.77 KB
+2025-12-04 16:54:40 - INFO - [Round 8][Client 1][PAYLOAD] upload=897.60 MB
+2025-12-04 16:54:40 - INFO - [Round 8] 客户端 1 接收完成: 122 层, 240.42s
+2025-12-04 16:54:40 - INFO - [Round 8] 所有客户端更新完毕，开始聚合
+2025-12-04 16:54:40 - INFO - [Round 8] 收到客户端 1 HE 流式更新，大小: 919338.42 KB
+2025-12-04 16:54:40 - INFO - [Round 8] 所有客户端更新已收集，开始聚合
+2025-12-04 16:54:40 - INFO - [Round 8] 开始 CKKS 密文聚合...
+2025-12-04 16:55:10 - INFO - [Round 8][LATENCY] aggregation=29.5826s
+2025-12-04 16:55:13 - INFO - [Round 8][LATENCY] decryption=3.4345s
+2025-12-04 16:55:13 - INFO - [Round 8] CKKS 聚合完成: 122 层, 耗时 33.02s
+2025-12-04 16:55:13 - INFO - [Round 8][Server][RESOURCE] peak_memory=5076.61 MB, cpu=102.6%, cpu_time=33.9100s
+2025-12-04 16:55:13 - INFO - [Round 8] 全局模型更新完成
+2025-12-04 16:55:25 - INFO - [Round 8] 全局评估: Acc=0.8278, AUC=0.9863
+2025-12-04 16:55:25 - INFO - [Round 8] 客户端聚合 (CKKS): Loss=0.1966
+2025-12-04 16:55:25 - INFO - [CONVERGENCE] round=8 accuracy=0.8278 auc=0.9863 loss=0.1966
+2025-12-04 16:55:25 - INFO - [Round 8] 聚合完成，进入 Round 9
+2025-12-04 16:55:53 - INFO - [Round 9] 接收客户端 3 CKKS 流式更新...
+2025-12-04 16:55:53 - INFO - [Round 9][Client 3][LATENCY] training=13.1118s
+2025-12-04 16:55:53 - INFO - [Round 9][Client 3][RESOURCE] peak_memory=1932.14 MB, cpu=93.6%
+2025-12-04 16:56:00 - INFO - [Round 9] 接收客户端 1 CKKS 流式更新...
+2025-12-04 16:56:00 - INFO - [Round 9][Client 1][LATENCY] training=20.0614s
+2025-12-04 16:56:00 - INFO - [Round 9][Client 1][RESOURCE] peak_memory=2024.85 MB, cpu=81.5%
+2025-12-04 16:56:03 - INFO - [Round 9] 接收客户端 2 CKKS 流式更新...
+2025-12-04 16:56:03 - INFO - [Round 9][Client 2][LATENCY] training=23.3579s
+2025-12-04 16:56:03 - INFO - [Round 9][Client 2][RESOURCE] peak_memory=2127.44 MB, cpu=77.1%
+2025-12-04 16:59:26 - INFO - [Round 9][Client 1][PAYLOAD] upload=897.58 MB
+2025-12-04 16:59:26 - INFO - [Round 9] 客户端 1 接收完成: 122 层, 206.32s
+2025-12-04 16:59:26 - INFO - [Round 9] 收到客户端 1 HE 流式更新，大小: 919317.22 KB
+2025-12-04 16:59:38 - INFO - [Round 9][Client 3][PAYLOAD] upload=897.56 MB
+2025-12-04 16:59:38 - INFO - [Round 9] 客户端 3 接收完成: 122 层, 225.11s
+2025-12-04 16:59:38 - INFO - [Round 9] 收到客户端 3 HE 流式更新，大小: 919298.55 KB
+2025-12-04 16:59:58 - INFO - [Round 9][Client 2][PAYLOAD] upload=897.60 MB
+2025-12-04 16:59:58 - INFO - [Round 9] 客户端 2 接收完成: 122 层, 234.73s
+2025-12-04 16:59:58 - INFO - [Round 9] 所有客户端更新完毕，开始聚合
+2025-12-04 16:59:58 - INFO - [Round 9] 收到客户端 2 HE 流式更新，大小: 919335.76 KB
+2025-12-04 16:59:58 - INFO - [Round 9] 所有客户端更新已收集，开始聚合
+2025-12-04 16:59:58 - INFO - [Round 9] 开始 CKKS 密文聚合...
+2025-12-04 17:00:27 - INFO - [Round 9][LATENCY] aggregation=29.7111s
+2025-12-04 17:00:31 - INFO - [Round 9][LATENCY] decryption=3.8937s
+2025-12-04 17:00:31 - INFO - [Round 9] CKKS 聚合完成: 122 层, 耗时 33.61s
+2025-12-04 17:00:31 - INFO - [Round 9][Server][RESOURCE] peak_memory=5112.62 MB, cpu=102.6%, cpu_time=34.5000s
+2025-12-04 17:00:31 - INFO - [Round 9] 全局模型更新完成
+2025-12-04 17:00:43 - INFO - [Round 9] 全局评估: Acc=0.8325, AUC=0.9867
+2025-12-04 17:00:43 - INFO - [Round 9] 客户端聚合 (CKKS): Loss=0.1666
+2025-12-04 17:00:43 - INFO - [CONVERGENCE] round=9 accuracy=0.8325 auc=0.9867 loss=0.1666
+2025-12-04 17:00:43 - INFO - [Round 9] 聚合完成，进入 Round 10
+2025-12-04 17:01:17 - INFO - [Round 10] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:01:17 - INFO - [Round 10][Client 3][LATENCY] training=18.8604s
+2025-12-04 17:01:17 - INFO - [Round 10][Client 3][RESOURCE] peak_memory=1981.43 MB, cpu=80.8%
+2025-12-04 17:01:18 - INFO - [Round 10] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:01:18 - INFO - [Round 10][Client 1][LATENCY] training=19.3739s
+2025-12-04 17:01:18 - INFO - [Round 10][Client 1][RESOURCE] peak_memory=2054.29 MB, cpu=90.3%
+2025-12-04 17:01:20 - INFO - [Round 10] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:01:20 - INFO - [Round 10][Client 2][LATENCY] training=21.2853s
+2025-12-04 17:01:20 - INFO - [Round 10][Client 2][RESOURCE] peak_memory=2154.86 MB, cpu=94.8%
+2025-12-04 17:05:11 - INFO - [Round 10][Client 1][PAYLOAD] upload=897.57 MB
+2025-12-04 17:05:11 - INFO - [Round 10] 客户端 1 接收完成: 122 层, 232.92s
+2025-12-04 17:05:11 - INFO - [Round 10] 收到客户端 1 HE 流式更新，大小: 919303.86 KB
+2025-12-04 17:05:18 - INFO - [Round 10][Client 2][PAYLOAD] upload=897.54 MB
+2025-12-04 17:05:18 - INFO - [Round 10] 客户端 2 接收完成: 122 层, 238.59s
+2025-12-04 17:05:18 - INFO - [Round 10] 收到客户端 2 HE 流式更新，大小: 919281.04 KB
+2025-12-04 17:05:19 - INFO - [Round 10][Client 3][PAYLOAD] upload=897.61 MB
+2025-12-04 17:05:19 - INFO - [Round 10] 客户端 3 接收完成: 122 层, 242.16s
+2025-12-04 17:05:19 - INFO - [Round 10] 所有客户端更新完毕，开始聚合
+2025-12-04 17:05:19 - INFO - [Round 10] 收到客户端 3 HE 流式更新，大小: 919343.98 KB
+2025-12-04 17:05:19 - INFO - [Round 10] 所有客户端更新已收集，开始聚合
+2025-12-04 17:05:19 - INFO - [Round 10] 开始 CKKS 密文聚合...
+2025-12-04 17:05:49 - INFO - [Round 10][LATENCY] aggregation=29.8672s
+2025-12-04 17:05:52 - INFO - [Round 10][LATENCY] decryption=3.6242s
+2025-12-04 17:05:52 - INFO - [Round 10] CKKS 聚合完成: 122 层, 耗时 33.49s
+2025-12-04 17:05:52 - INFO - [Round 10][Server][RESOURCE] peak_memory=5147.12 MB, cpu=102.6%, cpu_time=34.3700s
+2025-12-04 17:05:52 - INFO - [Round 10] 全局模型更新完成
+2025-12-04 17:06:04 - INFO - [Round 10] 全局评估: Acc=0.8436, AUC=0.9889
+2025-12-04 17:06:04 - INFO - [Round 10] 客户端聚合 (CKKS): Loss=0.1552
+2025-12-04 17:06:04 - INFO - [CONVERGENCE] round=10 accuracy=0.8436 auc=0.9889 loss=0.1552
+2025-12-04 17:06:04 - INFO - [Round 10] 聚合完成，进入 Round 11
+2025-12-04 17:06:35 - INFO - [Round 11] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:06:35 - INFO - [Round 11][Client 3][LATENCY] training=16.0307s
+2025-12-04 17:06:35 - INFO - [Round 11][Client 3][RESOURCE] peak_memory=2000.67 MB, cpu=94.7%
+2025-12-04 17:06:39 - INFO - [Round 11] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:06:39 - INFO - [Round 11][Client 1][LATENCY] training=19.9636s
+2025-12-04 17:06:39 - INFO - [Round 11][Client 1][RESOURCE] peak_memory=2065.85 MB, cpu=95.1%
+2025-12-04 17:06:42 - INFO - [Round 11] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:06:42 - INFO - [Round 11][Client 2][LATENCY] training=23.1218s
+2025-12-04 17:06:42 - INFO - [Round 11][Client 2][RESOURCE] peak_memory=2144.94 MB, cpu=90.4%
+2025-12-04 17:10:29 - INFO - [Round 11][Client 3][PAYLOAD] upload=897.58 MB
+2025-12-04 17:10:29 - INFO - [Round 11] 客户端 3 接收完成: 122 层, 233.73s
+2025-12-04 17:10:29 - INFO - [Round 11] 收到客户端 3 HE 流式更新，大小: 919322.23 KB
+2025-12-04 17:10:35 - INFO - [Round 11][Client 1][PAYLOAD] upload=897.66 MB
+2025-12-04 17:10:35 - INFO - [Round 11] 客户端 1 接收完成: 122 层, 236.15s
+2025-12-04 17:10:35 - INFO - [Round 11] 收到客户端 1 HE 流式更新，大小: 919400.39 KB
+2025-12-04 17:10:39 - INFO - [Round 11][Client 2][PAYLOAD] upload=897.59 MB
+2025-12-04 17:10:39 - INFO - [Round 11] 客户端 2 接收完成: 122 层, 237.11s
+2025-12-04 17:10:39 - INFO - [Round 11] 所有客户端更新完毕，开始聚合
+2025-12-04 17:10:39 - INFO - [Round 11] 收到客户端 2 HE 流式更新，大小: 919324.58 KB
+2025-12-04 17:10:39 - INFO - [Round 11] 所有客户端更新已收集，开始聚合
+2025-12-04 17:10:39 - INFO - [Round 11] 开始 CKKS 密文聚合...
+2025-12-04 17:11:09 - INFO - [Round 11][LATENCY] aggregation=29.5618s
+2025-12-04 17:11:12 - INFO - [Round 11][LATENCY] decryption=3.5174s
+2025-12-04 17:11:12 - INFO - [Round 11] CKKS 聚合完成: 122 层, 耗时 33.08s
+2025-12-04 17:11:12 - INFO - [Round 11][Server][RESOURCE] peak_memory=5113.97 MB, cpu=102.5%, cpu_time=33.9200s
+2025-12-04 17:11:12 - INFO - [Round 11] 全局模型更新完成
+2025-12-04 17:11:23 - INFO - [Round 11] 全局评估: Acc=0.8441, AUC=0.9882
+2025-12-04 17:11:23 - INFO - [Round 11] 客户端聚合 (CKKS): Loss=0.1413
+2025-12-04 17:11:23 - INFO - [CONVERGENCE] round=11 accuracy=0.8441 auc=0.9882 loss=0.1413
+2025-12-04 17:11:23 - INFO - [Round 11] 聚合完成，进入 Round 12
+2025-12-04 17:11:53 - INFO - [Round 12] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:11:53 - INFO - [Round 12][Client 3][LATENCY] training=15.3837s
+2025-12-04 17:11:53 - INFO - [Round 12][Client 3][RESOURCE] peak_memory=2047.79 MB, cpu=94.8%
+2025-12-04 17:11:58 - INFO - [Round 12] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:11:58 - INFO - [Round 12][Client 1][LATENCY] training=19.5011s
+2025-12-04 17:11:58 - INFO - [Round 12][Client 1][RESOURCE] peak_memory=2067.16 MB, cpu=94.7%
+2025-12-04 17:11:58 - INFO - [Round 12] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:11:58 - INFO - [Round 12][Client 2][LATENCY] training=21.9678s
+2025-12-04 17:11:58 - INFO - [Round 12][Client 2][RESOURCE] peak_memory=2204.27 MB, cpu=95.0%
+2025-12-04 17:15:47 - INFO - [Round 12][Client 3][PAYLOAD] upload=897.63 MB
+2025-12-04 17:15:47 - INFO - [Round 12] 客户端 3 接收完成: 122 层, 233.76s
+2025-12-04 17:15:47 - INFO - [Round 12] 收到客户端 3 HE 流式更新，大小: 919367.35 KB
+2025-12-04 17:15:55 - INFO - [Round 12][Client 2][PAYLOAD] upload=897.61 MB
+2025-12-04 17:15:55 - INFO - [Round 12] 客户端 2 接收完成: 122 层, 236.61s
+2025-12-04 17:15:55 - INFO - [Round 12] 收到客户端 2 HE 流式更新，大小: 919346.02 KB
+2025-12-04 17:15:57 - INFO - [Round 12][Client 1][PAYLOAD] upload=897.62 MB
+2025-12-04 17:15:57 - INFO - [Round 12] 客户端 1 接收完成: 122 层, 239.29s
+2025-12-04 17:15:57 - INFO - [Round 12] 所有客户端更新完毕，开始聚合
+2025-12-04 17:15:57 - INFO - [Round 12] 收到客户端 1 HE 流式更新，大小: 919353.81 KB
+2025-12-04 17:15:57 - INFO - [Round 12] 所有客户端更新已收集，开始聚合
+2025-12-04 17:15:57 - INFO - [Round 12] 开始 CKKS 密文聚合...
+2025-12-04 17:16:27 - INFO - [Round 12][LATENCY] aggregation=29.8091s
+2025-12-04 17:16:30 - INFO - [Round 12][LATENCY] decryption=3.5347s
+2025-12-04 17:16:30 - INFO - [Round 12] CKKS 聚合完成: 122 层, 耗时 33.35s
+2025-12-04 17:16:30 - INFO - [Round 12][Server][RESOURCE] peak_memory=5159.52 MB, cpu=102.6%, cpu_time=34.2200s
+2025-12-04 17:16:30 - INFO - [Round 12] 全局模型更新完成
+2025-12-04 17:16:41 - INFO - [Round 12] 全局评估: Acc=0.8536, AUC=0.9896
+2025-12-04 17:16:41 - INFO - [Round 12] 客户端聚合 (CKKS): Loss=0.1075
+2025-12-04 17:16:41 - INFO - [CONVERGENCE] round=12 accuracy=0.8536 auc=0.9896 loss=0.1075
+2025-12-04 17:16:41 - INFO - [Round 12] 聚合完成，进入 Round 13
+2025-12-04 17:17:12 - INFO - [Round 13] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:17:12 - INFO - [Round 13][Client 3][LATENCY] training=16.0335s
+2025-12-04 17:17:12 - INFO - [Round 13][Client 3][RESOURCE] peak_memory=2062.68 MB, cpu=94.4%
+2025-12-04 17:17:16 - INFO - [Round 13] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:17:16 - INFO - [Round 13][Client 1][LATENCY] training=19.9449s
+2025-12-04 17:17:16 - INFO - [Round 13][Client 1][RESOURCE] peak_memory=2106.36 MB, cpu=95.1%
+2025-12-04 17:17:18 - INFO - [Round 13] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:17:18 - INFO - [Round 13][Client 2][LATENCY] training=21.7455s
+2025-12-04 17:17:18 - INFO - [Round 13][Client 2][RESOURCE] peak_memory=2246.74 MB, cpu=94.8%
+2025-12-04 17:21:06 - INFO - [Round 13][Client 2][PAYLOAD] upload=897.61 MB
+2025-12-04 17:21:06 - INFO - [Round 13] 客户端 2 接收完成: 122 层, 227.88s
+2025-12-04 17:21:06 - INFO - [Round 13] 收到客户端 2 HE 流式更新，大小: 919344.78 KB
+2025-12-04 17:21:12 - INFO - [Round 13][Client 3][PAYLOAD] upload=897.60 MB
+2025-12-04 17:21:12 - INFO - [Round 13] 客户端 3 接收完成: 122 层, 239.45s
+2025-12-04 17:21:12 - INFO - [Round 13] 收到客户端 3 HE 流式更新，大小: 919339.14 KB
+2025-12-04 17:21:15 - INFO - [Round 13][Client 1][PAYLOAD] upload=897.57 MB
+2025-12-04 17:21:15 - INFO - [Round 13] 客户端 1 接收完成: 122 层, 238.99s
+2025-12-04 17:21:15 - INFO - [Round 13] 所有客户端更新完毕，开始聚合
+2025-12-04 17:21:15 - INFO - [Round 13] 收到客户端 1 HE 流式更新，大小: 919310.74 KB
+2025-12-04 17:21:15 - INFO - [Round 13] 所有客户端更新已收集，开始聚合
+2025-12-04 17:21:15 - INFO - [Round 13] 开始 CKKS 密文聚合...
+2025-12-04 17:21:45 - INFO - [Round 13][LATENCY] aggregation=29.9059s
+2025-12-04 17:21:48 - INFO - [Round 13][LATENCY] decryption=3.5110s
+2025-12-04 17:21:48 - INFO - [Round 13] CKKS 聚合完成: 122 层, 耗时 33.42s
+2025-12-04 17:21:48 - INFO - [Round 13][Server][RESOURCE] peak_memory=5147.73 MB, cpu=102.6%, cpu_time=34.2900s
+2025-12-04 17:21:48 - INFO - [Round 13] 全局模型更新完成
+2025-12-04 17:21:59 - INFO - [Round 13] 全局评估: Acc=0.8602, AUC=0.9903
+2025-12-04 17:21:59 - INFO - [Round 13] 客户端聚合 (CKKS): Loss=0.0995
+2025-12-04 17:21:59 - INFO - [CONVERGENCE] round=13 accuracy=0.8602 auc=0.9903 loss=0.0995
+2025-12-04 17:21:59 - INFO - [Round 13] 聚合完成，进入 Round 14
+2025-12-04 17:22:30 - INFO - [Round 14] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:22:30 - INFO - [Round 14][Client 3][LATENCY] training=15.7856s
+2025-12-04 17:22:30 - INFO - [Round 14][Client 3][RESOURCE] peak_memory=2061.71 MB, cpu=94.8%
+2025-12-04 17:22:34 - INFO - [Round 14] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:22:34 - INFO - [Round 14][Client 1][LATENCY] training=19.6256s
+2025-12-04 17:22:34 - INFO - [Round 14][Client 1][RESOURCE] peak_memory=2138.16 MB, cpu=94.8%
+2025-12-04 17:22:36 - INFO - [Round 14] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:22:36 - INFO - [Round 14][Client 2][LATENCY] training=21.6461s
+2025-12-04 17:22:36 - INFO - [Round 14][Client 2][RESOURCE] peak_memory=2265.32 MB, cpu=94.7%
+2025-12-04 17:26:14 - INFO - [Round 14][Client 1][PAYLOAD] upload=897.61 MB
+2025-12-04 17:26:14 - INFO - [Round 14] 客户端 1 接收完成: 122 层, 220.16s
+2025-12-04 17:26:14 - INFO - [Round 14] 收到客户端 1 HE 流式更新，大小: 919348.20 KB
+2025-12-04 17:26:20 - INFO - [Round 14][Client 3][PAYLOAD] upload=897.58 MB
+2025-12-04 17:26:20 - INFO - [Round 14] 客户端 3 接收完成: 122 层, 230.15s
+2025-12-04 17:26:20 - INFO - [Round 14] 收到客户端 3 HE 流式更新，大小: 919321.13 KB
+2025-12-04 17:26:35 - INFO - [Round 14][Client 2][PAYLOAD] upload=897.60 MB
+2025-12-04 17:26:35 - INFO - [Round 14] 客户端 2 接收完成: 122 层, 238.89s
+2025-12-04 17:26:35 - INFO - [Round 14] 所有客户端更新完毕，开始聚合
+2025-12-04 17:26:35 - INFO - [Round 14] 收到客户端 2 HE 流式更新，大小: 919341.29 KB
+2025-12-04 17:26:35 - INFO - [Round 14] 所有客户端更新已收集，开始聚合
+2025-12-04 17:26:35 - INFO - [Round 14] 开始 CKKS 密文聚合...
+2025-12-04 17:27:04 - INFO - [Round 14][LATENCY] aggregation=29.7166s
+2025-12-04 17:27:08 - INFO - [Round 14][LATENCY] decryption=3.7407s
+2025-12-04 17:27:08 - INFO - [Round 14] CKKS 聚合完成: 122 层, 耗时 33.46s
+2025-12-04 17:27:08 - INFO - [Round 14][Server][RESOURCE] peak_memory=5185.97 MB, cpu=102.6%, cpu_time=34.3300s
+2025-12-04 17:27:08 - INFO - [Round 14] 全局模型更新完成
+2025-12-04 17:27:18 - INFO - [Round 14] 全局评估: Acc=0.8663, AUC=0.9911
+2025-12-04 17:27:18 - INFO - [Round 14] 客户端聚合 (CKKS): Loss=0.0861
+2025-12-04 17:27:18 - INFO - [CONVERGENCE] round=14 accuracy=0.8663 auc=0.9911 loss=0.0861
+2025-12-04 17:27:18 - INFO - [Round 14] 聚合完成，进入 Round 15
+2025-12-04 17:27:49 - INFO - [Round 15] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:27:49 - INFO - [Round 15][Client 3][LATENCY] training=16.0410s
+2025-12-04 17:27:49 - INFO - [Round 15][Client 3][RESOURCE] peak_memory=2090.59 MB, cpu=87.5%
+2025-12-04 17:27:54 - INFO - [Round 15] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:27:54 - INFO - [Round 15][Client 1][LATENCY] training=20.5487s
+2025-12-04 17:27:54 - INFO - [Round 15][Client 1][RESOURCE] peak_memory=2159.35 MB, cpu=88.2%
+2025-12-04 17:27:57 - INFO - [Round 15] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:27:57 - INFO - [Round 15][Client 2][LATENCY] training=22.5418s
+2025-12-04 17:27:57 - INFO - [Round 15][Client 2][RESOURCE] peak_memory=2275.89 MB, cpu=88.3%
+2025-12-04 17:31:08 - INFO - [Round 15][Client 3][PAYLOAD] upload=897.58 MB
+2025-12-04 17:31:08 - INFO - [Round 15] 客户端 3 接收完成: 122 层, 198.40s
+2025-12-04 17:31:08 - INFO - [Round 15] 收到客户端 3 HE 流式更新，大小: 919319.49 KB
+2025-12-04 17:31:38 - INFO - [Round 15][Client 1][PAYLOAD] upload=897.60 MB
+2025-12-04 17:31:38 - INFO - [Round 15] 客户端 1 接收完成: 122 层, 224.11s
+2025-12-04 17:31:38 - INFO - [Round 15] 收到客户端 1 HE 流式更新，大小: 919340.90 KB
+2025-12-04 17:31:54 - INFO - [Round 15][Client 2][PAYLOAD] upload=897.58 MB
+2025-12-04 17:31:54 - INFO - [Round 15] 客户端 2 接收完成: 122 层, 238.07s
+2025-12-04 17:31:54 - INFO - [Round 15] 所有客户端更新完毕，开始聚合
+2025-12-04 17:31:54 - INFO - [Round 15] 收到客户端 2 HE 流式更新，大小: 919319.32 KB
+2025-12-04 17:31:54 - INFO - [Round 15] 所有客户端更新已收集，开始聚合
+2025-12-04 17:31:54 - INFO - [Round 15] 开始 CKKS 密文聚合...
+2025-12-04 17:32:24 - INFO - [Round 15][LATENCY] aggregation=29.8478s
+2025-12-04 17:32:28 - INFO - [Round 15][LATENCY] decryption=3.6011s
+2025-12-04 17:32:28 - INFO - [Round 15] CKKS 聚合完成: 122 层, 耗时 33.45s
+2025-12-04 17:32:28 - INFO - [Round 15][Server][RESOURCE] peak_memory=5126.65 MB, cpu=102.5%, cpu_time=34.3000s
+2025-12-04 17:32:28 - INFO - [Round 15] 全局模型更新完成
+2025-12-04 17:32:38 - INFO - [Round 15] 全局评估: Acc=0.8744, AUC=0.9914
+2025-12-04 17:32:38 - INFO - [Round 15] 客户端聚合 (CKKS): Loss=0.0882
+2025-12-04 17:32:38 - INFO - [CONVERGENCE] round=15 accuracy=0.8744 auc=0.9914 loss=0.0882
+2025-12-04 17:32:38 - INFO - [Round 15] 聚合完成，进入 Round 16
+2025-12-04 17:33:12 - INFO - [Round 16] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:33:12 - INFO - [Round 16][Client 3][LATENCY] training=18.7434s
+2025-12-04 17:33:12 - INFO - [Round 16][Client 3][RESOURCE] peak_memory=2088.35 MB, cpu=79.8%
+2025-12-04 17:33:13 - INFO - [Round 16] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:33:13 - INFO - [Round 16][Client 1][LATENCY] training=19.5597s
+2025-12-04 17:33:13 - INFO - [Round 16][Client 1][RESOURCE] peak_memory=2192.38 MB, cpu=94.4%
+2025-12-04 17:33:16 - INFO - [Round 16] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:33:16 - INFO - [Round 16][Client 2][LATENCY] training=23.2161s
+2025-12-04 17:33:16 - INFO - [Round 16][Client 2][RESOURCE] peak_memory=2257.73 MB, cpu=88.6%
+2025-12-04 17:37:05 - INFO - [Round 16][Client 2][PAYLOAD] upload=897.61 MB
+2025-12-04 17:37:05 - INFO - [Round 16] 客户端 2 接收完成: 122 层, 228.89s
+2025-12-04 17:37:05 - INFO - [Round 16] 收到客户端 2 HE 流式更新，大小: 919348.06 KB
+2025-12-04 17:37:11 - INFO - [Round 16][Client 1][PAYLOAD] upload=897.59 MB
+2025-12-04 17:37:11 - INFO - [Round 16] 客户端 1 接收完成: 122 层, 237.61s
+2025-12-04 17:37:11 - INFO - [Round 16] 收到客户端 1 HE 流式更新，大小: 919330.67 KB
+2025-12-04 17:37:14 - INFO - [Round 16][Client 3][PAYLOAD] upload=897.60 MB
+2025-12-04 17:37:14 - INFO - [Round 16] 客户端 3 接收完成: 122 层, 242.31s
+2025-12-04 17:37:14 - INFO - [Round 16] 所有客户端更新完毕，开始聚合
+2025-12-04 17:37:14 - INFO - [Round 16] 收到客户端 3 HE 流式更新，大小: 919342.45 KB
+2025-12-04 17:37:14 - INFO - [Round 16] 所有客户端更新已收集，开始聚合
+2025-12-04 17:37:14 - INFO - [Round 16] 开始 CKKS 密文聚合...
+2025-12-04 17:37:44 - INFO - [Round 16][LATENCY] aggregation=29.6022s
+2025-12-04 17:37:47 - INFO - [Round 16][LATENCY] decryption=3.3989s
+2025-12-04 17:37:47 - INFO - [Round 16] CKKS 聚合完成: 122 层, 耗时 33.00s
+2025-12-04 17:37:47 - INFO - [Round 16][Server][RESOURCE] peak_memory=5180.69 MB, cpu=102.5%, cpu_time=33.8500s
+2025-12-04 17:37:47 - INFO - [Round 16] 全局模型更新完成
+2025-12-04 17:37:57 - INFO - [Round 16] 全局评估: Acc=0.8538, AUC=0.9898
+2025-12-04 17:37:57 - INFO - [Round 16] 客户端聚合 (CKKS): Loss=0.0975
+2025-12-04 17:37:57 - INFO - [CONVERGENCE] round=16 accuracy=0.8538 auc=0.9898 loss=0.0975
+2025-12-04 17:37:57 - INFO - [Round 16] 聚合完成，进入 Round 17
+2025-12-04 17:38:31 - INFO - [Round 17] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:38:31 - INFO - [Round 17][Client 3][LATENCY] training=16.6218s
+2025-12-04 17:38:31 - INFO - [Round 17][Client 3][RESOURCE] peak_memory=2098.80 MB, cpu=85.7%
+2025-12-04 17:38:33 - INFO - [Round 17] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:38:33 - INFO - [Round 17][Client 1][LATENCY] training=20.2693s
+2025-12-04 17:38:33 - INFO - [Round 17][Client 1][RESOURCE] peak_memory=2220.23 MB, cpu=94.4%
+2025-12-04 17:38:33 - INFO - [Round 17] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:38:33 - INFO - [Round 17][Client 2][LATENCY] training=22.0966s
+2025-12-04 17:38:33 - INFO - [Round 17][Client 2][RESOURCE] peak_memory=2262.52 MB, cpu=94.5%
+2025-12-04 17:42:05 - INFO - [Round 17][Client 2][PAYLOAD] upload=897.62 MB
+2025-12-04 17:42:05 - INFO - [Round 17] 客户端 2 接收完成: 122 层, 211.82s
+2025-12-04 17:42:05 - INFO - [Round 17] 收到客户端 2 HE 流式更新，大小: 919354.10 KB
+2025-12-04 17:42:29 - INFO - [Round 17][Client 1][PAYLOAD] upload=897.58 MB
+2025-12-04 17:42:29 - INFO - [Round 17] 客户端 1 接收完成: 122 层, 236.48s
+2025-12-04 17:42:29 - INFO - [Round 17] 收到客户端 1 HE 流式更新，大小: 919316.64 KB
+2025-12-04 17:42:33 - INFO - [Round 17][Client 3][PAYLOAD] upload=897.57 MB
+2025-12-04 17:42:33 - INFO - [Round 17] 客户端 3 接收完成: 122 层, 242.54s
+2025-12-04 17:42:33 - INFO - [Round 17] 所有客户端更新完毕，开始聚合
+2025-12-04 17:42:33 - INFO - [Round 17] 收到客户端 3 HE 流式更新，大小: 919310.06 KB
+2025-12-04 17:42:33 - INFO - [Round 17] 所有客户端更新已收集，开始聚合
+2025-12-04 17:42:33 - INFO - [Round 17] 开始 CKKS 密文聚合...
+2025-12-04 17:43:03 - INFO - [Round 17][LATENCY] aggregation=29.7243s
+2025-12-04 17:43:06 - INFO - [Round 17][LATENCY] decryption=3.6118s
+2025-12-04 17:43:06 - INFO - [Round 17] CKKS 聚合完成: 122 层, 耗时 33.34s
+2025-12-04 17:43:06 - INFO - [Round 17][Server][RESOURCE] peak_memory=5150.21 MB, cpu=102.6%, cpu_time=34.2200s
+2025-12-04 17:43:06 - INFO - [Round 17] 全局模型更新完成
+2025-12-04 17:43:16 - INFO - [Round 17] 全局评估: Acc=0.8760, AUC=0.9922
+2025-12-04 17:43:16 - INFO - [Round 17] 客户端聚合 (CKKS): Loss=0.0599
+2025-12-04 17:43:16 - INFO - [CONVERGENCE] round=17 accuracy=0.8760 auc=0.9922 loss=0.0599
+2025-12-04 17:43:16 - INFO - [Round 17] 聚合完成，进入 Round 18
+2025-12-04 17:43:46 - INFO - [Round 18] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:43:46 - INFO - [Round 18][Client 3][LATENCY] training=14.2203s
+2025-12-04 17:43:46 - INFO - [Round 18][Client 3][RESOURCE] peak_memory=2086.84 MB, cpu=93.5%
+2025-12-04 17:43:50 - INFO - [Round 18] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:43:50 - INFO - [Round 18][Client 1][LATENCY] training=17.9600s
+2025-12-04 17:43:50 - INFO - [Round 18][Client 1][RESOURCE] peak_memory=2213.57 MB, cpu=94.5%
+2025-12-04 17:43:57 - INFO - [Round 18] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:43:57 - INFO - [Round 18][Client 2][LATENCY] training=24.1925s
+2025-12-04 17:43:57 - INFO - [Round 18][Client 2][RESOURCE] peak_memory=2291.18 MB, cpu=77.4%
+2025-12-04 17:47:25 - INFO - [Round 18][Client 3][PAYLOAD] upload=897.57 MB
+2025-12-04 17:47:25 - INFO - [Round 18] 客户端 3 接收完成: 122 层, 219.18s
+2025-12-04 17:47:25 - INFO - [Round 18] 收到客户端 3 HE 流式更新，大小: 919303.55 KB
+2025-12-04 17:47:49 - INFO - [Round 18][Client 1][PAYLOAD] upload=897.59 MB
+2025-12-04 17:47:49 - INFO - [Round 18] 客户端 1 接收完成: 122 层, 239.67s
+2025-12-04 17:47:49 - INFO - [Round 18] 收到客户端 1 HE 流式更新，大小: 919331.58 KB
+2025-12-04 17:47:50 - INFO - [Round 18][Client 2][PAYLOAD] upload=897.56 MB
+2025-12-04 17:47:50 - INFO - [Round 18] 客户端 2 接收完成: 122 层, 234.79s
+2025-12-04 17:47:50 - INFO - [Round 18] 所有客户端更新完毕，开始聚合
+2025-12-04 17:47:50 - INFO - [Round 18] 收到客户端 2 HE 流式更新，大小: 919297.83 KB
+2025-12-04 17:47:50 - INFO - [Round 18] 所有客户端更新已收集，开始聚合
+2025-12-04 17:47:50 - INFO - [Round 18] 开始 CKKS 密文聚合...
+2025-12-04 17:48:20 - INFO - [Round 18][LATENCY] aggregation=29.7758s
+2025-12-04 17:48:24 - INFO - [Round 18][LATENCY] decryption=3.8623s
+2025-12-04 17:48:24 - INFO - [Round 18] CKKS 聚合完成: 122 层, 耗时 33.64s
+2025-12-04 17:48:24 - INFO - [Round 18][Server][RESOURCE] peak_memory=5176.71 MB, cpu=102.5%, cpu_time=34.5100s
+2025-12-04 17:48:24 - INFO - [Round 18] 全局模型更新完成
+2025-12-04 17:48:34 - INFO - [Round 18] 全局评估: Acc=0.8730, AUC=0.9919
+2025-12-04 17:48:34 - INFO - [Round 18] 客户端聚合 (CKKS): Loss=0.0944
+2025-12-04 17:48:34 - INFO - [CONVERGENCE] round=18 accuracy=0.8730 auc=0.9919 loss=0.0944
+2025-12-04 17:48:34 - INFO - [Round 18] 聚合完成，进入 Round 19
+2025-12-04 17:49:04 - INFO - [Round 19] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:49:04 - INFO - [Round 19][Client 3][LATENCY] training=15.0180s
+2025-12-04 17:49:04 - INFO - [Round 19][Client 3][RESOURCE] peak_memory=2108.30 MB, cpu=92.7%
+2025-12-04 17:49:09 - INFO - [Round 19] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:49:09 - INFO - [Round 19][Client 1][LATENCY] training=20.6603s
+2025-12-04 17:49:09 - INFO - [Round 19][Client 1][RESOURCE] peak_memory=2241.97 MB, cpu=87.9%
+2025-12-04 17:49:10 - INFO - [Round 19] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:49:10 - INFO - [Round 19][Client 2][LATENCY] training=20.9307s
+2025-12-04 17:49:10 - INFO - [Round 19][Client 2][RESOURCE] peak_memory=2287.92 MB, cpu=94.5%
+2025-12-04 17:52:56 - INFO - [Round 19][Client 2][PAYLOAD] upload=897.59 MB
+2025-12-04 17:52:56 - INFO - [Round 19] 客户端 2 接收完成: 122 层, 225.80s
+2025-12-04 17:52:56 - INFO - [Round 19] 收到客户端 2 HE 流式更新，大小: 919325.25 KB
+2025-12-04 17:53:08 - INFO - [Round 19][Client 1][PAYLOAD] upload=897.64 MB
+2025-12-04 17:53:08 - INFO - [Round 19] 客户端 1 接收完成: 122 层, 239.01s
+2025-12-04 17:53:08 - INFO - [Round 19] 收到客户端 1 HE 流式更新，大小: 919373.76 KB
+2025-12-04 17:53:08 - INFO - [Round 19][Client 3][PAYLOAD] upload=897.60 MB
+2025-12-04 17:53:08 - INFO - [Round 19] 客户端 3 接收完成: 122 层, 244.01s
+2025-12-04 17:53:08 - INFO - [Round 19] 所有客户端更新完毕，开始聚合
+2025-12-04 17:53:08 - INFO - [Round 19] 收到客户端 3 HE 流式更新，大小: 919336.08 KB
+2025-12-04 17:53:08 - INFO - [Round 19] 所有客户端更新已收集，开始聚合
+2025-12-04 17:53:08 - INFO - [Round 19] 开始 CKKS 密文聚合...
+2025-12-04 17:53:38 - INFO - [Round 19][LATENCY] aggregation=30.0245s
+2025-12-04 17:53:42 - INFO - [Round 19][LATENCY] decryption=3.7673s
+2025-12-04 17:53:42 - INFO - [Round 19] CKKS 聚合完成: 122 层, 耗时 33.79s
+2025-12-04 17:53:42 - INFO - [Round 19][Server][RESOURCE] peak_memory=5186.22 MB, cpu=102.5%, cpu_time=34.6700s
+2025-12-04 17:53:42 - INFO - [Round 19] 全局模型更新完成
+2025-12-04 17:53:52 - INFO - [Round 19] 全局评估: Acc=0.8739, AUC=0.9920
+2025-12-04 17:53:52 - INFO - [Round 19] 客户端聚合 (CKKS): Loss=0.0600
+2025-12-04 17:53:52 - INFO - [CONVERGENCE] round=19 accuracy=0.8739 auc=0.9920 loss=0.0600
+2025-12-04 17:53:52 - INFO - [Round 19] 聚合完成，进入 Round 20
+2025-12-04 17:54:23 - INFO - [Round 20] 接收客户端 3 CKKS 流式更新...
+2025-12-04 17:54:23 - INFO - [Round 20][Client 3][LATENCY] training=15.4185s
+2025-12-04 17:54:23 - INFO - [Round 20][Client 3][RESOURCE] peak_memory=2112.97 MB, cpu=89.7%
+2025-12-04 17:54:27 - INFO - [Round 20] 接收客户端 1 CKKS 流式更新...
+2025-12-04 17:54:27 - INFO - [Round 20][Client 1][LATENCY] training=20.6335s
+2025-12-04 17:54:27 - INFO - [Round 20][Client 1][RESOURCE] peak_memory=2248.73 MB, cpu=89.6%
+2025-12-04 17:54:28 - INFO - [Round 20] 接收客户端 2 CKKS 流式更新...
+2025-12-04 17:54:28 - INFO - [Round 20][Client 2][LATENCY] training=21.8880s
+2025-12-04 17:54:28 - INFO - [Round 20][Client 2][RESOURCE] peak_memory=2303.09 MB, cpu=94.1%
+2025-12-04 17:58:07 - INFO - [Round 20][Client 1][PAYLOAD] upload=897.63 MB
+2025-12-04 17:58:07 - INFO - [Round 20] 客户端 1 接收完成: 122 层, 220.11s
+2025-12-04 17:58:07 - INFO - [Round 20] 收到客户端 1 HE 流式更新，大小: 919364.82 KB
+2025-12-04 17:58:14 - INFO - [Round 20][Client 3][PAYLOAD] upload=897.62 MB
+2025-12-04 17:58:14 - INFO - [Round 20] 客户端 3 接收完成: 122 层, 230.73s
+2025-12-04 17:58:14 - INFO - [Round 20] 收到客户端 3 HE 流式更新，大小: 919353.51 KB
+2025-12-04 17:58:29 - INFO - [Round 20][Client 2][PAYLOAD] upload=897.59 MB
+2025-12-04 17:58:29 - INFO - [Round 20] 客户端 2 接收完成: 122 层, 240.17s
+2025-12-04 17:58:29 - INFO - [Round 20] 所有客户端更新完毕，开始聚合
+2025-12-04 17:58:29 - INFO - [Round 20] 收到客户端 2 HE 流式更新，大小: 919330.51 KB
+2025-12-04 17:58:29 - INFO - [Round 20] 所有客户端更新已收集，开始聚合
+2025-12-04 17:58:29 - INFO - [Round 20] 开始 CKKS 密文聚合...
+2025-12-04 17:58:59 - INFO - [Round 20][LATENCY] aggregation=30.0667s
+2025-12-04 17:59:02 - INFO - [Round 20][LATENCY] decryption=3.7603s
+2025-12-04 17:59:02 - INFO - [Round 20] CKKS 聚合完成: 122 层, 耗时 33.83s
+2025-12-04 17:59:02 - INFO - [Round 20][Server][RESOURCE] peak_memory=5192.33 MB, cpu=102.5%, cpu_time=34.6900s
+2025-12-04 17:59:02 - INFO - [Round 20] 全局模型更新完成
+2025-12-04 17:59:13 - INFO - [Round 20] 全局评估: Acc=0.8741, AUC=0.9921
+2025-12-04 17:59:13 - INFO - [Round 20] 客户端聚合 (CKKS): Loss=0.0839
+2025-12-04 17:59:13 - INFO - [CONVERGENCE] round=20 accuracy=0.8741 auc=0.9921 loss=0.0839
+2025-12-04 17:59:13 - INFO - [Round 20] 训练收敛: Acc 变化 (0.003000) < 阈值 (0.005)
+2025-12-04 17:59:13 - INFO - [Server] 训练结束，总耗时: 6392.92s
+2025-12-04 17:59:13 - INFO - [Server] 通信开销汇总 (KB):
+           Total_KB
+1      1.838678e+07
+2      1.838671e+07
+3      1.838664e+07
+Total  5.516013e+07
+2025-12-04 17:59:13 - INFO - [Server] 评估指标汇总:
+      Accuracy     AUC    Loss
+Round                         
+1       0.2340  0.7201  0.8586
+2       0.5393  0.9261  0.5685
+3       0.6595  0.9554  0.5671
+4       0.7454  0.9715  0.4137
+5       0.7931  0.9807  0.3468
+6       0.7961  0.9813  0.2649
+7       0.8210  0.9852  0.2641
+8       0.8278  0.9863  0.1966
+9       0.8325  0.9867  0.1666
+10      0.8436  0.9889  0.1552
+11      0.8441  0.9882  0.1413
+12      0.8536  0.9896  0.1075
+13      0.8602  0.9903  0.0995
+14      0.8663  0.9911  0.0861
+15      0.8744  0.9914  0.0882
+16      0.8538  0.9898  0.0975
+17      0.8760  0.9922  0.0599
+18      0.8730  0.9919  0.0944
+19      0.8739  0.9920  0.0600
+20      0.8741  0.9921  0.0839
