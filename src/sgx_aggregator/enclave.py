@@ -138,8 +138,10 @@ def handle_streaming_aggregation(connection):
     logging.info("Enclave: 开始流式聚合处理。")
     
     # 资源监控起始点
+    # 注意：在 Gramine-SGX 环境中，psutil.cpu_times() 无法正常工作
+    # 因此使用墙钟时间 (wall-clock time) 来测量解密和聚合延迟
     process = psutil.Process()
-    start_cpu_time = process.cpu_times().user + process.cpu_times().system
+    start_wall_time = time.time()
     start_memory = process.memory_info().rss
     
     try:
@@ -202,10 +204,11 @@ def handle_streaming_aggregation(connection):
             total_train_num = aggregated_metrics['train_num']
             
             # 资源监控结束点
-            end_cpu_time = process.cpu_times().user + process.cpu_times().system
+            # 使用墙钟时间而非 CPU 时间（SGX 环境下 psutil.cpu_times() 无法工作）
+            end_wall_time = time.time()
             current_memory = process.memory_info().rss
             
-            cpu_time_used = end_cpu_time - start_cpu_time
+            wall_time_used = end_wall_time - start_wall_time
             memory_usage = current_memory
             
             # 构建最终返回的指标字典
@@ -214,10 +217,10 @@ def handle_streaming_aggregation(connection):
                 'auc': aggregated_metrics['auc'] / total_test_num if total_test_num > 0 else 0,
                 'loss': aggregated_metrics['loss'] / total_train_num if total_train_num > 0 else 0,
                 'total_samples': total_samples,
-                'server_cpu_time': cpu_time_used,
+                'server_cpu_time': wall_time_used,  # 使用墙钟时间
                 'server_memory_usage': memory_usage
             }
-            logging.info(f"✅ 流式聚合成功。CPU耗时: {cpu_time_used:.4f}s, 内存使用: {memory_usage / 1024 / 1024:.2f} MB")
+            logging.info(f"✅ 流式聚合成功。墙钟耗时: {wall_time_used:.4f}s, 内存使用: {memory_usage / 1024 / 1024:.2f} MB")
             return pickle.dumps({"params": final_params, "metrics": final_metrics})
         else:
             raise ValueError("没有可聚合的数据。")

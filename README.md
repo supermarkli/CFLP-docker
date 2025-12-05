@@ -4,206 +4,515 @@
 
 ## 主要特性
 
-- **模块化隐私策略**: 支持多种开箱即用的隐私保护方案，并可通过配置文件一键切换：
-  - `base`: 标准联邦学习，用于性能基准测试。
-  - `he`: 基于 Paillier 同态加密 (Homomorphic Encryption) 的方案，在客户端加密梯度后上传。
-  - `mpc`: 基于 Shamir 秘密共享的安全多方计算 (Multi-Party Computation) 方案，允许多方协同计算而不泄露各自的私有数据。
-  - `tee`: 基于TDX（Trusted Domain Extensions）的可信执行环境方案，数据在服务器端的安全区域内进行处理。
-  - `sgx`: 基于真实 SGX（Software Guard Extensions）的方案，数据在服务器端的安全区域内进行处理。
-- **容器化部署**: 使用 Docker 和 Docker Compose，一键即可启动整个联邦学习环境，包括一个中心服务器和多个客户端，极大地简化了部署和测试流程。
-- **gRPC 通信**: 客户端与服务器之间采用高性能的 gRPC 框架进行通信，协议在 `federation.proto` 中清晰定义，保证了通信的效率和稳定性。
-- **高度可配置**: 所有的实验参数，从联邦学习的轮次、客户端数量到特定隐私方案的参数（如加密密钥长度、MPC 秘密共享阈值等），都可以在一个中心化的 `default.yaml` 文件中进行配置。
-- **可扩展性**: 项目结构清晰，易于扩展。可以方便地添加新的隐私保护策略或自定义模型。
+- **模块化隐私策略**: 支持多种开箱即用的隐私保护方案，通过配置文件一键切换：
+  - `none`: 标准联邦学习（FedAvg），明文传输，用于性能基准测试。
+  - `he`: 基于 **CKKS 全同态加密**（TenSEAL 库）的方案，支持 SIMD 批处理，在密文空间直接聚合。
+  - `mpc`: 基于 **Shamir 秘密共享**的安全多方计算方案，使用高性能向量化实现。
+  - `tee`: 基于 **Intel TDX 硬件虚拟化隔离**的可信执行环境方案，服务端运行在 Trust Domain 中。
+  - `sgx`: 基于 **Intel SGX 进程级隔离**的方案，聚合逻辑运行在 Gramine 托管的 Enclave 中。
+
+- **容器化部署**: 使用 Docker 和 Docker Compose，一键启动完整的联邦学习环境，包括服务端、多个客户端以及 SGX 聚合器容器。
+
+- **高性能 gRPC 通信**: 采用 gRPC 框架，支持 TLS 加密信道、Gzip 压缩、流式传输和 keepalive 机制，适应大规模加密参数传输。
+
+- **灵活的数据分布**: 支持基于 **Dirichlet 分布**的 Non-IID 数据划分，通过 α 参数控制数据异构程度。
+
+- **丰富的模型支持**: 内置 FedAvgCNN、ResNet18、VGG16 等模型，均适配 MNIST 和 CIFAR-10 数据集。
+
+- **完善的训练优化**: 支持 CosineAnnealingLR 学习率调度、数据增强（RandomCrop、RandomHorizontalFlip）、混合精度训练（AMP）。
+
+- **自动收敛检测**: 基于滑动窗口的准确率变化检测，自动判定训练收敛并终止。
+
+- **实验可视化**: 自动生成收敛曲线、延迟分解图、内存占用对比等可视化图表。
+
+## 威胁模型与安全边界
+
+本平台的设计基于以下威胁模型假设：
+
+### 信任边界
+
+| 组件 | 信任级别 | 说明 |
+|------|---------|------|
+| 客户端环境 | **可信** | 客户端持有明文数据和模型，假设不会被攻击者控制 |
+| 网络信道 | **不可信** | 通信可能被窃听，需要加密保护 |
+| 服务端宿主 | **不可信** | 服务端操作系统和进程可能被攻击者控制 |
+| TEE/Enclave | **可信** | 硬件隔离区域，即使宿主被攻破也能保护数据 |
+
+### 各模式的安全保证
+
+| 模式 | 传输层保护 | 应用层保护 | 服务端可见明文？ |
+|------|-----------|-----------|----------------|
+| `none` | TLS | 无 | ✅ 是 |
+| `he` | TLS | CKKS 密文 | ❌ 否（仅见密文） |
+| `mpc` | TLS | 秘密份额 | ❌ 否（需多方协作恢复） |
+| `tee` | TLS | 混合加密 | ⚠️ 仅在 TD 内可见 |
+| `sgx` | TLS | 混合加密 | ⚠️ 仅在 Enclave 内可见 |
+
+### 端到端数据流保护
+
+在 TEE/SGX 模式下，系统提供端到端的数据保护：
+
+1. **客户端加密**: 模型更新使用 TEE/Enclave 的公钥进行混合加密后离开客户端
+2. **密文穿透**: 加密数据穿过不可信的网络和服务端宿主进程
+3. **隔离区解密**: 仅在硬件隔离的 TEE/Enclave 内部解密和聚合
+4. **远程证明**: 客户端可验证 TEE/Enclave 的身份和代码完整性（通过 MRENCLAVE）
 
 ## 系统架构
 
-本平台采用经典的星型联邦学习拓扑结构，其所有组件均被容器化，并通过 Docker Compose 进行编排。
+本平台采用经典的星型联邦学习拓扑结构，所有组件均被容器化，通过 Docker Compose 进行编排。
 
-其核心架构由以下几部分组成：
+### 部署拓扑
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        宿主机 (Host)                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │ fl-client-1 │  │ fl-client-2 │  │ fl-client-3 │   (Docker)   │
+│  │   (GPU)     │  │   (GPU)     │  │   (GPU)     │              │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘              │
+│         │                │                │                      │
+│         └────────────────┼────────────────┘                      │
+│                          │ gRPC (TLS)                            │
+│                          ▼                                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                    TDX VM / 普通 VM                         │  │
+│  │  ┌─────────────────────────────────────────────────────┐  │  │
+│  │  │                  fl-server (Docker)                  │  │  │
+│  │  │  ┌─────────────────────────────────────────────┐    │  │  │
+│  │  │  │  TEE 模式: 明文聚合在 TD 内执行              │    │  │  │
+│  │  │  │  SGX 模式: 转发至 sgx-aggregator            │    │  │  │
+│  │  │  └─────────────────────────────────────────────┘    │  │  │
+│  │  └─────────────────────────────────────────────────────┘  │  │
+│  │                          │ TCP Socket (仅 SGX)             │  │
+│  │                          ▼                                 │  │
+│  │  ┌─────────────────────────────────────────────────────┐  │  │
+│  │  │           sgx-aggregator (Gramine-SGX)              │  │  │
+│  │  │  ┌─────────────────────────────────────────────┐    │  │  │
+│  │  │  │         SGX Enclave (硬件隔离)               │    │  │  │
+│  │  │  │   - RSA 私钥驻留                            │    │  │  │
+│  │  │  │   - 解密 + 聚合                             │    │  │  │
+│  │  │  └─────────────────────────────────────────────┘    │  │  │
+│  │  └─────────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 核心架构组件
 
 - **服务容器 (Services)**:
-    - **一个 `fl-server` 容器**: 作为中心协调者，负责管理整个联邦学习的生命周期，包括模型分发、客户端协调和安全聚合。
-    - **多个 `fl-client` 容器**: 模拟独立的联邦学习参与方（如`fl-client-1`, `fl-client-2` 等）。每个客户端都持有自己的私有数据集，并独立进行本地训练。
+    - **`fl-server` 容器**: 中心协调者，负责管理联邦学习生命周期，包括客户端注册、状态同步、安全聚合和全局模型评估。
+    - **`fl-client-*` 容器**: 模拟独立的联邦学习参与方，每个客户端持有私有数据集并独立进行本地训练。支持 GPU 加速。
+    - **`sgx-aggregator` 容器**（仅 SGX 模式）: 运行在 Gramine-SGX 环境中的专用聚合器，通过硬件隔离保护明文聚合过程。
 
-- **网络 (Networking)**:
-    - 所有容器都连接到一个名为 `federated-network` 的自定义 Docker bridge 网络中。
-    - 在此网络内，客户端可以通过服务名 (`server`) 直接与服务端容器通信，无需关心底层的IP地址。服务器的 gRPC 服务运行在 `50051` 端口。
+- **网络与通信**:
+    - 所有容器连接到 `federated-network` 自定义 Docker bridge 网络。
+    - 客户端与服务端通过 gRPC 通信（默认端口 50051），支持 TLS 加密。
+    - SGX 模式下，服务端与 Enclave 通过 TCP Socket 通信（端口 8000），采用流式协议降低内存峰值。
 
-- **数据卷挂载 (Volume Mounts)**:
-    - **数据集 (`data/`)**: 每个客户端容器都挂载了其专属的数据子目录 (e.g., `data/client1` -> `/app/data`)，这精确地模拟了联邦学习中数据不出本地的“数据孤岛”场景。
-    - **证书 (`certs/`)**: `server` 和 `client` 容器分别挂载了用于 gRPC 安全通信的 TLS 证书和密钥，确保了信道安全。
-    - **输出与日志 (`out/`, `logs/`)**: `server` 容器挂载了这两个目录，用于将训练过程中生成的性能图表和日志文件持久化地保存在主机上，方便分析和回顾。
+- **数据卷挂载**:
+    - `data/client*/`: 各客户端专属数据目录，模拟"数据不出本地"的联邦场景。
+    - `data/global/`: 全局测试集，用于服务端评估全局模型真实性能。
+    - `certs/`: TLS 证书和密钥，确保传输层安全。
+    - `logs/`: 训练日志，记录每轮的延迟、资源消耗和收敛状态。
+    - `out/`: 可视化图表输出目录。
+    - `tdvm/`: TDX 虚拟机配置文件（libvirt XML），用于启动 Trust Domain。
 
-- **通信协议 (Communication)**:
-    - 客户端与服务器之间的所有交互都通过 gRPC 进行。`src/grpc/protos/federation.proto` 文件定义了通信的服务接口和消息格式，实现了高效、强类型的远程过程调用。
+### 通信协议设计
 
-这种基于 Docker 的架构不仅保证了环境的一致性和可复现性，还极大地简化了部署和横向扩展（通过增加更多 client 服务）的复杂性。
+通信协议在 `src/grpc/protos/federation.proto` 中定义，核心设计思想：
+
+1. **统一接口，多态载荷**: `ClientUpdate` 消息使用 `oneof` 封装不同隐私模式的载荷（明文、密文、份额、加密包），上层逻辑无需感知底层数据形态。
+
+2. **流式推送替代轮询**: `SubscribeTrainingStatus` 采用服务端流式 RPC，基于条件变量实现高效的状态通知，消除轮询开销。
+
+3. **分块流式传输**: `SubmitUpdateHeStream` 支持将大型加密参数按层分块上传，避免内存溢出。
+
+| 接口 | 类型 | 说明 |
+|------|------|------|
+| `RegisterAndSetup` | Unary | 客户端注册，获取隐私模式、初始模型和加密材料 |
+| `SubscribeTrainingStatus` | Server Stream | 客户端订阅训练状态，服务端**流式推送**状态变化 |
+| `SubmitUpdate` | Unary | 统一的模型更新提交接口，使用 `oneof` 适配多种隐私模式 |
+| `SubmitUpdateHeStream` | Client Stream | HE 模式专用，支持分块流式上传大型加密参数 |
+| `GetGlobalModel` | Unary | 获取聚合后的全局模型参数 |
 
 ## 核心工作流程
 
-一次完整的联邦学习流程遵循以下步骤，该流程由 `src/grpc/protos/federation.proto` 中定义的 gRPC 服务驱动：
+一次完整的联邦学习流程如下：
 
-1.  **启动与注册 (`RegisterAndSetup`)**:
-    - `docker-compose up` 启动 `server` 和所有 `client` 容器。
-    - 每个客户端启动后，立即向服务器发起 `RegisterAndSetup` 请求，并告知自己的 `client_id` 和本地数据量。
-    - 服务器收集所有客户端的注册信息。当达到 `federation.expected_clients` 所设定的数量时，服务器将为本次联邦学习任务选定一个**全局隐私模式**（根据 `default.yaml` 配置），并将此模式、初始模型及所需的加密材料（如HE公钥）通过 `SetupResponse` 返回给所有客户端。
+### 1. 启动与注册
 
-2.  **同步等待 (`CheckTrainingStatus`)**:
-    - 客户端进入轮询状态，周期性地调用 `CheckTrainingStatus` 来询问训练是否可以开始。
-    - 服务器监控所有客户端的准备状态，当所有客户端都已准备就绪后，服务器会通过 `TrainingStatusResponse` 发出开始训练的信号。
+- Docker Compose 启动服务端和所有客户端容器。
+- 每个客户端向服务端发起 `RegisterAndSetup` 请求，提交客户端 ID 和本地数据量。
+- 服务端收集注册信息，达到预设客户端数后，根据配置确定全局隐私模式。
+- 服务端返回 `SetupResponse`，包含：隐私模式、初始模型参数、加密材料（HE 公钥、TEE 公钥/证明报告、SGX Quote 等）。
 
-3.  **本地训练与安全更新 (`SubmitUpdate`)**:
-    - 收到开始信号后，每个客户端在自己的本地数据集上执行模型训练。
-    - 训练完成后，客户端**根据服务器指定的隐私模式**，对本地模型更新（如梯度或权重）进行相应的安全处理（加密、秘密共享等）。
-    - 客户端将处理后的模型更新封装在 `ClientUpdate` 消息中，通过 `SubmitUpdate` RPC 发送给服务器。这个消息体使用 `oneof` 结构来容纳不同隐私模式下的载荷。
+### 2. 状态同步
 
-4.  **安全聚合与模型更新**:
-    - 服务器接收来自客户端的 `ClientUpdate`。
-    - 服务器根据当前的隐私模式，调用 `src/strategies/server/` 中对应的聚合策略（如 `he_aggregation_strategy.py`）。
-    - 聚合策略在**不暴露任何单个客户端原始数据**的前提下，对收集到的所有更新进行安全计算（例如，在密文上求和），从而生成新的全局模型。
+- 客户端调用 `SubscribeTrainingStatus` 订阅训练状态。
+- 服务端维护状态条件变量（Condition），当所有客户端就绪或状态变化时，**主动推送**通知。
+- 这种基于推送的机制避免了传统轮询带来的网络开销和锁竞争。
 
-5.  **获取新模型 (`GetGlobalModel`)**:
-    - 客户端在提交更新后，可以调用 `GetGlobalModel` 来获取服务器聚合完毕的最新全局模型。
-    - 获得新模型后，客户端用它来更新自己的本地模型，并准备进入下一轮训练。
+### 3. 本地训练与安全更新
 
-6.  **循环与收敛**:
-    - 上述第 2 到第 5 步循环执行，直到达到 `federation.max_rounds` 定义的最大轮次，或满足 `federation.convergence` 中定义的收敛条件。
-    - 训练结束后，服务器会将最终的性能指标（如准确率、损失）和图表保存到 `logs/` 和 `out/` 目录。
+- 客户端在本地数据集上执行模型训练，支持数据增强和混合精度训练。
+- 训练完成后，根据隐私模式对模型更新进行安全预处理：
+  - **none**: 直接序列化明文参数
+  - **he**: 使用 CKKS 加密，参数按层分块打包到密文中
+  - **mpc**: 使用 Shamir 秘密共享将参数拆分为多个份额
+  - **tee/sgx**: 使用混合加密（RSA-OAEP + AES-GCM），SGX 模式下参数以 float16 格式压缩
+- 客户端同时记录延迟指标（训练时间、加密时间、上传大小、内存峰值），随更新一并提交。
+- 客户端通过 `SubmitUpdate`（或 HE 模式的 `SubmitUpdateHeStream`）提交更新。
+
+### 4. 安全聚合
+
+- 服务端根据隐私模式调用相应的聚合策略：
+  - **none**: 按数据量加权平均明文参数（FedAvg）
+  - **he**: 在 CKKS 密文空间执行向量加法，然后用私钥解密
+  - **mpc**: 聚合秘密份额后通过拉格朗日插值恢复明文
+  - **tee**: 在 TD 内解密后执行明文聚合
+  - **sgx**: 将加密参数流式转发至 Enclave，在硬件隔离环境中逐客户端解密并累加
+
+### 5. 全局模型评估
+
+- 服务端使用**全局测试集**评估聚合后的模型性能（准确率、AUC）。
+- 如全局测试集不可用，则回退到客户端聚合指标（加权平均各客户端的本地评估结果）。
+- 记录每轮评估结果用于收敛判定和可视化。
+
+### 6. 收敛检测与终止
+
+- 系统采用**滑动窗口**策略检测收敛：当最近 $w$ 轮（默认 4 轮）的准确率变化幅度小于阈值 $\delta$（默认 0.005）时，判定收敛。
+- 达到最大轮次或收敛后，服务端：
+  - 输出通信开销汇总（各客户端上传数据量）
+  - 输出评估指标汇总表（每轮 Accuracy、AUC、Loss）
+  - 生成可视化图表保存至 `out/` 目录
 
 ## 隐私策略详解
 
-本项目实现了五种不同的隐私保护等级，通过 `federation.privacy_mode` 进行切换。
+### 1. `none` - 标准联邦学习
 
-### 1. `base` - 无保护
-- **原理**: 标准的联邦平均 (FedAvg) 算法。
-- **实现**: 客户端在本地训练后，将**明文**的模型权重或梯度直接发送给服务器。服务器以明文形式进行平均聚合。此模式主要用作性能基准。
+- **原理**: 标准 FedAvg 算法，客户端发送明文模型参数。
+- **用途**: 性能基准测试，评估隐私保护方案的额外开销。
+- **安全性**: 仅依赖 TLS 信道加密，服务端可见所有明文参数。
 
-### 2. `he` - 同态加密
-- **原理**: 利用 Paillier 同态加密方案的加法同态特性。客户端可以在不解密的情况下，对密文进行某些计算（如加法）。
+### 2. `he` - CKKS 同态加密
+
+- **原理**: 利用 CKKS 全同态加密的 **SIMD 批处理**特性，一个密文可打包数千个浮点数。
 - **实现**:
-    1.  服务器在启动时生成一对 Paillier 公私钥，并将**公钥**分发给所有客户端。
-    2.  客户端使用公钥对本地计算出的模型梯度进行**加密**。
-    3.  服务器收集所有客户端的加密梯度，并利用加法同态性，在**密文上直接求和**。
-    4.  服务器使用**私钥**解密求和后的结果，得到聚合后的全局梯度，并用它来更新全局模型。
-    - *库依赖*: `phe`
+    1. 服务端生成 CKKS 密钥对，将公钥上下文分发给客户端。
+    2. 客户端将模型参数按 `chunk_size` 分块，每块打包到一个 CKKS 密文中。
+    3. 密文支持 zlib 压缩，通过流式接口分块上传，降低内存压力。
+    4. 服务端在**密文空间**执行向量加法聚合，然后用私钥解密。
+- **性能优势**: 相比 Paillier 逐元素加密，CKKS 批处理显著提升加密和聚合效率。
+- **安全性**: 服务端仅能见到密文，无法获取明文参数。私钥由服务端持有，因此服务端可解密结果。
+- **依赖**: `tenseal`
 
-### 3. `mpc` - 安全多方计算
-- **原理**: 基于 Shamir 秘密共享 (SSS) 方案。一个秘密值可以被拆分成多个“份额”，分发给不同参与方。只有当足够数量的份额组合在一起时，才能恢复出原始秘密。
+### 3. `mpc` - Shamir 秘密共享
+
+- **原理**: 基于 Shamir 秘密共享方案，一个秘密被拆分成 $n$ 个份额，至少需要 $k$ 个份额才能恢复。
 - **实现**:
-    1.  客户端将本地计算出的模型梯度，通过 SSS 算法**拆分成多个份额**。
-    2.  每个客户端将自己的份额分发给其他所有客户端（在本项目中，为简化架构，所有份额先发送给服务器，由服务器代为分发和计算）。
-    3.  服务器收集所有份额，并在这些份额上执行安全加法协议，计算出聚合梯度的份额。
-    4.  服务器将聚合份额组合，恢复出最终的**明文**聚合梯度，并用其更新全局模型。
-    - *库依赖*: `pyseltongue`
+    1. 客户端将模型参数缩放为整数，使用 Shamir 算法生成份额。
+    2. 采用固定 8 字节编码（适用于 $p < 2^{64}$），支持 NumPy 向量化加速。
+    3. 服务端收集份额后，在有限域上聚合，通过预计算的拉格朗日系数批量恢复明文。
+- **安全性**: 单个份额不泄露任何信息，需要 $k$ 个份额才能恢复。但当前实现中所有份额发送给同一服务端，适合研究场景。
+- **配置参数**: `shamir_k`（恢复阈值）、`shamir_n`（总份额数）、`prime_mod`（素数域）。
 
-### 4. `tee` - TDX 可信执行环境 
-- **原理**: TEE（如 Intel SGX）可以在服务器的 CPU 中创建一个硬件隔离的“安全区”（Enclave）。代码和数据在此区域内执行时，即使是服务器的操作系统也无法窥探。
-- **实现 (模拟流程)**:
-    1.  服务器模拟一个持有非对称密钥对的 Enclave，并将其**公钥**分发给客户端。
-    2.  每个客户端生成一个一次性的**对称密钥**（如 AES），然后用服务器的公钥加密该对称密钥。
-    3.  客户端使用该对称密钥加密自己的**明文梯度**。
-    4.  客户端将“加密后的对称密钥”和“加密后的梯度”一同发送给服务器。
-    5.  服务器模拟在 Enclave 内部，使用其私钥解密对称密钥，然后再用解密出的对称密钥解密梯度，得到明文梯度。
-    6.  所有明文梯度都在 Enclave 内部被安全地聚合。
+### 4. `tee` - Intel TDX 可信执行环境
 
-### 5. `sgx` - 真实 SGX  可信执行环境  
-- **原理**: 基于硬件级 Intel SGX (或下一代 TDX) 的隔离执行区，将聚合逻辑运行在真正的 Enclave 内，进一步提升机密性与完整性。  
-- **实现**:  
-    1.  项目提供了独立的 `sgx-aggregator` 服务（`src/sgx_aggregator/`），内部运行 `enclave.py` 并在启动时生成 RSA 密钥及 DCAP Quote。  
-    2.  `fl-server` 在 `RegisterAndSetup` 阶段向客户端分发 Quote 与 RSA 公钥；客户端可校验 `expected_mrenclave` 并完成远程证明。  
-    3.  客户端采用 **混合加密**（RSA-OAEP + AES-GCM）加密梯度和指标后上传；服务器仅保存密文并转发至 Enclave。  
-    4.  Enclave 内部解密并执行安全聚合，将明文结果返回服务器，服务器更新全局模型。  
-- **依赖**: 需要支持 SGX/TDX 的 CPU、Intel DCAP 驱动，以及 Gramine 运行时。  
-- **启动**: 见下文“SGX 启动示例”或执行  
-    ```bash
-    docker-compose -f src/docker/docker-compose.sgx.yml   up --build -d   # server + enclave
-    docker-compose -f src/docker/docker-compose.clients.yml up --build -d # clients
-    ```
+- **原理**: 服务端运行在 **Intel TDX (Trust Domain Extensions)** 硬件虚拟化隔离环境中。TDX 提供 VM 级别的内存加密和隔离，保护整个虚拟机免受宿主机攻击。
+- **部署**: 服务端容器运行在 TDX VM（Trust Domain）内部，`tdvm/` 目录包含 libvirt XML 配置文件用于启动 TD。
+- **实现**:
+    1. 服务端在 TD 内生成 RSA 密钥对，并生成用于身份验证的 MRENCLAVE 指纹。
+    2. 客户端使用**混合加密**: RSA-OAEP 加密对称密钥，AES-GCM 加密模型参数。
+    3. 服务端在 TD 内解密并执行明文聚合。
+- **远程证明**: 当前实现中远程证明使用软件模拟（基于模型哈希生成 MRENCLAVE），生产环境应集成真实的 TDX 远程证明流程。
+- **安全性**: 明文仅在 TD 内可见，宿主机无法访问 TD 内存。
+
+### 5. `sgx` - Intel SGX 进程级隔离
+
+- **原理**: 聚合逻辑运行在真实的 **SGX Enclave** 中，由 Gramine 运行时托管。SGX 提供进程级别的硬件隔离，Enclave 内存对外完全不可见。
+- **实现**:
+    1. `sgx-aggregator` 容器启动时，在 Enclave 内生成 RSA 密钥对，并通过 `/dev/attestation/` 生成真实的 DCAP Quote。
+    2. Quote 将公钥与 Enclave 度量（MRENCLAVE）绑定，服务端获取后分发给客户端。
+    3. 客户端可验证 Quote 和 MRENCLAVE（当前开发阶段为可选），然后使用公钥进行混合加密。
+    4. 参数以 **float16** 格式压缩（减少约 50% 数据量），服务端通过 TCP Socket **流式发送**至 Enclave。
+    5. Enclave 内部逐个客户端解密、使用 float32 累加（保证精度），最终返回聚合结果。
+- **安全特性**: 
+    - RSA 私钥仅存在于 Enclave 内，即使宿主进程被攻破也无法提取。
+    - MRENCLAVE 确保 Enclave 代码完整性可验证。
+- **依赖**: Intel SGX 硬件、DCAP 驱动、Gramine 运行时。
 
 ## 快速开始
 
 ### 前提条件
 
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker](https://www.docker.com/get-started) 和 [Docker Compose](https://docs.docker.com/compose/install/)
+- NVIDIA GPU + CUDA（可选，用于客户端训练加速）
+- Intel TDX 支持的 CPU（仅 TEE 模式需要）
+- Intel SGX 支持的 CPU + DCAP 驱动（仅 SGX 模式需要）
 
 ### 安装与运行
 
-1.  **克隆项目**:
+1. **克隆项目**:
     ```bash
     git clone <your-repository-url>
     cd CFLP-docker
     ```
 
-2.  **生成数据 (首次运行)**:
-    如果 `data/client*` 目录为空，需要先为每个客户端生成它们各自的数据集。
+2. **生成数据集**:
+    根据配置文件中的数据集和客户端数量，使用 Dirichlet 分布划分 Non-IID 数据：
     ```bash
-    python src/data_process/generate_mnist_data.py
+    python src/data_process/data_loader.py
+    ```
+    这将生成：
+    - `data/client*/`: 各客户端的本地训练集和验证集（`{dataset}_train.npz`, `{dataset}_val.npz`）
+    - `data/global/`: 全局测试集（`{dataset}_test.npz`）
+
+3. **生成 TLS 证书**（如需安全通信）:
+    ```bash
+    # 生成自签名证书（开发用途）
+    mkdir -p certs/server certs/client
+    openssl req -x509 -newkey rsa:4096 -keyout certs/server/server.key \
+        -out certs/server/server.crt -days 365 -nodes -subj "/CN=server"
+    cp certs/server/server.crt certs/client/ca.crt
     ```
 
-3.  **生成 gRPC 代码 (如果修改了 .proto 文件)**:
-    如果 `src/grpc/protos/federation.proto` 文件被修改，需要重新生成客户端和服务器端的 gRPC 代码。
+4. **生成 gRPC 代码**（如果修改了 `.proto` 文件）:
     ```bash
     python src/scripts/generate_grpc.py
     ```
 
-4.  **启动联邦学习环境**:
-    使用 Docker Compose 一键启动所有服务。
-    ```bash
-    docker-compose -f src/docker/docker-compose.yml up --build
-    ```
-    - 容器将会在后台启动并开始联邦学习过程。
-    - 你可以通过 `docker logs -f fl-server` 查看服务器端的日志。
+5. **修改配置**:
+    编辑 `src/default.yaml`，设置隐私模式、模型、数据集、服务器地址等参数。
 
-    **SGX 启动示例**  
+6. **启动联邦学习环境**:
+
+    **标准模式（none/he/mpc）**:
     ```bash
-    docker-compose -f src/docker/docker-compose.sgx.yml   up --build -d   # server + enclave
-    docker-compose -f src/docker/docker-compose.clients.yml up --build -d # clients
+    # 启动服务端
+    docker-compose -f src/docker/docker-compose.server.yml up --build -d
+    # 启动客户端
+    docker-compose -f src/docker/docker-compose.clients.yml up --build -d
     ```
 
-5.  **查看结果**:
-    训练完成后，准确率和损失曲线图将保存在 `out/` 目录下。日志文件保存在 `logs/` 目录下。
-
-6.  **停止并清理环境**:
+    **TEE 模式（TDX）**:
     ```bash
-    docker-compose -f src/docker/docker-compose.yml down
+    # 1. 使用 libvirt 启动 TDX VM
+    virsh create tdvm/lzh_td.xml
+    # 2. 在 TD 内启动服务端容器
+    # 3. 在宿主机启动客户端
+    docker-compose -f src/docker/docker-compose.clients.yml up --build -d
     ```
+
+    **SGX 模式**:
+    ```bash
+    # 启动服务端 + Enclave 聚合器
+    docker-compose -f src/docker/docker-compose.sgx.yml up --build -d
+    # 启动客户端
+    docker-compose -f src/docker/docker-compose.clients.yml up --build -d
+    ```
+
+7. **查看日志**:
+    ```bash
+    docker logs -f fl-server
+    ```
+
+8. **查看结果**:
+    - 收敛曲线和评估图表保存在 `out/` 目录
+    - 训练日志保存在 `logs/` 目录
+
+9. **停止并清理环境**:
+    ```bash
+    docker-compose -f src/docker/docker-compose.server.yml down
+    docker-compose -f src/docker/docker-compose.clients.yml down
+    # 或 SGX 模式:
+    docker-compose -f src/docker/docker-compose.sgx.yml down
+    ```
+
+## 日志格式与指标说明
+
+平台使用统一的日志格式，便于解析和可视化：
+
+### 关键日志格式
+
+```
+# 客户端延迟指标
+[Round {轮次}][Client {ID}][LATENCY] training={训练时间}s, encryption={加密时间}s
+[Round {轮次}][Client {ID}][PAYLOAD] upload={上传大小} MB
+[Round {轮次}][Client {ID}][RESOURCE] peak_memory={内存峰值} MB, cpu={CPU占用}%
+
+# 服务端聚合指标
+[Round {轮次}][LATENCY] decryption={解密时间}s
+[Round {轮次}][LATENCY] aggregation={聚合时间}s
+[Round {轮次}][Server][RESOURCE] peak_memory={内存峰值} MB, cpu={CPU占用}%
+
+# 收敛状态（用于绘图）
+[CONVERGENCE] round={轮次} accuracy={准确率} auc={AUC} loss={损失}
+```
+
+### 性能指标说明
+
+| 指标 | 说明 | 影响因素 |
+|------|------|---------|
+| `training_time` | 客户端本地训练耗时 | 数据量、模型大小、GPU 性能 |
+| `encryption_time` | 参数加密/秘密共享耗时 | 隐私模式、参数规模 |
+| `decryption_time` | 服务端解密耗时 | 隐私模式、客户端数量 |
+| `aggregation_time` | 聚合计算耗时 | 参数规模、聚合算法 |
+| `peak_memory` | 进程峰值内存占用 | 模型大小、批次大小、加密膨胀 |
+| `payload_size` | 上传数据量 | 模型大小、加密膨胀、压缩率 |
 
 ## 实验配置详解
 
-要运行不同隐私策略的实验，或调整超参数，只需修改 `src/default.yaml` 文件即可。
+所有实验参数在 `src/default.yaml` 中配置。
 
-### 切换隐私模式
+### 核心配置项
 
-修改 `federation.privacy_mode` 字段为你想要的模式：
 ```yaml
+# 数据配置
+data:
+  dataset: "cifar10"        # 数据集: "mnist" 或 "cifar10"
+  dirichlet_alpha: 0.5      # Dirichlet 分布参数，α 越小越 Non-IID
+  local_val_size: 0.1       # 客户端本地验证集比例
+
+# 模型配置
+model:
+  name: "resnet18"          # 模型: "cnn", "resnet18", "vgg16"
+
+# 联邦学习配置
 federation:
-  # "base": 无保护，基准性能。
-  # "he": 同态加密。
-  # "mpc": 安全多方计算。
-  # "tee": TDX可信执行环境。
-  # "sgx": 真 SGX 可信执行环境。
-  privacy_mode: "mpc" 
+  privacy_mode: "none"      # 隐私模式: "none", "he", "mpc", "tee", "sgx"
+  expected_clients: 3       # 预期客户端数量
+  max_rounds: 10000         # 最大训练轮次
+  convergence:
+    acc_delta_threshold: 0.005  # 收敛阈值
+    window: 4                   # 滑动窗口大小
+
+# gRPC 配置
+grpc:
+  server_host: "10.16.56.126"  # 服务端地址（客户端使用）
+  server_port: 50051           # 服务端端口
+  max_workers: 10              # gRPC 线程池大小
+
+# 训练配置
+training:
+  batch_size: 128
+  learning_rate: 0.01
+  epochs: 5                 # 每轮本地训练轮数
+  optimizer: sgd
+  scheduler: cosine         # 学习率调度器
+  estimated_rounds: 200     # 预估收敛轮数，用于调度器
+  use_augmentation: true    # 数据增强
+  use_amp: true             # 混合精度训练
+
+# CKKS 同态加密配置（仅 he 模式）
+encryption:
+  poly_modulus_degree: 8192
+  coeff_mod_bit_sizes: [60, 40, 40, 60]
+  global_scale: 1099511627776.0  # 2^40
+  chunk_size: 4096          # 每个密文打包的元素数
+
+# MPC 配置（仅 mpc 模式）
+mpc:
+  shamir_k: 3               # 恢复阈值
+  shamir_n: 3               # 总份额数
+  scaling_factor: 1000000   # 浮点数缩放因子
+  prime_mod: "2305843009213693951"  # 2^61 - 1
+
+# TEE 配置（仅 tee 模式）
+tee:
+  expected_mrenclave: "..."  # 预期的 TD 度量值
+
+# SGX 配置（仅 sgx 模式）
+sgx:
+  expected_mrenclave: "..."  # Enclave 度量值，用于远程证明
 ```
 
-### 关键参数说明
+## 项目结构
 
-- `federation.expected_clients`: 必须有多少个客户端注册成功后，训练才能开始。
-- `federation.max_rounds`: 联邦学习的最大通信轮次。
-- `training.learning_rate`: 客户端本地训练时使用的学习率。
-- `encryption.key_size`: 用于 HE (Paillier) 或 TEE (RSA) 的密钥长度（位数）。密钥越长越安全，但计算开销越大。
-- `mpc.shamir_k`: (Shamir's Threshold) 恢复MPC秘密所需的最小份额数。必须小于等于 `shamir_n`。
-- `mpc.shamir_n`: (Total Shares) MPC中一个秘密被分割成的总份额数。通常等于客户端数量。
-- `mpc.prime_mod`: 一个巨大的素数，用于定义MPC计算所在的有限域。必须足够大以避免计算溢出。
-
-
-修改配置文件后，**重新运行步骤 4** (`docker-compose up`) 即可启动新的实验。
+```
+CFLP-docker/
+├── src/
+│   ├── grpc/                    # gRPC 通信层
+│   │   ├── protos/              # Protocol Buffers 定义
+│   │   │   └── federation.proto # 核心协议定义
+│   │   ├── generated/           # 自动生成的 gRPC 代码
+│   │   ├── server_grpc.py       # 服务端实现（协调、调度、评估）
+│   │   └── client_grpc.py       # 客户端实现（训练、上传、同步）
+│   ├── strategies/              # 隐私策略模块（策略模式）
+│   │   ├── server/              # 服务端聚合策略
+│   │   │   ├── base_aggregation_strategy.py
+│   │   │   ├── none_aggregation_strategy.py
+│   │   │   ├── he_aggregation_strategy.py
+│   │   │   ├── mpc_aggregation_strategy.py
+│   │   │   ├── tee_aggregation_strategy.py
+│   │   │   └── sgx_aggregation_strategy.py
+│   │   └── client/              # 客户端更新策略
+│   │       ├── base_strategy.py
+│   │       ├── none_strategy.py
+│   │       ├── he_strategy.py
+│   │       ├── mpc_strategy.py
+│   │       ├── tee_strategy.py
+│   │       └── sgx_strategy.py
+│   ├── models/                  # 神经网络模型（CNN, ResNet18, VGG16）
+│   ├── data_process/            # 数据加载和 Dirichlet 划分
+│   ├── sgx_aggregator/          # SGX Enclave 聚合器
+│   │   ├── enclave.py           # Enclave 主逻辑
+│   │   ├── Dockerfile.aggregator
+│   │   └── aggregator.manifest.template
+│   ├── docker/                  # Docker Compose 配置
+│   │   ├── docker-compose.server.yml
+│   │   ├── docker-compose.clients.yml
+│   │   ├── docker-compose.sgx.yml
+│   │   ├── Dockerfile.server
+│   │   └── Dockerfile.client
+│   ├── utils/                   # 工具函数
+│   │   ├── logging_config.py    # 日志配置
+│   │   ├── config_utils.py      # 配置加载
+│   │   ├── parameter_utils.py   # 参数序列化/反序列化
+│   │   ├── fast_shamir.py       # 高性能 Shamir 秘密共享
+│   │   ├── draw.py              # 收敛曲线绘制
+│   │   └── plot_experiments.py  # 实验结果可视化
+│   ├── scripts/                 # 辅助脚本
+│   └── default.yaml             # 全局配置文件
+├── tdvm/                        # TDX VM 配置（libvirt XML）
+├── data/                        # 数据目录
+│   ├── client1/, client2/, ...  # 各客户端本地数据
+│   └── global/                  # 全局测试集
+├── certs/                       # TLS 证书
+│   ├── server/                  # 服务端证书和私钥
+│   └── client/                  # 客户端 CA 证书
+├── logs/                        # 训练日志
+└── out/                         # 可视化输出
+```
 
 ## 扩展性
 
-该框架易于扩展，例如添加一种新的隐私保护方案：
-1.  在 `src/strategies/client/` 下创建一个新的客户端策略文件 (e.g., `my_strategy.py`)。
-2.  在 `src/strategies/server/` 下创建一个新的服务端聚合策略文件 (e.g., `my_aggregation_strategy.py`)。
-3.  在 `federation.proto` 中为新策略定义相应的 `Payload`。
-4.  更新服务端和客户端的策略加载逻辑，以识别新的 `privacy_mode`。
+该框架采用**策略模式**设计，易于扩展新的隐私保护方案：
 
+1. 在 `src/strategies/client/` 下创建客户端策略（继承 `ClientStrategy`），实现 `prepare_update_request()` 方法。
+2. 在 `src/strategies/server/` 下创建服务端聚合策略（继承 `AggregationStrategy`），实现 `aggregate()`、`aggregate_parameters()` 和 `evaluate_metrics()` 方法。
+3. 在 `federation.proto` 中为新策略定义相应的 Payload 消息类型，并添加到 `ClientUpdate` 的 `oneof` 中。
+4. 更新 `server_grpc.py` 和 `client_grpc.py` 中的策略加载逻辑。
+
+所有调度、通信、日志和可视化链路均可复用，新策略只需关注加密/解密和聚合逻辑。
+
+## 可视化工具
+
+平台提供了日志分析和可视化工具：
+
+```bash
+# 分析单个日志（生成收敛图和延迟分解图）
+python src/utils/plot_experiments.py logs/server_sgx.log -o plots/
+
+# 对比多个模式
+python src/utils/plot_experiments.py \
+    logs/server_none.log \
+    logs/server_he.log \
+    logs/server_mpc.log \
+    logs/server_sgx.log \
+    --compare -o plots/
+```
+
+生成的图表包括：
+- **收敛曲线**: 准确率、AUC、损失随训练轮次的变化
+- **延迟分解图**: 训练、加密、聚合、解密各阶段的时间占比
+- **内存足迹对比**: 客户端、服务端、Enclave 的峰值内存使用
