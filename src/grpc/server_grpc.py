@@ -239,7 +239,9 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 submitted = len(self.client_parameters.get(current_round, {}))
                 
                 # 检查是否达到最大轮次（训练结束）
-                if current_round + 1 >= self.max_rounds:
+                # 注意：current_round 是 0-indexed，当 current_round == max_rounds 时表示已完成所有轮次
+                # 使用 >= 而不是 +1 >=，避免在进入最后一轮之前就提前返回结束信号
+                if current_round >= self.max_rounds:
                     code = 300
                     message = f"达到最大轮次 ({self.max_rounds})，训练结束"
                 elif converged:
@@ -387,6 +389,8 @@ class FederatedLearningServicer(federation_pb2_grpc.FederatedLearningServicer):
                 self.evaluate(round_num) 
 
                 if self.converged or self.current_round + 1 == self.max_rounds:
+                    # 标记为已收敛，确保客户端能正确收到结束信号
+                    self.converged = True
                     self.next_step = True
                     # 唤醒所有等待状态更新的客户端（训练结束或收敛）
                     self.status_condition.notify_all()

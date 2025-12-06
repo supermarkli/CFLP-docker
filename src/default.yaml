@@ -16,7 +16,7 @@ federation:
   # "tee"  - 使用TDX（Trust Domain Extensions）在服务器端保护聚合，VM级别机密计算。
   # "mpc"  - 使用MPC（秘密共享）在服务器端保护明文聚合。
   # "sgx"  - 使用SGX（Software Guard Extensions）在Enclave内保护聚合，进程级别机密计算。
-  privacy_mode: "he" # <--- 总开关，可在此处切换实验模式
+  privacy_mode: "sgx" # <--- 总开关，可在此处切换实验模式
   expected_clients: 3
   max_rounds: 40
   convergence:

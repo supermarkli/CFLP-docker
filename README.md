@@ -219,13 +219,15 @@
 ### 4. `tee` - Intel TDX 可信执行环境
 
 - **原理**: 服务端运行在 **Intel TDX (Trust Domain Extensions)** 硬件虚拟化隔离环境中。TDX 提供 VM 级别的内存加密和隔离，保护整个虚拟机免受宿主机攻击。
-- **部署**: 服务端容器运行在 TDX VM（Trust Domain）内部，`tdvm/` 目录包含 libvirt XML 配置文件用于启动 TD。
+- **部署**: 服务端容器运行在 TDX VM（Trust Domain）内部，通过挂载 `/dev/tdx_guest` 设备访问 TDX 硬件能力。
 - **实现**:
-    1. 服务端在 TD 内生成 RSA 密钥对，并生成用于身份验证的 MRENCLAVE 指纹。
-    2. 客户端使用**混合加密**: RSA-OAEP 加密对称密钥，AES-GCM 加密模型参数。
-    3. 服务端在 TD 内解密并执行明文聚合。
-- **远程证明**: 当前实现中远程证明使用软件模拟（基于模型哈希生成 MRENCLAVE），生产环境应集成真实的 TDX 远程证明流程。
-- **安全性**: 明文仅在 TD 内可见，宿主机无法访问 TD 内存。
+    1. 服务端在 TD 内生成 RSA 密钥对。
+    2. **远程证明**: 服务端通过 `/dev/tdx_guest` 驱动生成绑定了公钥哈希的 **TD Quote/Report**。
+    3. 客户端验证 TD 证明报告（检查硬件标志及公钥绑定），确认服务端运行在真实 TDX 环境中。
+    4. **混合加密**: 客户端使用验证后的 RSA 公钥加密 AES 密钥，AES-GCM 加密模型参数。
+    5. 服务端在 TD 内存中解密并执行明文聚合，全过程受 MKTME 内存加密保护。
+- **兼容性**: 代码自动检测 TDX 硬件，若未检测到 `/dev/tdx_guest` 则自动回退到模拟模式（并在日志中警告），方便在非 TDX 机器上开发。
+- **安全性**: 提供由硬件信任根担保的执行环境验证，确保明文数据仅在经过验证的 TD 内处理。
 
 ### 5. `sgx` - Intel SGX 进程级隔离
 
@@ -296,10 +298,10 @@
 
     **TEE 模式（TDX）**:
     ```bash
-    # 1. 使用 libvirt 启动 TDX VM
-    virsh create tdvm/lzh_td.xml
-    # 2. 在 TD 内启动服务端容器
-    # 3. 在宿主机启动客户端
+    # 1. 确保宿主机为 TDX Guest 环境且存在 /dev/tdx_guest 设备
+    # 2. 启动服务端（自动挂载 TDX 设备）
+    docker-compose -f src/docker/docker-compose.tdx.yml up --build -d
+    # 3. 启动客户端
     docker-compose -f src/docker/docker-compose.clients.yml up --build -d
     ```
 
