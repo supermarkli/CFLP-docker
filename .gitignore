@@ -6,6 +6,8 @@
 # *.crt
 # logs/
 out/
+logs/
+*.ttf
 *.npz
 __pycache__/
 *.pyc
